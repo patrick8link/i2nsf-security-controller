@@ -10,7 +10,7 @@ python3 -m pip install pymongo regex flask flask_cors dict2xml mysqlclient zss p
 pip install pyopenssl
 
 sed -i -e '$aexport PATH="$HOME/.local/bin:$PATH"' ~/.bashrc
-source $HOME/.bashrc
+export PATH="$HOME/.local/bin:$PATH"
 
 cd API
 sh generate_bindings.sh
