@@ -10,4 +10,5 @@ pip install pyopenssl
 
 source $HOME/.bashrc
 
-sh API/generate_bindings.sh
+cd API
+sh generate_bindings.sh
