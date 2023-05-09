@@ -1,4 +1,8 @@
 import pymongo
+import netifaces as ni
+import sys, getopt
+import netifaces as ni
+import re
 from regex import R
 from pprint import pprint
 import json
@@ -145,5 +149,30 @@ def cleanNullTerms(d):
          clean[k] = v
    return clean
 
+def main(argv):
+#  print(sys.argv[1])
+  ip = ''
+  opts, args = getopt.getopt(argv,"h",["ip=","if="])
+  for opt, arg in opts:
+    if opt == '-h':
+      print("RestAPI.py [--ip <ip-address>|--if <interface-name>]")
+      sys.exit()
+    elif opt in ("--ip"):
+      if re.match("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",arg):
+        ip = arg
+      else:
+        print(f"{arg} is not a valid IP address")
+        sys.exit()
+    elif opt in ("--if"):
+      try:
+        ip = ni.ifaddresses(arg)[ni.AF_INET][0]['addr']
+      except ValueError:
+        print(f"Invalid interface value. The value must be: {ni.interfaces()}")
+        sys.exit()
+  if ip == '':
+    print(f"""Put the IP address or interface.\nUsage:\nRestAPI.py [--ip <ip-address>|--if <interface-name>]""")
+  else:
+    api.run(host=ip)
+
 if __name__== '__main__':
-    api.run(host="10.0.0.9")
+  main(sys.argv[1:])
