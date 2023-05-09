@@ -5,6 +5,7 @@ sudo python3 get-pip.py
 
 curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 
+sudo apt-get install default-libmysqlclient-dev build-essential -y
 python3 -m pip install pymongo regex flask flask_cors dict2xml mysqlclient zss pyangbind ncclient xmltodict pulp
 pip install pyopenssl
 
