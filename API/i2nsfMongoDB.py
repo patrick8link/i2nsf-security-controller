@@ -15,7 +15,7 @@ from pprint import pprint
 # Data Model: {"name": string, "url": [string]}
 def insertURLGroup(data):
     try:
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["url"]
         
@@ -26,7 +26,7 @@ def insertURLGroup(data):
 
 
 def getURLGroup(key):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["url"]
     
@@ -38,7 +38,7 @@ def getURLGroup(key):
 # Data Model: {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
 def insertUserGroup(data):
     try:
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["user"]
         
@@ -48,7 +48,7 @@ def insertUserGroup(data):
         print("Duplicate Key for ",data["name"])
 
 def getUserGroup(key):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["user"]
     
@@ -60,7 +60,7 @@ def getUserGroup(key):
 # Data Model: {"name": string, "geo-ipv4-address": {}, "ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "ipv6-address": {"start": ipv6-address,"end": ipv6-address}}
 def insertLocationGroup(data):
     try:
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["location"]
         
@@ -70,7 +70,7 @@ def insertLocationGroup(data):
         print("Duplicate Key for ",data["name"])
 
 def getLocationGroup(country,region,city):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["location"]
     
@@ -82,7 +82,7 @@ def getLocationGroup(country,region,city):
 def insertAttributesMap(cfiTree,nfiTree):
     try:
         mapResult = mapper.mapAttributes(cfiTree,nfiTree)
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["mapping"]
 
@@ -100,7 +100,7 @@ def insertAttributesMap(cfiTree,nfiTree):
         print("Duplicate Key for ",mapDict["cfiID"])
 
 def getAttributesMap(cfiID):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["mapping"]
     
@@ -111,7 +111,7 @@ def getAttributesMap(cfiID):
 #Register NSF Capability, parameter in Python Diction / JSON, Pattern:
 # {'nsf-name': string, "nsf-capability-info": Follow-Registration-Data-Model, "nsf-access-info": Follow-Registration-Data-Model}
 def insertCapability(capability):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["nsfDB"]
     col = db["capabilities"]
     
@@ -119,7 +119,7 @@ def insertCapability(capability):
     return res
 
 def getAllCapability(query={}):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["nsfDB"]
     col = db["capabilities"]
     
@@ -148,7 +148,7 @@ def findCapability(filter,query={}):
 
 #CAPABILITY MAPPING
 def insertCapabilityMapping(capabilityMapping):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["capabilityMapping"]
 
@@ -156,7 +156,7 @@ def insertCapabilityMapping(capabilityMapping):
     return res
 
 def getCapabilityMapping(val):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["capabilityMapping"]
 
@@ -166,7 +166,7 @@ def getCapabilityMapping(val):
 
 #CAPABILITY PATH
 def insertCapabilityPath(capabilityPath):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["capabilityPath"]
 
@@ -174,7 +174,7 @@ def insertCapabilityPath(capabilityPath):
     return res
 
 def getCapabilityPath(val):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["capabilityPath"]
 
@@ -185,7 +185,7 @@ def getCapabilityPath(val):
 
 #NEXT HEADER
 def insertNextHeader(nextHeader):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["nextHeader"]
 
@@ -193,7 +193,7 @@ def insertNextHeader(nextHeader):
     return res
 
 def getNextHeader(val):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["nextHeader"]
 
@@ -204,7 +204,7 @@ def getNextHeader(val):
 
 #ICMP MESSAGE
 def insertICMPMessage(icmpMessage):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["icmpMessage"]
 
@@ -212,7 +212,7 @@ def insertICMPMessage(icmpMessage):
     return res
 
 def getICMPMessage(val):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["mapping"]
     col = db["icmpMessage"]
 
