@@ -9,6 +9,7 @@ sudo apt-get install default-libmysqlclient-dev build-essential -y
 python3 -m pip install pymongo regex flask flask_cors dict2xml mysqlclient zss pyangbind ncclient xmltodict pulp
 pip install pyopenssl
 
+sed -i -e '$aexport PATH="$HOME/.local/bin:$PATH"' ~/.bashrc
 source $HOME/.bashrc
 
 cd API
