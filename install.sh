@@ -11,6 +11,6 @@ pip install pyopenssl
 
 sed -i -e '$aexport PATH="$HOME/.local/bin:$PATH"' ~/.bashrc
 export PATH="$HOME/.local/bin:$PATH"
-
+pip install pyopenssl --upgrade
 cd API
 sh generate_bindings.sh
