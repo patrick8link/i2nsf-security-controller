@@ -12,16 +12,16 @@ from pprint import pprint
 # i2nsfMongoDB.insertUserGroup({'name':"employeesv6","mac-address":None,"range-ipv4-address":{"start":None,"end":None},"range-ipv6-address":{"start":"2001:db8:1::","end":"2001:db8:1:f:ffff:ffff:ffff:ffff"}})
 
 # INSERT CAPABILITY MAPPING FROM AUTOMATIC DATA MODEL MAPPER
-# with open("capabilityMapping.json") as f:
-#     capDict = json.load(f)
-#     #print(capDict["capabilityMapping"])
-#     i2nsfMongoDB.insertCapabilityMapping(capDict["capabilityMapping"])
+with open("capabilityMapping.json") as f:
+    capDict = json.load(f)
+    #print(capDict["capabilityMapping"])
+    i2nsfMongoDB.insertCapabilityMapping(capDict["capabilityMapping"])
 
 # INSERT CAPABILITY PATH
-# with open("capabilityPath.json") as f:
-#     capDict = json.load(f)
-#     #print(capDict["capabilityPath"])
-#     i2nsfMongoDB.insertCapabilityPath(capDict["capabilityPath"])
+with open("capabilityPath.json") as f:
+    capDict = json.load(f)
+    #print(capDict["capabilityPath"])
+    i2nsfMongoDB.insertCapabilityPath(capDict["capabilityPath"])
 
 # print(i2nsfMongoDB.getCapabilityPath("ipv4-capability"))
 
@@ -43,15 +43,15 @@ i2nsfMongoDB.insertAttributesMap('DataModel/cfi_minus.txt','DataModel/nfi.txt')
 #     data =json.load(f)
 #     i2nsfMongoDB.insertCapability(data)
 
-# # INSERT ICMP MESSAGE MAPPING
-# with open("icmp-code-type.json") as f:
-#     icmpDict = json.load(f)
-#     i2nsfMongoDB.insertICMPMessage(icmpDict["icmp-code-type"])
+# INSERT ICMP MESSAGE MAPPING
+with open("icmp-code-type.json") as f:
+    icmpDict = json.load(f)
+    i2nsfMongoDB.insertICMPMessage(icmpDict["icmp-code-type"])
 
-# # INSERT NEXT HEADER (PROTOCOL) MAPPING
-# with open("next-header.json") as f:
-#     nhDict = json.load(f)
-#     i2nsfMongoDB.insertNextHeader(nhDict["next-header"])
+# INSERT NEXT HEADER (PROTOCOL) MAPPING
+with open("next-header.json") as f:
+    nhDict = json.load(f)
+    i2nsfMongoDB.insertNextHeader(nhDict["next-header"])
 
 
 
