@@ -6,7 +6,6 @@ Created on Mon May 30 17:25:17 2022
 """
 
 import DFAAPI
-import MySQLdb
 from convert import convert, convertMongo
 from bindingNFI4 import ietf_i2nsf_nsf_facing_interface
 #from bindingCFI import ietf_i2nsf_cfi_policy
