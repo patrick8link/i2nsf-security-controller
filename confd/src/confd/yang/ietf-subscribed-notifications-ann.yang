@@ -1,0 +1,55 @@
+module ietf-subscribed-notifications-ann {
+  namespace "urn:dummy";
+  prefix dummy;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import ietf-subscribed-notifications {
+    prefix sn;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "Annotation module for ietf-subscribed-notifications.
+
+     Copyright 2019-2023 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification";
+
+  revision 2023-02-21 {
+    description
+      "Released as part of ConfD-8.0.3 / NCS-6.0.3.
+
+       Annotate module as an internal data provider with tailf:internal-dp.";
+  }
+
+  revision 2022-04-12 {
+    description
+      "Management of monitor model under /sn:subscriptions
+
+       Added first revision statement which was missing.
+
+       Modified annotation targets for ncagent callpoint.";
+    reference
+      "RFC 8639: A YANG Data Model for Subscriptions to
+                 Event Notifications";
+  }
+
+  tailf:annotate "/sn:streams" {
+    tailf:callpoint "ncagent" {
+      tailf:internal;
+    }
+  }
+  tailf:annotate "/sn:subscriptions" {
+    tailf:callpoint "ncagent" {
+      tailf:internal;
+    }
+  }
+
+  tailf:annotate-module "ietf-subscribed-notifications" {
+    tailf:internal-dp;
+  }
+}

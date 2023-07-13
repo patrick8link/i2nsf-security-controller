@@ -1,0 +1,36 @@
+[doc]
+ENG-24758 UTF-8 input validation
+
+Note that there are invalid UTF-8 code points in this file.
+Be careful when editing.
+[enddoc]
+
+[config require=TEST_DIR]
+[include $TEST_DIR/luxinc/conditional.luxinc]
+[include $TEST_DIR/luxinc/utils.luxinc]
+[global fail_pattern=[Ee][Rr][Rr][Oo][Rr]]
+
+################################################################################
+
+[shell confd]
+    -$fail_pattern
+
+    !$MAKE reset-cdb
+    [invoke ok]
+
+    [invoke start_system_conf confd.conf.enabled]
+
+
+[shell restconf]
+    -
+    [progress \neconfd\n]
+    !$MAKE test-econfd-maapi-fail
+    ???{error,{5,<<"\"é\" is not a valid value.">>}}
+    [invoke ok]
+
+
+[shell confd]
+    [invoke end_test]
+
+[cleanup]
+    [invoke stop_system]

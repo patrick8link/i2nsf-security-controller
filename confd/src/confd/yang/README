@@ -1,0 +1,3 @@
+The .yang files in this directory are implemented by confd-basic
+and should therefore not be modified. If modified, confd-basic
+may behave unpredictably.

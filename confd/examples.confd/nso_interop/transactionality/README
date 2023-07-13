@@ -1,0 +1,111 @@
+Using priorities to handle non-transactional devices
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example illustrates how to use different priorities on CDB
+subscribers to handle events in required order.  We are assuming a
+simple device with a data-model which consisting of a list of VRFs and
+a list of interfaces.  Internally, the device is non-transactional; in
+particular it requires that certain configuration changes are done in
+given order:
+
+* The interfaces have a couple of hardware settings and can be
+  configured with a VRF reference and a number of IP addresses.  When
+  creating a new interface and assigning IP addresses to it, the
+  interface itself and its parameters must be processed before IP
+  addresses; on the other hand, when deleting an interface, its IP
+  addresses must be unassigned before the interface deletion is
+  handled.
+
+* Similarly, a VRF instance creation must have been processed before
+  it is assigned to an interface, and VRF reference must be removed
+  from an interface before the VRF instance is deleted.
+
+To deal with these restrictions while preserving full transactionality
+of the system this example uses several subscriptions with priorities
+in this order:
+
+* VRF creation
+* deletion of IP addresses from deleted interface instances
+* interface creation and changes, except for changes in IP addresses
+* IP addresses changes
+* VRF deletion.
+
+
+How to run
+~~~~~~~~~~
+
+Start by building everything: make sure you have the CONFD_DIR
+variable set and then type "make all".  After it has been built try
+"make start" to start the system:
+
+    $ make start
+    ./cdb_client
+    cdb_client: started
+
+CDB has been populated by initial data on startup, but the subscriber
+has not been notified about that:
+
+    $ make trigger
+    IF port-0 CREATE
+    IF port-0 disabled
+    IF port-0 SET mac 00:01:e6:22:e4:94
+    ...
+    IF port-0 IP 192.168.1.88 CREATE
+    IF port-0 IP 192.168.1.88 SET prefix-length 24
+    IF port-0 IP 192.168.2.88 CREATE
+    IF port-0 IP 192.168.2.88 SET prefix-length 24
+
+Notice how the configuration is processed in stages, first interface
+creation and setup for all interfaces, then IP addresses creation and
+setup.
+
+In another terminal window run "confd_cli" to start a CLI session.
+
+    $ confd_cli -C -u admin
+
+    admin connected from 127.0.0.1 using console on box
+    box# show running-config sys ifc
+    sys ifc port-0
+     disabled
+     hw mac 00:01:e6:22:e4:94
+     ip 192.168.1.88
+      prefix-length 24
+     !
+    ...
+
+Try different settings and see how the CDB clients react in the
+other window. For example:
+
+    box# config
+    Entering configuration mode terminal
+
+    box(config)# sys ifc port-0 enabled vrf blue
+    box(config-ifc-port-0)# top
+    box(config)# sys vrf blue
+    box(config-vrf-blue)# commit
+    Commit complete.
+
+In the other window you should see this:
+
+    VRF blue CREATE
+    IF port-0 enabled
+    IF port-0 SET vrf blue
+
+Now let's try to reassign the interface VRF and delete the old VRF
+instance:
+
+    box(config-vrf-blue)# sys vrf red
+    box(config-vrf-red)# top
+    box(config)# no sys vrf blue
+    box(config)# sys ifc port-0 vrf red
+    box(config-ifc-port-0)# commit
+    Commit complete.
+
+The other window yields this:
+
+    VRF red CREATE
+    IF port-0 SET vrf red
+    VRF blue DELETE
+
+Again, notice how the VRF creation and reassignment is processed
+before the the old VRF instance deletion.

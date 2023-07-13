@@ -16,7 +16,7 @@ export default function NSFs({mode}) {
   const [value, setValue] = useState([]);
 
   useEffect(() => {
-    fetch('http://115.145.178.185:5000/nsfDB/get')
+    fetch('http://172.24.4.120:5000/nsfDB/get')
        .then((response) => response.json())
        .then((data) => {
           setPosts(data["nsf"]);

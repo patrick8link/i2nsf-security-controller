@@ -1,0 +1,60 @@
+module servers {
+  namespace "http://tail-f.com/ns/example/servers";
+  prefix servers;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for In-service Upgrade example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-01 {
+    description "Updated version.";
+  }
+
+  revision 2009-04-01 {
+    description "Initial revision.";
+  }
+
+  /* A set of server structures */
+  container servers {
+    list server {
+      key name;
+      max-elements 64;
+      leaf name {
+        type string;
+      }
+      leaf enabled {
+        type boolean;
+        mandatory true;
+      }
+      leaf ip {
+        type inet:ip-address;
+        mandatory true;
+      }
+      leaf port {
+        type inet:port-number;
+        mandatory true;
+      }
+      leaf proxy {
+        type inet:ip-address;
+        mandatory true;
+      }
+    }
+  }
+}

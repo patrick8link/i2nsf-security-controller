@@ -1,0 +1,64 @@
+ConfD Example - NETCONF SSH Call Home
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates NETCONF SSH Call Home (RFC 8071) using an external
+SSH daemon, in this case OpenSSH.
+
+NETCONF SSH Call Home means that the NETCONF server initiates the TCP
+connection to the NETCONF client.  The client then initiates the SSH
+session towards the server, as normal.  Even though the session was
+initiated from the server (i.e., the device), it is up to the client
+what to do with the session.
+
+Diagram
+-------
+
+
+              NETCONF                              NETCONF
+               Server                              Client
+                 |                                    |
+                 |   1. TCP connect                   |
+                 |----------------------------------->|
+                 |                                    |
+                 |                                    |
+                 |   2. SSH over the TCP session      |
+                 |<-----------------------------------|
+                 |                                    |
+                 |                                    |
+                 |   3. NETCONF over the SSH session  |
+                 |<-----------------------------------|
+                 |                                    |
+
+
+To run:
+-------
+
+1.  Build:
+
+    $ make all
+
+2.  Make the netconf-call-home program owned by root and set uid on
+    execution:
+
+    $ sudo chown root netconf-call-home
+    $ sudo chmod 755 netconf-call-home
+    $ sudo chmod u+s netconf-call-home
+
+
+3.  Start ConfD
+
+    $ make start
+
+4.  In a shell, start netconf-console, which will be our NETCONF client:
+
+    $ netconf-console --user ${USER} --privKeyType rsa --privKeyFile sshkey \
+                      --listen --get
+
+    netconf-console will by default listen to the standard call home
+    port 4334.
+
+5.  In another shell, instruct ConfD to call home:
+
+    $ confd_cmd -c "netconf_ssh_call_home 127.0.0.1 4334"
+
+    When ConfD calls home, netconf-console will run the "get" operation.

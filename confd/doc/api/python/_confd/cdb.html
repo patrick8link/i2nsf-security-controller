@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>_confd.cdb API documentation</title>
+<meta name="description" content="Low level module for connecting to ConfD built-in XML database (CDB) …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>_confd.cdb</code></h1>
+</header>
+<section id="section-intro">
+<p>Low level module for connecting to ConfD built-in XML database (CDB).</p>
+<p>This module is used to connect to the ConfD built-in XML database, CDB.
+The purpose of this API is to provide a read and subscription API to CDB.</p>
+<p>CDB owns and stores the configuration data and the user of the API wants
+to read that configuration data and also get notified when someone through
+either NETCONF, SNMP, the CLI, the Web UI or the MAAPI modifies the data
+so that the application can re-read the configuration data and act
+accordingly.</p>
+<p>CDB can also store operational data, i.e. data which is designated with a
+"config false" statement in the YANG data model. Operational data can be
+both read and written by the applications, but NETCONF and the other
+northbound agents can only read the operational data.</p>
+<p>This documentation should be read together with the confd_lib_cdb(3) man page.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="_confd.cdb.cd"><code class="name flex">
+<span>def <span class="ident">cd</span></span>(<span>sock, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Changes the working directory according to the format path. Note that
+this function can not be used as an existence test.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to cd to</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Closes the socket. end_session() should be called before calling this
+function.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.connect"><code class="name flex">
+<span>def <span class="ident">connect</span></span>(<span>sock, type, ip, port, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The application has to connect to NCS before it can interact. There are two
+different types of connections identified by the type argument -
+DATA_SOCKET and SUBSCRIPTION_SOCKET.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a Python socket instance</li>
+<li>type &ndash; DATA_SOCKET or SUBSCRIPTION_SOCKET</li>
+<li>ip &ndash; the ip address if socket is AF_INET (optional)</li>
+<li>port &ndash; the port if socket is AF_INET (optional)</li>
+<li>path &ndash; a filename if socket is AF_UNIX (optional).</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.connect_name"><code class="name flex">
+<span>def <span class="ident">connect_name</span></span>(<span>sock, type, name, ip, port, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When we use connect() to create a connection to NCS/CDB, the name
+argument passed to the library initialization function confd_init() (see
+confd_lib_lib(3)) is used to identify the connection in status reports and
+logs. I we want different names to be used for different connections from
+the same application process, we can use connect_name() with the wanted
+name instead of connect().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a Python socket instance</li>
+<li>type &ndash; DATA_SOCKET or SUBSCRIPTION_SOCKET</li>
+<li>name &ndash; the name</li>
+<li>ip &ndash; the ip address if socket is AF_INET (optional)</li>
+<li>port &ndash; the port if socket is AF_INET (optional)</li>
+<li>path &ndash; a filename if socket is AF_UNIX (optional).</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.create"><code class="name flex">
+<span>def <span class="ident">create</span></span>(<span>sock, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new list entry, presence container, or leaf of type empty. Note
+that for list entries and containers, sub-elements will not exist until
+created or set via some of the other functions, thus doing implicit
+create via set_object() or set_values() may be preferred in this case.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; item to create (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.cs_node_cd"><code class="name flex">
+<span>def <span class="ident">cs_node_cd</span></span>(<span>socket, path) ‑> <a title="Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a title="_confd.CsNode" href="index.html#_confd.CsNode">CsNode</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Utility function which finds the resulting CsNode given a string keypath.</p>
+<p>Does the same thing as _confd.cs_node_cd(), but can handle paths that are
+ambiguous due to traversing a mount point, by sending a request to the
+daemon</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; the path</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.delete"><code class="name flex">
+<span>def <span class="ident">delete</span></span>(<span>sock, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a list entry, presence container, or leaf of type empty, and all
+its child elements (if any).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; item to delete (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.diff_iterate"><code class="name flex">
+<span>def <span class="ident">diff_iterate</span></span>(<span>sock, subid, iter, flags, initstate) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>After reading the subscription socket the diff_iterate() function can be
+used to iterate over the changes made in CDB data that matched the
+particular subscription point given by subid.</p>
+<p>The user defined function iter() will be called for each element that has
+been modified and matches the subscription.</p>
+<p>This function will return the last return value from the iter() callback.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>subid &ndash; the subcscription id</li>
+<li>iter &ndash; iterator function (see below)</li>
+<li>initstate &ndash; opaque passed to iter function</li>
+</ul>
+<p>The user defined function iter() will be called for each element that has
+been modified and matches the subscription. It must have the following
+signature:</p>
+<pre><code>iter_fn(kp, op, oldv, newv, state) -&gt; int
+</code></pre>
+<p>Where arguments are:</p>
+<ul>
+<li>kp - a HKeypathRef or None</li>
+<li>op - the operation</li>
+<li>oldv - the old value or None</li>
+<li>newv - the new value or None</li>
+<li>state - the initstate object</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.diff_iterate_resume"><code class="name flex">
+<span>def <span class="ident">diff_iterate_resume</span></span>(<span>sock, reply, iter, resumestate) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The application must call this function whenever an iterator function has
+returned ITER_SUSPEND to finish up the iteration. If the application does
+not wish to continue iteration it must at least call
+diff_iterate_resume(sock, ITER_STOP, None, None) to clean up the state.
+The reply parameter is what the iterator function would have returned
+(i.e. normally ITER_RECURSE or ITER_CONTINUE) if it hadn't returned
+ITER_SUSPEND.</p>
+<p>This function will return the last return value from the iter() callback.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>reply &ndash; the reply value</li>
+<li>iter &ndash; iterator function (see diff_iterate())</li>
+<li>resumestate &ndash; opaque passed to iter function</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.diff_match"><code class="name flex">
+<span>def <span class="ident">diff_match</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function not yet implemented.</p></div>
+</dd>
+<dt id="_confd.cdb.end_session"><code class="name flex">
+<span>def <span class="ident">end_session</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>We use connect() to establish a read socket to CDB. When the socket is
+closed, the read session is ended. We can reuse the same socket for another
+read session, but we must then end the session and create another session
+using start_session().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.exists"><code class="name flex">
+<span>def <span class="ident">exists</span></span>(<span>sock, path) ‑> <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Leafs in the data model may be optional, and presence containers and list
+entries may or may not exist. This function checks whether a node exists
+in CDB.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to check for existence</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>sock, path) ‑> <a title="_confd.Value" href="index.html#_confd.Value">Value</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This reads a a value from the path and returns the result. The path must
+lead to a leaf element in the XML data tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to leaf</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_case"><code class="name flex">
+<span>def <span class="ident">get_case</span></span>(<span>sock, choice, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When we use the YANG choice statement in the data model, this function
+can be used to find the currently selected case, avoiding useless
+get() etc requests for elements that belong to other cases.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>choice &ndash; the choice (string)</li>
+<li>path &ndash; path to container or list entry where choice is defined (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_modifications"><code class="name flex">
+<span>def <span class="ident">get_modifications</span></span>(<span>sock, subid, flags, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The get_modifications() function can be called after reception of a
+subscription notification to retrieve all the changes that caused the
+subscription notification. The socket sock is the subscription socket. The
+subscription id must also be provided. Optionally a path can be used to
+limit what is returned further (only changes below the supplied path will
+be returned), if this isn't needed path can be set to None.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>subid &ndash; subscription id</li>
+<li>flags &ndash; the flags</li>
+<li>path &ndash; a path in string format or None</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_modifications_cli"><code class="name flex">
+<span>def <span class="ident">get_modifications_cli</span></span>(<span>sock, subid, flags) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The get_modifications_cli() function can be called after reception of
+a subscription notification to retrieve all the changes that caused the
+subscription notification as a string in Cisco CLI format. The socket sock
+is the subscription socket. The subscription id must also be provided.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>subid &ndash; subscription id</li>
+<li>flags &ndash; the flags</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_modifications_iter"><code class="name flex">
+<span>def <span class="ident">get_modifications_iter</span></span>(<span>sock, flags) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The get_modifications_iter() is basically a convenient short-hand of
+the get_modifications() function intended to be used from within a
+iteration function started by diff_iterate(). In this case no subscription
+id is needed, and the path is implicitly the current position in the
+iteration.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>flags &ndash; the flags</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_object"><code class="name flex">
+<span>def <span class="ident">get_object</span></span>(<span>sock, n, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function reads at most n values from the container or list entry
+specified by the path, and returns them as a list of Value's.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>n &ndash; max number of values to read</li>
+<li>path &ndash; path to a list entry or a container (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_objects"><code class="name flex">
+<span>def <span class="ident">get_objects</span></span>(<span>sock, n, ix, nobj, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Similar to get_object(), but reads multiple entries of a list based
+on the "instance integer" otherwise given within square brackets in the
+path - here the path must specify the list without the instance integer.
+At most n values from each of nobj entries, starting at entry ix, are
+read and placed in the values array. The return value is a list of objects
+where each object is represented as a list of Values.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>n &ndash; max number of values to read from each object</li>
+<li>ix &ndash; start index</li>
+<li>nobj &ndash; number of objects to read</li>
+<li>path &ndash; path to a list entry or a container (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_phase"><code class="name flex">
+<span>def <span class="ident">get_phase</span></span>(<span>sock) ‑> <a title="dict" href="https://docs.python.org/3/library/typing.html#typing.dict">dict</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the start-phase that CDB is currently in. The return value is a
+dict of the form:</p>
+<pre><code>{
+   'phase': phase,
+   'flags': flags,
+   'init': init,
+   'upgrade': upgrade
+}
+</code></pre>
+<p>In this dict 'phase' and 'flags' are integers, while 'init' and 'upgrade'
+are booleans.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_replay_txids"><code class="name flex">
+<span>def <span class="ident">get_replay_txids</span></span>(<span>sock) ‑> <a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="Tuple" href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When the subscriptionReplay functionality is enabled in confd.conf this
+function returns the list of available transactions that CDB can replay.
+The current transaction id will be the first in the list, the second at
+txid[1] and so on. In case there are no replay transactions available (the
+feature isn't enabled or there hasn't been any transactions yet) only one
+(the current) transaction id is returned.</p>
+<p>The returned list contains tuples with the form (s1, s2, s3, primary) where
+s1, s2 and s3 are unsigned integers and primary is either a string or None.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_transaction_handle"><code class="name flex">
+<span>def <span class="ident">get_transaction_handle</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the transaction handle for the transaction that triggered the
+current subscription notification. This function uses a subscription
+socket, and can only be called when a subscription notification for
+configuration data has been received on that socket, before
+sync_subscription_socket() has been called. Additionally, it is not
+possible to call this function from the iter() function passed to
+diff_iterate().</p>
+<p>Note:</p>
+<blockquote>
+<p>A CDB client is not expected to access the ConfD transaction store
+directly - this function should only be used for logging or debugging
+purposes.</p>
+</blockquote>
+<p>Note:</p>
+<blockquote>
+<p>When the ConfD High Availability functionality is used, the
+transaction information is not available on secondary nodes.</p>
+</blockquote>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_txid"><code class="name flex">
+<span>def <span class="ident">get_txid</span></span>(<span>sock) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read the last transaction id from CDB. This function can be used if we are
+forced to reconnect to CDB. If the transaction id we read is identical to
+the last id we had prior to loosing the CDB sockets we don't have to reload
+our managed object data. See the User Guide for full explanation.</p>
+<p>The returned tuple has the form (s1, s2, s3, primary) where s1, s2 and s3
+are unsigned integers and primary is either a string or None.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_user_session"><code class="name flex">
+<span>def <span class="ident">get_user_session</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the user session id for the transaction that triggered the
+current subscription notification. This function uses a subscription
+socket, and can only be called when a subscription notification for
+configuration data has been received on that socket, before
+sync_subscription_socket() has been called. Additionally, it is not
+possible to call this function from the iter() function passed to
+diff_iterate(). To retrieve full information about the user session,
+use _maapi.get_user_session() (see confd_lib_maapi(3)).</p>
+<p>Note:</p>
+<blockquote>
+<p>When the ConfD High Availability functionality is used, the
+user session information is not available on secondary nodes.</p>
+</blockquote>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.get_values"><code class="name flex">
+<span>def <span class="ident">get_values</span></span>(<span>sock, values, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read an arbitrary set of sub-elements of a container or list entry. The
+values list must be pre-populated with a number of TagValue instances.</p>
+<p>TagValues passed in the values list will be updated with the corresponding
+values read and a new values list will be returned.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>values &ndash; a list of TagValue instances</li>
+<li>path &ndash; path to a list entry or a container (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.getcwd"><code class="name flex">
+<span>def <span class="ident">getcwd</span></span>(<span>sock) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the current position as previously set by cd(), pushd(), or popd()
+as a string path. Note that what is returned is a pretty-printed version of
+the internal representation of the current position. It will be the shortest
+unique way to print the path but it might not exactly match the string given
+to cd().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.getcwd_kpath"><code class="name flex">
+<span>def <span class="ident">getcwd_kpath</span></span>(<span>sock) ‑> <a title="_confd.HKeypathRef" href="index.html#_confd.HKeypathRef">HKeypathRef</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the current position like getcwd(), but as a HKeypathRef
+instead of as a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.index"><code class="name flex">
+<span>def <span class="ident">index</span></span>(<span>sock, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a path to a list entry index() returns its position (starting from 0).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to list entry</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.initiate_journal_compaction"><code class="name flex">
+<span>def <span class="ident">initiate_journal_compaction</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Normally CDB handles journal compaction of the config datastore
+automatically. If this has been turned off (in the configuration file)
+then the A.cdb file will grow indefinitely unless this API function is
+called periodically to initiate compaction. This function initiates a
+compaction and returns immediately (if the datastore is locked, the
+compaction will be delayed, but eventually compaction will take place).
+Calling this function when journal compaction is configured to be automatic
+has no effect.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.is_default"><code class="name flex">
+<span>def <span class="ident">is_default</span></span>(<span>sock, path) ‑> <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function returns True for a leaf which has a default value defined in
+the data model when no value has been set, i.e. when the default value is
+in effect. It returns False for other existing leafs.
+There is normally no need to call this function, since CDB automatically
+provides the default value as needed when get() etc is called.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to leaf</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.mandatory_subscriber"><code class="name flex">
+<span>def <span class="ident">mandatory_subscriber</span></span>(<span>sock, name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attaches a mandatory attribute and a mandatory name to the subscriber
+identified by sock. The name argument is distinct from the name argument
+in connect_name().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>name &ndash; the name</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.next_index"><code class="name flex">
+<span>def <span class="ident">next_index</span></span>(<span>sock, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a path to a list entry next_index() returns the position
+(starting from 0) of the next entry (regardless of whether the path
+exists or not).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to list entry</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.num_instances"><code class="name flex">
+<span>def <span class="ident">num_instances</span></span>(<span>sock, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the number of instances in a list.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to list node</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.oper_subscribe"><code class="name flex">
+<span>def <span class="ident">oper_subscribe</span></span>(<span>sock, nspace, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets up a CDB subscription for changes in the operational database.
+Similar to the subscriptions for configuration data, we can be notified
+of changes to the operational data stored in CDB. Note that there are
+several differences from the subscriptions for configuration data.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>nspace &ndash; the namespace hash</li>
+<li>path &ndash; path to node</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.popd"><code class="name flex">
+<span>def <span class="ident">popd</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pops the top element from the directory stack and changes directory to
+previous directory.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.pushd"><code class="name flex">
+<span>def <span class="ident">pushd</span></span>(<span>sock, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Similar to cd() but pushes the previous current directory on a stack.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>path &ndash; path to cd to</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.read_subscription_socket"><code class="name flex">
+<span>def <span class="ident">read_subscription_socket</span></span>(<span>sock) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This call will return a list of integer values containing subscription
+points earlier acquired through calls to subscribe().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.read_subscription_socket2"><code class="name flex">
+<span>def <span class="ident">read_subscription_socket2</span></span>(<span>sock) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Another version of read_subscription_socket() which will return a 3-tuple
+in the form (type, flags, subpoints).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.replay_subscriptions"><code class="name flex">
+<span>def <span class="ident">replay_subscriptions</span></span>(<span>sock, txid, sub_points)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function makes it possible to replay the subscription events for the
+last configuration change to some or all CDB subscribers. This call is
+useful in a number of recovery scenarios, where some CDB subscribers lost
+connection to ConfD before having received all the changes in a
+transaction. The replay functionality is only available if it has been
+enabled in confd.conf.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>txid &ndash; a 4-tuple of the form (s1, s2, s3, primary)</li>
+<li>sub_points &ndash; a list of subscription points</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_case"><code class="name flex">
+<span>def <span class="ident">set_case</span></span>(<span>sock, choice, scase, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When we use the YANG choice statement in the data model, this function
+can be used to select the current case.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>choice &ndash; the choice (string)</li>
+<li>scase &ndash; the case (string)</li>
+<li>path &ndash; path to container or list entry where choice is defined (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_elem"><code class="name flex">
+<span>def <span class="ident">set_elem</span></span>(<span>sock, value, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the value of a single leaf. The value may be either a Value instance or
+a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>value &ndash; the value to set</li>
+<li>path &ndash; a string pointing to a single leaf</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_namespace"><code class="name flex">
+<span>def <span class="ident">set_namespace</span></span>(<span>sock, hashed_ns)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If we want to access data in CDB where the toplevel element name is not
+unique, we need to set the namespace. We are reading data related to a
+specific .fxs file. confdc can be used to generate a .py file with a class
+for the namespace, by the flag &ndash;emit-python to confdc (see confdc(1)).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>hashed_ns &ndash; the namespace hash</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_object"><code class="name flex">
+<span>def <span class="ident">set_object</span></span>(<span>sock, values, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set all elements corresponding to the complete contents of a container or
+list entry, except for sub-lists.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>values &ndash; a list of Value:s</li>
+<li>path &ndash; path to container or list entry (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_timeout"><code class="name flex">
+<span>def <span class="ident">set_timeout</span></span>(<span>sock, timeout_secs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A timeout for client actions can be specified via
+/confdConfig/cdb/clientTimeout in confd.conf, see the confd.conf(5)
+manual page. This function can be used to dynamically extend (or shorten)
+the timeout for the current action. Thus it is possible to configure a
+restrictive timeout in confd.conf, but still allow specific actions to
+have a longer execution time.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>timeout_secs &ndash; timeout in seconds</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.set_values"><code class="name flex">
+<span>def <span class="ident">set_values</span></span>(<span>sock, values, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set arbitrary sub-elements of a container or list entry.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>values &ndash; a list of TagValue:s</li>
+<li>path &ndash; path to container or list entry (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.start_session"><code class="name flex">
+<span>def <span class="ident">start_session</span></span>(<span>sock, db)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Starts a new session on an already established socket to CDB. The db
+parameter should be one of RUNNING, PRE_COMMIT_RUNNING, STARTUP and
+OPERATIONAL.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>db &ndash; the database</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.start_session2"><code class="name flex">
+<span>def <span class="ident">start_session2</span></span>(<span>sock, db, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function may be used instead of start_session() if it is considered
+necessary to have more detailed control over some aspects of the CDB
+session - if in doubt, use start_session() instead. The sock and db
+arguments are the same as for start_session(), and these values can be used
+for flags (ORed together if more than one).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>db &ndash; the database</li>
+<li>flags &ndash; the flags</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.sub_abort_trans"><code class="name flex">
+<span>def <span class="ident">sub_abort_trans</span></span>(<span>sock, code, apptag_ns, apptag_tag, reason)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function is to be called instead of sync_subscription_socket()
+when the subscriber wishes to abort the current transaction. It is only
+valid to call after read_subscription_socket2() has returned with
+type set to CDB_SUB_PREPARE. The arguments after sock are the same as to
+X_seterr_extended() and give the caller a way of indicating the
+reason for the failure.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>code &ndash; the error code</li>
+<li>apptag_ns &ndash; the namespace hash</li>
+<li>apptag_tag &ndash; the tag hash</li>
+<li>reason &ndash; reason string</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.sub_abort_trans_info"><code class="name flex">
+<span>def <span class="ident">sub_abort_trans_info</span></span>(<span>sock, code, apptag_ns, apptag_tag, error_info, reason)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Same a sub_abort_trans() but also fills in the NETCONF <error-info> element.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>code &ndash; the error code</li>
+<li>apptag_ns &ndash; the namespace hash</li>
+<li>apptag_tag &ndash; the tag hash</li>
+<li>error_info &ndash; a list of TagValue instances</li>
+<li>reason &ndash; reason string</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.sub_progress"><code class="name flex">
+<span>def <span class="ident">sub_progress</span></span>(<span>sock, msg)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>After receiving a subscription notification (using
+read_subscription_socket()) but before acknowledging it (or aborting,
+in the case of prepare subscriptions), it is possible to send progress
+reports back to ConfD using the sub_progress() function.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>msg &ndash; the message</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.subscribe"><code class="name flex">
+<span>def <span class="ident">subscribe</span></span>(<span>sock, prio, nspace, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets up a CDB subscription so that we are notified when CDB configuration
+data changes. There can be multiple subscription points from different
+sources, that is a single client daemon can have many subscriptions and
+there can be many client daemons. The return value is a subscription point
+used to identify this particular subscription.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>prio &ndash; priority</li>
+<li>nspace &ndash; the namespace hash</li>
+<li>path &ndash; path to node</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.subscribe2"><code class="name flex">
+<span>def <span class="ident">subscribe2</span></span>(<span>sock, type, flags, prio, nspace, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function supersedes the current subscribe() and oper_subscribe() as
+well as makes it possible to use the new two phase subscription method.
+Operational and configuration subscriptions can be done on the same
+socket, but in that case the notifications may be arbitrarily interleaved,
+including operational notifications arriving between different configuration
+notifications for the same transaction. If this is a problem, use separate
+sockets for operational and configuration subscriptions.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>type &ndash; subscription type</li>
+<li>flags &ndash; flags</li>
+<li>prio &ndash; priority</li>
+<li>nspace &ndash; the namespace hash</li>
+<li>path &ndash; path to node</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.subscribe_done"><code class="name flex">
+<span>def <span class="ident">subscribe_done</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When a client is done registering all its subscriptions on a particular
+subscription socket it must call subscribe_done(). No notifications will be
+delivered until then.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.sync_subscription_socket"><code class="name flex">
+<span>def <span class="ident">sync_subscription_socket</span></span>(<span>sock, st)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Once we have read the subscription notification through a call to
+read_subscription_socket() and optionally used the diff_iterate()
+to iterate through the changes as well as acted on the changes to CDB, we
+must synchronize with CDB so that CDB can continue and deliver further
+subscription messages to subscribers with higher priority numbers.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>st &ndash; sync type (int)</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.trigger_oper_subscriptions"><code class="name flex">
+<span>def <span class="ident">trigger_oper_subscriptions</span></span>(<span>sock, sub_points, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function works like trigger_subscriptions(), but for CDB
+subscriptions to operational data. The caller will trigger all
+subscription points passed in the sub_points list (or all operational
+data subscribers if the list is empty), and the call will not return until
+the last subscriber has called sync_subscription_socket().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>sub_points &ndash; a list of subscription points</li>
+<li>flags &ndash; the flags</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.trigger_subscriptions"><code class="name flex">
+<span>def <span class="ident">trigger_subscriptions</span></span>(<span>sock, sub_points)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function makes it possible to trigger CDB subscriptions for
+configuration data even though the configuration has not been modified.
+The caller will trigger all subscription points passed in the sub_points
+list (or all subscribers if the list is empty) in priority order, and the
+call will not return until the last subscriber has called
+sync_subscription_socket().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+<li>sub_points &ndash; a list of subscription points</li>
+</ul></div>
+</dd>
+<dt id="_confd.cdb.wait_start"><code class="name flex">
+<span>def <span class="ident">wait_start</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This call waits until CDB has completed start-phase 1 and is available,
+when it is CONFD_OK is returned. If CDB already is available (i.e.
+start-phase &gt;= 1) the call returns immediately. This can be used by a CDB
+client who is not synchronously started and only wants to wait until it
+can read its configuration. The call can be used after connect().</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected CDB socket</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="_confd" href="index.html">_confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="_confd.cdb.cd" href="#_confd.cdb.cd">cd</a></code></li>
+<li><code><a title="_confd.cdb.close" href="#_confd.cdb.close">close</a></code></li>
+<li><code><a title="_confd.cdb.connect" href="#_confd.cdb.connect">connect</a></code></li>
+<li><code><a title="_confd.cdb.connect_name" href="#_confd.cdb.connect_name">connect_name</a></code></li>
+<li><code><a title="_confd.cdb.create" href="#_confd.cdb.create">create</a></code></li>
+<li><code><a title="_confd.cdb.cs_node_cd" href="#_confd.cdb.cs_node_cd">cs_node_cd</a></code></li>
+<li><code><a title="_confd.cdb.delete" href="#_confd.cdb.delete">delete</a></code></li>
+<li><code><a title="_confd.cdb.diff_iterate" href="#_confd.cdb.diff_iterate">diff_iterate</a></code></li>
+<li><code><a title="_confd.cdb.diff_iterate_resume" href="#_confd.cdb.diff_iterate_resume">diff_iterate_resume</a></code></li>
+<li><code><a title="_confd.cdb.diff_match" href="#_confd.cdb.diff_match">diff_match</a></code></li>
+<li><code><a title="_confd.cdb.end_session" href="#_confd.cdb.end_session">end_session</a></code></li>
+<li><code><a title="_confd.cdb.exists" href="#_confd.cdb.exists">exists</a></code></li>
+<li><code><a title="_confd.cdb.get" href="#_confd.cdb.get">get</a></code></li>
+<li><code><a title="_confd.cdb.get_case" href="#_confd.cdb.get_case">get_case</a></code></li>
+<li><code><a title="_confd.cdb.get_modifications" href="#_confd.cdb.get_modifications">get_modifications</a></code></li>
+<li><code><a title="_confd.cdb.get_modifications_cli" href="#_confd.cdb.get_modifications_cli">get_modifications_cli</a></code></li>
+<li><code><a title="_confd.cdb.get_modifications_iter" href="#_confd.cdb.get_modifications_iter">get_modifications_iter</a></code></li>
+<li><code><a title="_confd.cdb.get_object" href="#_confd.cdb.get_object">get_object</a></code></li>
+<li><code><a title="_confd.cdb.get_objects" href="#_confd.cdb.get_objects">get_objects</a></code></li>
+<li><code><a title="_confd.cdb.get_phase" href="#_confd.cdb.get_phase">get_phase</a></code></li>
+<li><code><a title="_confd.cdb.get_replay_txids" href="#_confd.cdb.get_replay_txids">get_replay_txids</a></code></li>
+<li><code><a title="_confd.cdb.get_transaction_handle" href="#_confd.cdb.get_transaction_handle">get_transaction_handle</a></code></li>
+<li><code><a title="_confd.cdb.get_txid" href="#_confd.cdb.get_txid">get_txid</a></code></li>
+<li><code><a title="_confd.cdb.get_user_session" href="#_confd.cdb.get_user_session">get_user_session</a></code></li>
+<li><code><a title="_confd.cdb.get_values" href="#_confd.cdb.get_values">get_values</a></code></li>
+<li><code><a title="_confd.cdb.getcwd" href="#_confd.cdb.getcwd">getcwd</a></code></li>
+<li><code><a title="_confd.cdb.getcwd_kpath" href="#_confd.cdb.getcwd_kpath">getcwd_kpath</a></code></li>
+<li><code><a title="_confd.cdb.index" href="#_confd.cdb.index">index</a></code></li>
+<li><code><a title="_confd.cdb.initiate_journal_compaction" href="#_confd.cdb.initiate_journal_compaction">initiate_journal_compaction</a></code></li>
+<li><code><a title="_confd.cdb.is_default" href="#_confd.cdb.is_default">is_default</a></code></li>
+<li><code><a title="_confd.cdb.mandatory_subscriber" href="#_confd.cdb.mandatory_subscriber">mandatory_subscriber</a></code></li>
+<li><code><a title="_confd.cdb.next_index" href="#_confd.cdb.next_index">next_index</a></code></li>
+<li><code><a title="_confd.cdb.num_instances" href="#_confd.cdb.num_instances">num_instances</a></code></li>
+<li><code><a title="_confd.cdb.oper_subscribe" href="#_confd.cdb.oper_subscribe">oper_subscribe</a></code></li>
+<li><code><a title="_confd.cdb.popd" href="#_confd.cdb.popd">popd</a></code></li>
+<li><code><a title="_confd.cdb.pushd" href="#_confd.cdb.pushd">pushd</a></code></li>
+<li><code><a title="_confd.cdb.read_subscription_socket" href="#_confd.cdb.read_subscription_socket">read_subscription_socket</a></code></li>
+<li><code><a title="_confd.cdb.read_subscription_socket2" href="#_confd.cdb.read_subscription_socket2">read_subscription_socket2</a></code></li>
+<li><code><a title="_confd.cdb.replay_subscriptions" href="#_confd.cdb.replay_subscriptions">replay_subscriptions</a></code></li>
+<li><code><a title="_confd.cdb.set_case" href="#_confd.cdb.set_case">set_case</a></code></li>
+<li><code><a title="_confd.cdb.set_elem" href="#_confd.cdb.set_elem">set_elem</a></code></li>
+<li><code><a title="_confd.cdb.set_namespace" href="#_confd.cdb.set_namespace">set_namespace</a></code></li>
+<li><code><a title="_confd.cdb.set_object" href="#_confd.cdb.set_object">set_object</a></code></li>
+<li><code><a title="_confd.cdb.set_timeout" href="#_confd.cdb.set_timeout">set_timeout</a></code></li>
+<li><code><a title="_confd.cdb.set_values" href="#_confd.cdb.set_values">set_values</a></code></li>
+<li><code><a title="_confd.cdb.start_session" href="#_confd.cdb.start_session">start_session</a></code></li>
+<li><code><a title="_confd.cdb.start_session2" href="#_confd.cdb.start_session2">start_session2</a></code></li>
+<li><code><a title="_confd.cdb.sub_abort_trans" href="#_confd.cdb.sub_abort_trans">sub_abort_trans</a></code></li>
+<li><code><a title="_confd.cdb.sub_abort_trans_info" href="#_confd.cdb.sub_abort_trans_info">sub_abort_trans_info</a></code></li>
+<li><code><a title="_confd.cdb.sub_progress" href="#_confd.cdb.sub_progress">sub_progress</a></code></li>
+<li><code><a title="_confd.cdb.subscribe" href="#_confd.cdb.subscribe">subscribe</a></code></li>
+<li><code><a title="_confd.cdb.subscribe2" href="#_confd.cdb.subscribe2">subscribe2</a></code></li>
+<li><code><a title="_confd.cdb.subscribe_done" href="#_confd.cdb.subscribe_done">subscribe_done</a></code></li>
+<li><code><a title="_confd.cdb.sync_subscription_socket" href="#_confd.cdb.sync_subscription_socket">sync_subscription_socket</a></code></li>
+<li><code><a title="_confd.cdb.trigger_oper_subscriptions" href="#_confd.cdb.trigger_oper_subscriptions">trigger_oper_subscriptions</a></code></li>
+<li><code><a title="_confd.cdb.trigger_subscriptions" href="#_confd.cdb.trigger_subscriptions">trigger_subscriptions</a></code></li>
+<li><code><a title="_confd.cdb.wait_start" href="#_confd.cdb.wait_start">wait_start</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

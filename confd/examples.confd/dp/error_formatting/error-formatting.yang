@@ -1,0 +1,62 @@
+module error-formatting {
+
+  namespace "https://tail-f.com/example/error-formatting";
+  prefix "error-formatting";
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "The 'err-examples' model provides a placeholder for showing
+     a custom error formatting callback.
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-12-04 {
+    description "Initial revision";
+  }
+
+  container err-example {
+
+    leaf numeric {
+        type uint32 {
+            range "1000..2000";
+        }
+    }
+
+    leaf stringy {
+        type string {
+            length "8..16";
+        }
+    }
+
+    leaf oper-leaf {
+        tailf:callpoint "oper-dc-bd";
+        config false;
+        type uint32;
+    }
+
+    list person {
+        key "name";
+
+        leaf name {
+            type string;
+        }
+
+        leaf indispensable-leaf {
+            must "/err-example/numeric != 1234";
+            mandatory true;
+            type empty;
+        }
+    }
+
+  }
+}

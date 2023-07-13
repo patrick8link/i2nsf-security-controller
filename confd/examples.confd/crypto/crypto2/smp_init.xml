@@ -1,0 +1,20 @@
+<smp:strs xmlns:smp="http://tail-f.com/ns/example/smp">
+  <smp:str>
+    <smp:nr>1</smp:nr>
+    <smp:secret>$0$hello there</smp:secret>
+    <smp:secret2>$0$believethediagnosis-questiontheprognosis</smp:secret2>
+    <smp:secret3>$0$knowledge is impossible if the world is random</smp:secret3>
+  </smp:str>
+  <smp:str>
+    <smp:nr>2</smp:nr>
+    <smp:secret>$0$now is the time</smp:secret>
+    <smp:secret2>$0$i-dont_mind_what-happens</smp:secret2>
+    <smp:secret3>$0$Take the Stairs</smp:secret3>
+  </smp:str>
+  <smp:str>
+    <smp:nr>3</smp:nr>
+    <smp:secret>$0$Experiments are repeatable in this world</smp:secret>
+    <smp:secret2>$0$95 percent need 8 hours of sleep</smp:secret2>
+    <smp:secret3>$0$100 steps after each meal, you’ll live to 99</smp:secret3>
+  </smp:str>
+</smp:strs>

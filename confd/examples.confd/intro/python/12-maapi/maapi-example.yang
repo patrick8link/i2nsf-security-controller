@@ -1,0 +1,66 @@
+module maapi-example {
+    namespace "http://tail-f.com/ns/example/maapi-example";
+    prefix maapi-example;
+
+    import ietf-yang-types { prefix yang; }
+    import tailf-common { prefix tailf; }
+
+    organization "Tail-f Systems (a Cisco company)";
+
+    contact "info@tail-f.com";
+
+    description
+    "YANG datamodel for Use of MAAPI example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+    revision 2019-02-14 {
+        description "Normalized YANG identifier names.";
+    }
+
+    revision 2018-11-27 {
+      description "YANG header information updated";
+    }
+
+    revision 2017-09-08 {
+      description "Initial revision.";
+    }
+
+    grouping grouping-items {
+        leaf name {
+            type string;
+        }
+        leaf value {
+            type uint32;
+        }
+    }
+
+    container config {
+        list start-log {
+            key time;
+            leaf time {
+                type yang:date-and-time;
+            }
+        }
+        list items {
+            tailf:validate val-items {
+                tailf:dependency ".";
+            }
+            key name;
+            uses grouping-items;
+        }
+    }
+
+    container state {
+        config false;
+        list items {
+            tailf:callpoint items;
+            key name;
+            uses grouping-items;
+        }
+    }
+}

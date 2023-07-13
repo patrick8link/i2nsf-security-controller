@@ -1,0 +1,140 @@
+ConfD Example - external authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates how you can use external authorization callbacks.
+
+The callbacks can replace the access checks (command, data) done within the AAA
+subsystem, and they may accept or reject the access. Typically many access
+checks are done during the processing. Using these callbacks can have
+a performance impact.
+
+The example is implemented in C.
+
+Set in confd.conf
+
+ <aaa>
+    <authorization>
+      <callback>
+        <enabled>true</enabled>
+      </callback>
+    </authorization>
+ </aaa>
+
+Note: Only control socket is needed for authorization callbacks. This means the
+callback should be quick. Timeout is defined in  `confd.conf` file in
+`confdConfig/capi/newSessionTimeout`.
+
+`confd_authorization_set_timeout` function can be used to extend timeout.
+
+What the Example does
+~~~~~~~~~~~~~~~~~~~~~
+
+Part of the default ConfD AAA init file are following users
+
+admin   (pw:admin)
+oper    (pw:oper)
+public  (pw:public)
+private (pw:private)
+
+these users will be used to demonstrate authorization callbacks functionality
+
+admin   - no restriction
+
+oper    - can configure
+          cannot configure example-config items with name starting with "secret"
+          cannot delete example-config items with name starting with "important"
+          cannot invoke following commands:
+          id
+
+public  - can see operational data for example-state, cannot see
+          config data for example-config and cannot enter config mode
+          cannot invoke following commands:
+          config,
+          show running-config example-config
+
+private - can configure, cannot commit, cannot delete configuration,
+          cannot see operational data for example-state,
+          cannot invoke following commands:
+          show example-state,
+          no,
+          commit
+
+Source code
+~~~~~~~~~~~
+
+* 'main' function
+    - calls `init_confd_daemon` function to initialize example application
+       (connection to the ConfD, registration of the callbacks)
+    - calls `confd_loop` function to enter application loop processing ConfD
+      events (see setting of `cmd_filter` and `data_filter` filters)
+* `data_access_cb` - data authorization callback
+     - according to the user and data being accessed it returns
+       `CONFD_ACCESS_RESULT_CONTINUE` (to call callback for subtree) or
+       `CONFD_ACCESS_RESULT_REJECT`. The data callback reads values from the
+       keypath parameter (possible only for key values of `list`).
+* `cmd_access_cb` - command authorization callback
+     - according to the user and command being accessed it returns
+       `CONFD_ACCESS_RESULT_DEFAULT` or `CONFD_ACCESS_RESULT_REJECT`
+
+
+Starting and running the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ 1. Build the necessary files and start ConfD by typing
+
+        $ make all start
+
+ 2. Start the C-style CLI with 'make cli-c' in a different window and try some
+    commands
+
+Performance
+~~~~~~~~~~~
+
+Authorization callbacks are invoked in a ConfD daemon application, which may
+result in performance penalty. To compare performance of this example, we have
+prepared following scenario:
+
+configure N items - (script `fill_data.sh config <N>`)
+set N state items - (script `fill_data.sh state <N>`)
+show configuration items with NETCONF
+    `netconf-console --get-config -x example-config`
+show state items with NETCONF  - `netconf-console --get -x example-state`
+show configuration items with `confd_load`
+show state items with `confd_load`
+
+
+Steps:
+
+(Make sure logging level in the Makefile is set to -DT_LOG_INFO.)
+
+Example for N equals 10000
+
+ make clean all start
+ ./fill_data.sh state 10000
+ time ./fill_data.sh config 10000
+
+ time netconf-console --get-config -x example-config
+ time netconf-console --get -x example-state
+
+ or
+
+ time confd_load -u admin -c cli -p example-config -o -F c
+ time confd_load -u admin -c cli -p example-state -o -F c
+
+disable authorization callback in the `confd.conf` and re-run scenario
+
+Depending on the target system and number of the items (N) the example shows
+that configuration is approximately 2 times slower and reading of the data is
+approximately 3 to 4 times slower.
+
+For more complex callback processing we can expect even bigger performance
+penalty. This is the reason it is recommended to use callback filtering
+(in `struct confd_authorization_cbs`) as much as possible and
+use authorization callbacks only in rare cases.
+It is better to use built in ConfD NACM mechanism.
+
+Further Reading
+~~~~~~~~~~~~~~~
+
++ ConfD User Guide: AUTHORIZATION CALLBACKS (in confd_lib_dp)
++ man 3 confd_lib_dp (confd_authorization_cbs)

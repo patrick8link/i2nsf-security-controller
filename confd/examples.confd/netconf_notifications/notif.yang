@@ -1,0 +1,83 @@
+module notif {
+  namespace "http://tail-f.com/ns/test/notif";
+  prefix notif;
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for NETCONF notifications example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-12-04 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-30 {
+    description "Initial revision.";
+  }
+
+  container interfaces {
+    list interface {
+      key if-index;
+      leaf if-index {
+        type uint32;
+      }
+      leaf desc {
+        type string;
+      }
+    }
+  }
+
+  notification link-up {
+    leaf if-index {
+      type leafref {
+        path "/interfaces/interface/if-index";
+      }
+      mandatory true;
+    }
+    leaf extra-id {
+      type string;
+    }
+    list link-property {
+      max-elements 64;
+      leaf newly-added {
+        type empty;
+      }
+      leaf flags {
+        type uint32;
+        default 0;
+      }
+      list extensions {
+        max-elements 64;
+        leaf name {
+          type uint32;
+          mandatory true;
+        }
+        leaf value {
+          type uint32;
+          mandatory true;
+        }
+      }
+    }
+  }
+
+  notification link-down {
+    leaf if-index {
+      type leafref {
+        path "/interfaces/interface/if-index";
+      }
+      mandatory true;
+    }
+  }
+}

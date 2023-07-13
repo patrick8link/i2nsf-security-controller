@@ -1,0 +1,44 @@
+module ietf-routing-ann {
+  namespace "urn:dummy";
+  prefix "dummy";
+
+  import tailf-common {
+      prefix tailf;
+  }
+  import ietf-routing {
+      prefix rt;
+  }
+
+  tailf:annotate-module "ietf-routing" {
+    tailf:annotate-statement "container[name='routing']" {
+      tailf:callpoint "routing_state_dp" {
+        tailf:operational;
+      }
+      tailf:callpoint "routing_state_dp" {
+        tailf:config false;
+      }
+      tailf:annotate-statement "container[name='control-plane-protocols']" {
+        tailf:annotate-statement "list[name='control-plane-protocol']" {
+          tailf:annotate-statement "container[name='static-routes']" {
+            // this must is not needed  when 'when' is used is added
+            // to 'container static-routes'
+            must "../type = 'rt:static'" {
+                error-message "Static route is only valid" +
+                               " for the 'static' routing protocol.";
+            }
+          }
+        }
+      }
+      tailf:annotate-statement "container[name='ribs']" {
+        tailf:annotate-statement "list[name='rib']" {
+          tailf:annotate-statement "action[name='active-route']" {
+            tailf:actionpoint "routing_state_active_route";
+          }
+        }
+      }
+    }
+    tailf:annotate-statement "container[name='routing-state']" {
+      tailf:hidden full;
+    }
+  }
+}

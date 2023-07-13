@@ -1,0 +1,7 @@
+ConfD Basic version 8.0.4 for linux on x86_64.
+Revision: 5de52a44d4a184f2caf3e37e54a4f5c697e74d50 (GIT)
+Date: Fri Mar 24 20:14:30 CET 2023
+DOCUMENTATION_PACKAGE=confd-basic-8.0.4.doc.tar.gz
+JAVA_PACKAGE=confd-basic-8.0.4.java.tar.gz
+EXAMPLE_PACKAGE=confd-basic-8.0.4.examples.tar.gz
+Erlang/OTP version: 22.3.4.17

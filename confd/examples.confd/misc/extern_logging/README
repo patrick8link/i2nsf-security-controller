@@ -1,0 +1,28 @@
+Sending log data to external application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates how to use an external application to filter
+log data. The external logging functionality is intended as a
+development feature.
+
+This example use a python script to filter raw NETCONF trace data,
+however, the feature is language agnostic and works by reading the log
+data from standard input and then doing the required processing.
+
+
+Running the Example
+~~~~~~~~~~~~~~~~~~~
+
+  1. Build the necessary files and start ConfD by typing
+
+         $ make clean all start
+
+  2. Run a NETCONF query getting the configuration that is
+     filtered.
+
+         $ make query
+
+  3. Compare the real trace log with the filtered trace log and notice
+     that the address tag content is replaced with ********:
+
+         $ diff -u netconf.trace netconf_filtered.trace

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+bindir=`dirname $0`
+case $bindir in
+    /*) confddir=`dirname $bindir`;;
+    *)  confddir=`(cd $bindir/..; pwd)`;;
+esac
+libdir=$confddir/lib
+
+
+ROOTDIR=${libdir}/confd
+BINDIR=${ROOTDIR}/erts/bin
+PROGNAME=confd
+EMU=confd
+EMULATOR_FLAGS=''
+export ROOTDIR BINDIR PROGNAME EMU EMULATOR_FLAGS
+
+## Single out the Erl emulator flags to a separate variable
+for arg do
+    shift
+    case $arg in
+        "--emulator-flags"* )
+            EMULATOR_FLAGS=`echo $arg| cut -d = -f 2`
+            continue ;;
+        * )
+            set -- "$@" "$arg" ;;
+    esac
+done
+
+# async I/O is just unnecessary overhead as long
+# as a single Erlang process does all the work
+async="+A0 "
+confdc_cmd="${BINDIR}/confdexec +B ${async} ${EMULATOR_FLAGS} -boot confdc \
+                                -noinput"
+
+
+exec ${confdc_cmd} -s confdc run -extra -confddir ${confddir} "$@"

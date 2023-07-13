@@ -4,9 +4,19 @@ import xml.dom.minidom
 from lxml import etree
 import xmltodict, json
 import requests
+import configparser
+
+config = configparser.ConfigParser()
+config.sections()
+
+config.read('../controller.ini')
+config.sections()
+
+#print(f"mongodb://{config['DEFAULT']['Controller']}:27017/")
+
 
 def query_with_file(filename):
-    host = "192.168.56.104"
+    host = "10.0.0.19"
 
     with manager.connect(host=host, port=2022, username="admin", password="admin", hostkey_verify=False) as m:
         with open(filename, 'r') as f:
@@ -20,7 +30,7 @@ def query_with_file(filename):
     return data
 
 def query_with_string(capability):
-    host = "192.168.56.104"
+    host = "10.0.0.19"
     with manager.connect(host=host, port=2022, username="admin", password="admin", hostkey_verify=False) as m:
         start_rpc = etree.fromstring(capability)
         c = m.dispatch(rpc_command=start_rpc)
@@ -28,8 +38,9 @@ def query_with_string(capability):
     return data
 
 def query(capability):
-    url = "http://115.145.178.185:5000/register/nsf"
+    url = f"http://{config['DEFAULT']['PrivateController']}:5000/register/nsf"
     data = query_with_string(capability)
+    print(data)
     if 'rpc-error' in data:
         print("ERROR")
         return ("NSF Not Found")
@@ -53,4 +64,3 @@ def query(capability):
             i+=1
         return(data["rpc-reply"]["nsf"])
 
-#query("register3.xml")

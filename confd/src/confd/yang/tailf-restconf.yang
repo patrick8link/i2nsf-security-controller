@@ -1,0 +1,42 @@
+module tailf-restconf {
+  namespace "http://tail-f.com/ns/tailf-restconf";
+  prefix "tfrcr";
+
+  tailf:export none;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import ietf-restconf {
+    prefix rc;
+  }
+  import tailf-rollback {
+    prefix rollback;
+  }
+
+  description
+    "Copyright 2020-2023 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification.";
+
+  revision 2023-01-17 {
+    description
+      "Released as part of ConfD-8.0.2 / NCS-6.0.2.
+
+       Non-backwards-compatible changes have been introduced.
+
+       Renamed the tailf:structure node 'result' to 'rcresult'.";
+  }
+
+  revision 2020-06-25 {
+    description
+      "Initial revision, released as part of ConfD-7.4 / NCS-5.4.";
+  }
+
+  tailf:structure rcresult {
+    container result {
+      uses rollback:rollback-commit-result;
+    }
+  }
+}

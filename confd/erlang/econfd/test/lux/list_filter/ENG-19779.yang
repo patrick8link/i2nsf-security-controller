@@ -1,0 +1,62 @@
+module ENG-19779 {
+  namespace "urn:test:ENG-19779";
+  prefix E19779;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  identity vehicle-type;
+
+  identity car {
+    base vehicle-type;
+  }
+  identity bus {
+    base vehicle-type;
+  }
+  identity bicycle {
+    base vehicle-type;
+  }
+
+  container ENG-19779 {
+    container elements {
+      list element {
+        tailf:callpoint ENG-19779;
+        key name;
+
+        leaf name {
+          type string;
+        }
+
+        leaf size {
+          type uint8;
+        }
+
+        leaf ref {
+          type identityref {
+            base vehicle-type;
+          }
+        }
+      }
+
+      list object-element {
+        tailf:callpoint ENG-19779-obj;
+        key name;
+
+        leaf name {
+          type string;
+        }
+
+        leaf size {
+          type uint8;
+        }
+
+        leaf ref {
+          type identityref {
+            base vehicle-type;
+          }
+        }
+      }
+    }
+  }
+}

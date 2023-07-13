@@ -1,0 +1,143 @@
+module tailf-webui-one {
+  namespace "http://tail-f.com/ns/webui-one";
+  prefix webui-one;
+
+  import tailf-webui {
+    prefix webui;
+  }
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "This module defines the data model for the webui-one Web UI.
+
+     Copyright 2017-2019 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification.";
+
+  revision 2019-06-27 {
+    description
+      "Added leaf 'action-status-indicator-timeout'.";
+  }
+
+  revision 2018-04-25 {
+    description
+      "Added hidden flag for webui-one applications";
+  }
+
+  revision 2017-11-03 {
+    description
+      "Added leafs for shortcut functionality";
+  }
+
+  revision 2017-09-07 {
+    description
+      "Initial release containing application definitions";
+  }
+
+  augment "/webui:webui" {
+    container applications {
+      list application {
+        tailf:info "The list of applications";
+        key id;
+        description
+          "List of applications in the webui-one Web UI.
+           The data is used to populate the application hub.";
+
+        leaf id {
+          tailf:info "A unique identifier for the application";
+          type string;
+          description
+            "Used as an unique identifier.";
+        }
+
+        leaf href {
+          tailf:info "Hyperlink to the application";
+          type string;
+          mandatory true;
+          description
+            "Url to the application. The url can be either relative to the
+             webui-one base url e.g. /SomeTool or an absolute url e.g.
+             https://www.example.com/SomeTool";
+        }
+
+        leaf title {
+          tailf:info "Application title";
+          type string;
+          mandatory true;
+          description
+            "Title of the application, the title is displayed
+             in the applicaion hub.";
+        }
+
+        leaf description {
+          tailf:info "Description of the application.";
+          type string;
+          description
+            "Description of the application.";
+        }
+
+        leaf promo-label {
+          tailf:info "Promotional label.";
+          type string;
+          description
+            "The current promotional label of the application,
+             e.g. P.O.C., DEMO, NEW, LEGACY etc";
+        }
+
+        leaf category {
+          tailf:info "The application category.";
+          type string;
+          mandatory true;
+          description
+            "Used to categorize the applications.
+             The category is case-sensitive.";
+        }
+
+        leaf abbreviation {
+          tailf:info "An abbreviation of the applications name.
+          Used on the shortcut buttons";
+          type string;
+          description
+            "This abbreviation will be displayed on the
+             shortcut buttons in the shortcut panel.";
+        }
+
+        leaf shortcut {
+          tailf:info "A key combination that will open this application.";
+          type string;
+          description
+            "The shortcut handler will listen to all key events. When ever
+             this key combination is typed, this application will be launched.
+             This does not work if an input field is active.";
+        }
+
+        leaf hidden {
+          tailf:info "Hides the application in the Application hub.";
+          type boolean;
+          description
+            "Used to determine in the application should be hidden in the
+             application hub.";
+        }
+      }
+
+      leaf action-status-indicator-timeout {
+        tailf:info
+          "Determines the timeout in seconds before resetting
+           the action result status indicators";
+        default 1800;
+        type union {
+          type uint16;
+          type enumeration {
+            enum infinite;
+          }
+        }
+      }
+    }
+  }
+}

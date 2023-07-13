@@ -1,0 +1,66 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;14.&nbsp;Rollbacks</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch13.html" title="Chapter&nbsp;13.&nbsp;Transformations, Hooks and Hidden Data"><link rel="next" href="ch15.html" title="Chapter&nbsp;15.&nbsp;Actions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;14.&nbsp;Rollbacks</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch13.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch15.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.rollbacks"></a>Chapter&nbsp;14.&nbsp;Rollbacks</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch14.html#d5e3359">14.1. Introduction</a></span></dt><dt><span class="sect1"><a href="ch14.html#d5e3366">14.2. Configuration</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e3359"></a>14.1.&nbsp;Introduction</h2></div></div></div><p>
+      ConfD support creating rollback files during the commit of a
+      transaction that allows for rolling back the introduced
+      changes. Rollbacks does not come without a cost and should be
+      disabled if the functionality is not going to be used. Enabling
+      rollbacks impact both the time it takes to commit a change and
+      requires sufficient storage on disk.
+    </p><p>
+      Rollback files contain a set of headers and the data required to
+      restore the changes that were made when the rollback was
+      created. One of the header fields includes a unique rollback id
+      that can be used to address the rollback file independent of the
+      rollback numbering format.
+    </p><p>
+      Rollback file numbering and content are configurable and care
+      needs to be taken if using 'rolling' numbering as the content of
+      the rollback of a given number will change whenever a new
+      rollback is created.
+    </p><p>
+      When retrieving the rollback id from a transaction using any of
+      the supported APIs the 'fixed' number is always returned to
+      avoid race conditions.
+    </p><p>
+      Use of rollbacks from the supported APIs and the CLI is
+      documented in the documentation for the given API.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e3366"></a>14.2.&nbsp;Configuration</h2></div></div></div><p>
+      ConfD is configured through a configuration file - <code class="filename">confd.conf</code> .  In that file we have the
+      following items related to rollbacks:
+
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="sgmltag-element">/confdConfig/rollback/enabled</code></span></dt><dd><p>
+              If 'true', then a rollback file will be created whenever
+              the running configuration is modified.
+            </p></dd></dl></div><p>
+
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="sgmltag-element">/confdConfig/rollback/directory</code></span></dt><dd><p>
+              Location where rollback files will be created.
+            </p></dd></dl></div><p>
+
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="sgmltag-element">/confdConfig/rollback/historySize</code></span></dt><dd><p>
+              Number of old rollback files to save.
+            </p></dd></dl></div><p>
+
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="sgmltag-element">/confdConfig/rollback/rollbackType</code></span></dt><dd><p>
+              Type of rollback file to use. If 'full' is specified, then a
+              full configuration dump is stored in each rollback file.
+              Rollback file 0 will always contain the running
+              configuration.  If 'delta' is used, then only the changes
+              are stored in the rollback file. Rollback file 0 will
+              contain the changes from the last configuration.
+            </p><p>
+              Using deltas is more space and time efficient for large
+              configurations.  Full rollback files are more robust when
+              multiple external databases are used. If the external
+              databases becomes inconsistent a previous configuration can
+              always be restored using a full rollback file.
+            </p></dd></dl></div><p>
+
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="sgmltag-element">/confdConfig/rollback/rollbackNumbering</code></span></dt><dd><p>
+              Can be either 'fixed' or 'rolling'. If set to 'rolling'
+              then rollback file '0' will always contain the last
+              commit. When using 'fixed' each rollback will get a
+              unique increasing number.
+            </p></dd></dl></div><p>
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch13.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch15.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;13.&nbsp;Transformations, Hooks and Hidden Data&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;15.&nbsp;Actions</td></tr></table></div></body></html>

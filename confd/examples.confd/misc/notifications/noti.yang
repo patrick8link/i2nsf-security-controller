@@ -1,0 +1,83 @@
+module noti {
+  namespace "http://tail-f.com/ns/example/noti";
+  prefix noti;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Notifications example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-12-04 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-30 {
+    description "Initial revision.";
+  }
+
+  typedef direction {
+    type enumeration {
+      enum dirty;
+      enum clean;
+    }
+  }
+  container root {
+    leaf foo {
+      type string;
+      default fooo;
+    }
+    leaf bar {
+      type int32;
+      default 66;
+    }
+    container hosts {
+      list host {
+        key "hname hnum";
+        max-elements 64;
+        leaf hname {
+          type string;
+        }
+        leaf hnum {
+          type int32;
+        }
+        container servers {
+          list server {
+            key name;
+            max-elements 64;
+            leaf name {
+              type string;
+            }
+            leaf ip {
+              type inet:ipv4-address;
+              mandatory true;
+            }
+            leaf port {
+              type inet:port-number;
+              mandatory true;
+            }
+            leaf dir {
+              type direction;
+              mandatory true;
+            }
+          }
+        }
+      }
+    }
+  }
+}

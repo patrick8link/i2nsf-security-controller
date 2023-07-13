@@ -1,0 +1,149 @@
+module logging-model {
+  namespace "http://tail-f.com/ns/example/logging";
+
+  prefix logging;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for ConfD logging framework example
+     (C) 2005-2018 Tail-f Systems
+
+     This YANG module defines essential components for
+     the management of traceh.h logging system.
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-30 {
+    description "YANG header information updated";
+  }
+
+  revision 2017-05-15 {
+    description "Initial revision.";
+  }
+
+  typedef log-level-type {
+    description "logging levels";
+    type enumeration {
+      enum off {
+        value -1;
+      }
+      enum fatal {
+        value 2;
+      }
+      enum error {
+        value 3;
+      }
+      enum warn {
+        value 4;
+      }
+      enum info {
+        value 6;
+      }
+      enum debug {
+        value 7;
+      }
+      enum trace {
+        value 10;
+      }
+    }
+  }
+
+  typedef log-time-format {
+    description "time format";
+    type enumeration {
+      enum simple {
+        value 0;
+      }
+      enum formatted {
+        value 1;
+      }
+    }
+  }
+
+  container logging {
+    description "Configuration parameters for traceh.h framework.";
+    leaf console-level {
+      type log-level-type;
+      description "Log level configuration for console logging.";
+      tailf:info "Log level configuration for console logging.";
+      tailf:validate logging-config-val {
+        tailf:dependency .;
+      }
+    }
+    leaf stream-level {
+      type log-level-type;
+      description "Log level configuration for stream logging.";
+      tailf:info "Log level configuration for stream logging.";
+      tailf:validate logging-config-val {
+        tailf:dependency .;
+      }
+    }
+    leaf syslog-level {
+      type log-level-type;
+      description "Log level configuration for syslog logging.";
+      tailf:info "Log level configuration for syslog logging.";
+      tailf:validate logging-config-val {
+        tailf:dependency .;
+      }
+    }
+    leaf time-format {
+      type log-time-format;
+      description "Time format configuration for logging.";
+      tailf:info "Time format configuration for logging.";
+    }
+  }
+
+  container logging-state {
+    config false;
+    description "State data of the traceh.h framework.";
+    tailf:callpoint logging-state-dp;
+    leaf console-level {
+      type log-level-type;
+      description "Log level for console logging.";
+      tailf:info "Log level for console logging.";
+    }
+    leaf stream-level {
+      type log-level-type;
+      description "Log level for stream logging.";
+      tailf:info "Log level for stream logging.";
+    }
+    leaf syslog-level {
+      type log-level-type;
+      description "Log level for syslog logging.";
+      tailf:info "Log level for syslog logging.";
+    }
+    leaf compiled-level {
+      type log-level-type;
+      description "Log level for compiled logging.";
+      tailf:info "Log level for compiled logging.";
+    }
+    leaf time-format {
+      type log-time-format;
+      description "Time format for logging.";
+      tailf:info "Time format for logging.";
+    }
+    leaf syslog-initialized {
+      type boolean;
+      description "Is syslog logging initialized?";
+    }
+    leaf streams-initialized {
+      type boolean;
+      description "Is streams logging initialized?";
+    }
+  }
+
+}

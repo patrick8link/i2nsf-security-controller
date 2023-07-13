@@ -1,0 +1,108 @@
+module example {
+  namespace "http://tail-f.com/ns/test/example";
+  prefix example;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for cdb_trigger_subscriptions example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-30 {
+    description "Initial revision.";
+  }
+
+  typedef interface-name {
+    type string {
+      length "min .. 30";
+      pattern "[A-Za-z][^/:.]*";
+    }
+  }
+  typedef prefix-length-ipv4 {
+    type int32 {
+      range "0 .. 32";
+    }
+  }
+  typedef interface-speed {
+    type enumeration {
+      enum 10;
+      enum 100;
+      enum 1000;
+    }
+  }
+  typedef interface-duplex {
+    type enumeration {
+      enum half;
+      enum full;
+    }
+  }
+  typedef mtu-size {
+    type int32 {
+      range "68 .. 1500";
+    }
+  }
+
+  container sys {
+    list ifc {
+      key name;
+      max-elements 64;
+      leaf name {
+        type interface-name;
+      }
+      leaf description {
+        type string;
+      }
+      leaf enabled {
+        type boolean;
+        default true;
+      }
+      container hw {
+        leaf speed {
+          type interface-speed;
+        }
+        leaf duplex {
+          type interface-duplex;
+        }
+        leaf mtu {
+          type mtu-size;
+        }
+        leaf mac {
+          type string;
+        }
+      }
+      list ip {
+        key address;
+        max-elements 1024;
+        leaf address {
+          type inet:ipv4-address;
+        }
+        leaf prefix-length {
+          type prefix-length-ipv4;
+          mandatory true;
+        }
+        leaf broadcast {
+          type inet:ipv4-address;
+        }
+      }
+    }
+  }
+}

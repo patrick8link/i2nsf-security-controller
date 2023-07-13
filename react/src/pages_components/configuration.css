@@ -32,6 +32,8 @@ p {
     display: inline-block;
     clear: left;
     width: 250px;
+    font-size: 20px;
+    font-weight: bolder;
     text-align: right; /*Change to right here if you want it close to the inputs*/
 }
 
@@ -78,7 +80,6 @@ option {
     font-size:medium;
 }
 select {
-
     font-family: 'Courier New', Courier, monospace;
     font-size:medium;
 }
@@ -87,12 +88,17 @@ select {
     align-items: left;
 }
 
+fieldset {
+    border-style: solid;
+    border-width: 3px;
+}
 
 legend {
     display: block;
     top: 0;
     left: 0;
-    font-size: x-large;
+    font-size: 35px;
+    font-weight: bolder;
 }
 
 .isHidden {

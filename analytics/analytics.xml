@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+  </capabilities>
+</hello>
+]]>]]>
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+ <edit-config>
+    <target>
+      <running/>
+    </target>
+    <config>
+      <i2nsfnfi:i2nsf-security-policy xmlns="urn:ietf:params:xml:ns:yang:ietf-i2nsf-analytics-interface"
+          xmlns:i2nsfnfi="urn:ietf:params:xml:ns:yang:ietf-i2nsf-nsf-facing-interface"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <i2nsfnfi:name>block_attack</i2nsfnfi:name>
+        <i2nsfnfi:rules>
+          <i2nsfnfi:name>block_attack</i2nsfnfi:name>
+          <i2nsfnfi:condition>
+            <i2nsfnfi:ipv4>
+              <i2nsfnfi:destination-ipv4-range>
+                <i2nsfnfi:start>115.145.178.177</i2nsfnfi:start>
+                <i2nsfnfi:end>115.145.178.177</i2nsfnfi:end>
+              </i2nsfnfi:destination-ipv4-range>
+            </i2nsfnfi:ipv4>
+          </i2nsfnfi:condition>
+          <i2nsfnfi:action>
+            <i2nsfnfi:packet-action>
+              <i2nsfnfi:ingress-action>drop</i2nsfnfi:ingress-action>
+            </i2nsfnfi:packet-action>
+          </i2nsfnfi:action>
+        </i2nsfnfi:rules>
+        <nsf-name>firewall</nsf-name>
+        <problem>
+          <ddos-detected>
+            <attack-src-ip>115.145.178.177</attack-src-ip>
+            <attack-dst-ip>10.0.0.58</attack-dst-ip>
+            <attack-dst-port>80</attack-dst-port>
+          </ddos-detected>
+        </problem>
+      </i2nsfnfi:i2nsf-security-policy>
+    </config>
+  </edit-config>
+</rpc>
+]]>]]>
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <close-session/>
+</rpc>

@@ -1,0 +1,25 @@
+module econfd_maapi {
+  namespace "urn:test:econfd:maapi";
+  prefix em;
+
+  container econfd_maapi {
+    container maapi {
+      leaf rollback-leaf {
+        type uint64;
+      }
+
+      container persons {
+        list person {
+          key name;
+
+          leaf name {
+            type string;
+          }
+          leaf age {
+            type uint8;
+          }
+        }
+      }
+    }
+  }
+}

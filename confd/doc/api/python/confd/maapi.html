@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>confd.maapi API documentation</title>
+<meta name="description" content="MAAPI high level module …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>confd.maapi</code></h1>
+</header>
+<section id="section-intro">
+<p>MAAPI high level module.</p>
+<p>This module defines a high level interface to the low-level maapi functions.</p>
+<p>The 'Maapi' class encapsulates a MAAPI connection which upon constructing,
+sets up a connection towards ConfD/NCS. An example of setting up a transaction
+and manipulating data:</p>
+<pre><code>import ncs
+
+m = ncs.maapi.Maapi()
+m.start_user_session('admin', 'test_context')
+t = m.start_write_trans()
+t.get_elem('/model/data{one}/str')
+t.set_elem('testing', '/model/data{one}/str')
+t.apply()
+</code></pre>
+<p>Another way is to use context managers, which will handle all cleanup
+related to transactions, user sessions and socket connections:</p>
+<pre><code>with ncs.maapi.Maapi() as m:
+    with ncs.maapi.Session(m, 'admin', 'test_context'):
+        with m.start_write_trans() as t:
+            t.get_elem('/model/data{one}/str')
+            t.set_elem('testing', '/model/data{one}/str')
+            t.apply()
+</code></pre>
+<p>Finally, a really compact way of doing this:</p>
+<pre><code>with ncs.maapi.single_write_trans('admin', 'test_context') as t:
+    t.get_elem('/model/data{one}/str')
+    t.set_elem('testing', '/model/data{one}/str')
+    t.apply()
+</code></pre>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="confd.maapi.connect"><code class="name flex">
+<span>def <span class="ident">connect</span></span>(<span>ip='127.0.0.1', port=4565, path=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience function for connecting to ConfD/NCS.</p>
+<p>The 'ip' and 'port' arguments are ignored if path is specified.</p>
+<p>Arguments:</p>
+<ul>
+<li>ip &ndash; ConfD/NCS instance ip address (str)</li>
+<li>port &ndash; ConfD/NCS instance port (int)</li>
+<li>path &ndash; ConfD/NCS instance location path (str)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>socket (Python socket)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.retry_on_conflict"><code class="name flex">
+<span>def <span class="ident">retry_on_conflict</span></span>(<span>retries=10, log=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function/method decorator to retry a transaction in case of conflicts.</p>
+<p>When executing multiple concurrent transactions against the NCS RUNNING
+datastore, read-write conflicts are resolved by rejecting transactions
+having potentially stale data with ERR_TRANSACTION_CONFLICT.</p>
+<p>This decorator restarts a function, should it run into a conflict, giving
+it multiple attempts to apply. The decorated function must start its own
+transaction because a conflicting transaction must be thrown away entirely
+and a new one started.</p>
+<p>Example usage:</p>
+<pre><code>@retry_on_conflict()
+def do_work():
+    with ncs.maapi.single_write_trans('admin', 'python') as t:
+        root = ncs.maagic.get_root(t)
+        root.some_value = str(root.some_other_value)
+        t.apply()
+</code></pre>
+<p>Arguments:</p>
+<ul>
+<li>retries &ndash; number of times to retry (int)</li>
+<li>log &ndash; optional log object for logging conflict details</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.single_read_trans"><code class="name flex">
+<span>def <span class="ident">single_read_trans</span></span>(<span>user, context, groups=[], db=2, ip='127.0.0.1', port=4565, path=None, src_ip='127.0.0.1', src_port=0, proto=1, vendor=None, product=None, version=None, client_id=None, load_schemas=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Context manager for a single READ transaction.</p>
+<p>This function connects to ConfD/NCS, starts a user session and finally
+starts a new READ transaction.</p>
+<p>Function signature:</p>
+<pre><code>def single_read_trans(user, context, groups=[],
+                      db=RUNNING, ip=&lt;CONFD-OR-NCS-ADDR&gt;,
+                      port=&lt;CONFD-OR-NCS-PORT&gt;, path=None,
+                      src_ip=&lt;CONFD-OR-NCS-ADDR&gt;, src_port=0,
+                      proto=PROTO_TCP,
+                      vendor=None, product=None, version=None,
+                      client_id=_mk_client_id(),
+                      load_schemas=LOAD_SCHEMAS_LOAD):
+</code></pre>
+<p>For argument db see Maapi.start_trans(). For arguments user,
+context, groups, src_ip, src_port, proto, vendor, product, version and
+client_id see Maapi.start_user_session().
+For arguments ip, port and path see connect().
+For argument load_schemas see <strong>init</strong>().</p>
+<p>Arguments:</p>
+<ul>
+<li>user - username (str)</li>
+<li>context - context for the session (str)</li>
+<li>groups - groups (list)</li>
+<li>db &ndash; database (int)</li>
+<li>ip &ndash; ConfD/NCS instance ip address (str)</li>
+<li>port &ndash; ConfD/NCS instance port (int)</li>
+<li>path &ndash; ConfD/NCS instance location path (str)</li>
+<li>src_ip - source ip address (str)</li>
+<li>src_port - source port (int)</li>
+<li>proto - protocol used by for connecting (i.e. ncs.PROTO_TCP)</li>
+<li>vendor &ndash; lock error information (str, optional)</li>
+<li>product &ndash; lock error information (str, optional)</li>
+<li>version &ndash; lock error information (str, optional)</li>
+<li>client_id &ndash; lock error information (str, optional)</li>
+<li>load_schemas - passed on to Maapi.<strong>init</strong>()</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>read transaction object (maapi.Transaction)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.single_write_trans"><code class="name flex">
+<span>def <span class="ident">single_write_trans</span></span>(<span>user, context, groups=[], db=2, ip='127.0.0.1', port=4565, path=None, src_ip='127.0.0.1', src_port=0, proto=1, vendor=None, product=None, version=None, client_id=None, load_schemas=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Context manager for a single READ/WRITE transaction.</p>
+<p>This function connects to ConfD/NCS, starts a user session and finally
+starts a new READ/WRITE transaction.</p>
+<p>Function signature:</p>
+<pre><code>def single_write_trans(user, context, groups=[],
+                       db=RUNNING, ip=&lt;CONFD-OR-NCS-ADDR&gt;,
+                       port=&lt;CONFD-OR-NCS-PORT&gt;, path=None,
+                       src_ip=&lt;CONFD-OR-NCS-ADDR&gt;, src_port=0,
+                       proto=PROTO_TCP,
+                       vendor=None, product=None, version=None,
+                       client_id=_mk_client_id(),
+                       load_schemas=LOAD_SCHEMAS_LOAD):
+</code></pre>
+<p>For argument db see Maapi.start_trans(). For arguments user,
+context, groups, src_ip, src_port, proto, vendor, product, version and
+client_id see Maapi.start_user_session().
+For arguments ip, port and path see connect().
+For argument load_schemas see <strong>init</strong>().</p>
+<p>Arguments:</p>
+<ul>
+<li>user - username (str)</li>
+<li>context - context for the session (str)</li>
+<li>groups - groups (list)</li>
+<li>db &ndash; database (int)</li>
+<li>ip &ndash; ConfD/NCS instance ip address (str)</li>
+<li>port &ndash; ConfD/NCS instance port (int)</li>
+<li>path &ndash; ConfD/NCS instance location path (str)</li>
+<li>src_ip - source ip address (str)</li>
+<li>src_port - source port (int)</li>
+<li>proto - protocol used by the client for connecting (int)</li>
+<li>vendor &ndash; lock error information (str, optional)</li>
+<li>product &ndash; lock error information (str, optional)</li>
+<li>version &ndash; lock error information (str, optional)</li>
+<li>client_id &ndash; lock error information (str, optional)</li>
+<li>load_schemas - passed on to Maapi.<strong>init</strong>()</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>write transaction object (maapi.Transaction)</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="confd.maapi.CommitParams"><code class="flex name class">
+<span>class <span class="ident">CommitParams</span></span>
+<span>(</span><span>result=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class representing NSO commit parameters.</p>
+<p>Start with creating an empty instance of this class and set commit
+parameters using helper methods.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.maapi.CommitParams.commit_queue_async"><code class="name flex">
+<span>def <span class="ident">commit_queue_async</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set commit queue asynchronous mode of operation.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_atomic"><code class="name flex">
+<span>def <span class="ident">commit_queue_atomic</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make the commit queue item atomic.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_block_others"><code class="name flex">
+<span>def <span class="ident">commit_queue_block_others</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make the commit queue item block other commit queue items for
+this device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_bypass"><code class="name flex">
+<span>def <span class="ident">commit_queue_bypass</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make the commit transactional even if commit queue is
+configured by default.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_error_option"><code class="name flex">
+<span>def <span class="ident">commit_queue_error_option</span></span>(<span>self, error_option)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set commit queue item behaviour on error.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_lock"><code class="name flex">
+<span>def <span class="ident">commit_queue_lock</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make the commit queue item locked.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_non_atomic"><code class="name flex">
+<span>def <span class="ident">commit_queue_non_atomic</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make the commit queue item non-atomic.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_sync"><code class="name flex">
+<span>def <span class="ident">commit_queue_sync</span></span>(<span>self, timeout=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set commit queue synchronous mode of operation.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.commit_queue_tag"><code class="name flex">
+<span>def <span class="ident">commit_queue_tag</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set commit-queue tag. Implicitly enabled commit queue commit.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_cli"><code class="name flex">
+<span>def <span class="ident">dry_run_cli</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat CLI.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_cli_c"><code class="name flex">
+<span>def <span class="ident">dry_run_cli_c</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat cli-c.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_cli_c_reverse"><code class="name flex">
+<span>def <span class="ident">dry_run_cli_c_reverse</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat cli-c reverse.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_native"><code class="name flex">
+<span>def <span class="ident">dry_run_native</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat native.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_native_reverse"><code class="name flex">
+<span>def <span class="ident">dry_run_native_reverse</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat native reverse.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.dry_run_xml"><code class="name flex">
+<span>def <span class="ident">dry_run_xml</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dry-run commit outformat XML.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_commit_queue_error_option"><code class="name flex">
+<span>def <span class="ident">get_commit_queue_error_option</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get commit queue item behaviour on error.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_commit_queue_sync_timeout"><code class="name flex">
+<span>def <span class="ident">get_commit_queue_sync_timeout</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get commit queue synchronous mode of operation timeout.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_commit_queue_tag"><code class="name flex">
+<span>def <span class="ident">get_commit_queue_tag</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get commit-queue tag.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_dry_run_outformat"><code class="name flex">
+<span>def <span class="ident">get_dry_run_outformat</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get dry-run outformat</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_trace_id"><code class="name flex">
+<span>def <span class="ident">get_trace_id</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get trace id.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.get_wait_devices"><code class="name flex">
+<span>def <span class="ident">get_wait_devices</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the devices that the transaction should wait for a device lock
+for before entering the transactions critical section.</p>
+<p>This method is deprecated and will be removed in future release.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_async"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_async</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get commit queue asynchronous mode of operation.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_atomic"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_atomic</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the commit queue item should be atomic.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_block_others"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_block_others</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the the commit queue item should block other commit
+queue items for this device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_bypass"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_bypass</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the commit is transactional even if commit queue is
+configured by default.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_lock"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_lock</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the commit queue item should be locked.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_non_atomic"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_non_atomic</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the commit queue item should be non-atomic.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_commit_queue_sync"><code class="name flex">
+<span>def <span class="ident">is_commit_queue_sync</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get commit queue synchronous mode of operation.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_dry_run"><code class="name flex">
+<span>def <span class="ident">is_dry_run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Is dry-run enabled</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_dry_run_reverse"><code class="name flex">
+<span>def <span class="ident">is_dry_run_reverse</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Is dry-run reverse enabled.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_deploy"><code class="name flex">
+<span>def <span class="ident">is_no_deploy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Should service create method be invoked or not.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_lsa"><code class="name flex">
+<span>def <span class="ident">is_no_lsa</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get no-lsa commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_networking"><code class="name flex">
+<span>def <span class="ident">is_no_networking</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the the configuration should only be written to CDB and
+not actually pushed to the device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_out_of_sync_check"><code class="name flex">
+<span>def <span class="ident">is_no_out_of_sync_check</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Do not check device sync state before pushing the configuration
+change.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_overwrite"><code class="name flex">
+<span>def <span class="ident">is_no_overwrite</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Should a check be done that the parts of the device configuration
+to be modified are are up-to-date in CDB before pushing the
+configuration change to the device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_no_revision_drop"><code class="name flex">
+<span>def <span class="ident">is_no_revision_drop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get no-revision-drop commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_reconcile_discard_non_service_config"><code class="name flex">
+<span>def <span class="ident">is_reconcile_discard_non_service_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get reconcile commit parameter with discard-non-service-config
+behaviour.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_reconcile_keep_non_service_config"><code class="name flex">
+<span>def <span class="ident">is_reconcile_keep_non_service_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get reconcile commit parameter with keep-non-service-config
+behaviour.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.is_use_lsa"><code class="name flex">
+<span>def <span class="ident">is_use_lsa</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get use-lsa commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_deploy"><code class="name flex">
+<span>def <span class="ident">no_deploy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Do not invoke service's create method.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_lsa"><code class="name flex">
+<span>def <span class="ident">no_lsa</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set no-lsa commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_networking"><code class="name flex">
+<span>def <span class="ident">no_networking</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Only write the configuration to CDB, do not actually push it to
+the device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_out_of_sync_check"><code class="name flex">
+<span>def <span class="ident">no_out_of_sync_check</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Do not check device sync state before pushing the configuration
+change.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_overwrite"><code class="name flex">
+<span>def <span class="ident">no_overwrite</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check that the parts of the device configuration to be modified are
+are up-to-date in CDB before pushing the configuration change to the
+device.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.no_revision_drop"><code class="name flex">
+<span>def <span class="ident">no_revision_drop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set no-revision-drop commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.reconcile_discard_non_service_config"><code class="name flex">
+<span>def <span class="ident">reconcile_discard_non_service_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set reconcile commit parameter with discard-non-service-config
+behaviour.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.reconcile_keep_non_service_config"><code class="name flex">
+<span>def <span class="ident">reconcile_keep_non_service_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set reconcile commit parameter with keep-non-service-config
+behaviour.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.set_dry_run_outformat"><code class="name flex">
+<span>def <span class="ident">set_dry_run_outformat</span></span>(<span>self, outformat)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set dry-run outformat</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.trace_id"><code class="name flex">
+<span>def <span class="ident">trace_id</span></span>(<span>self, trace_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set trace id.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.use_lsa"><code class="name flex">
+<span>def <span class="ident">use_lsa</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set use-lsa commit parameter.</p></div>
+</dd>
+<dt id="confd.maapi.CommitParams.wait_device"><code class="name flex">
+<span>def <span class="ident">wait_device</span></span>(<span>self, devices)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wait for device locks before entering transaction critical state.</p>
+<p>This method is deprecated and will be removed in future release.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.maapi.DryRunOutformat"><code class="flex name class">
+<span>class <span class="ident">DryRunOutformat</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="enum.Enum" href="https://docs.python.org/3/library/typing.html#typing.enum.Enum">enum.Enum</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="confd.maapi.DryRunOutformat.CLI"><code class="name">var <span class="ident">CLI</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="confd.maapi.DryRunOutformat.CLI_C"><code class="name">var <span class="ident">CLI_C</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="confd.maapi.DryRunOutformat.NATIVE"><code class="name">var <span class="ident">NATIVE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="confd.maapi.DryRunOutformat.XML"><code class="name">var <span class="ident">XML</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.maapi.Key"><code class="flex name class">
+<span>class <span class="ident">Key</span></span>
+<span>(</span><span>key, enum_cs_nodes=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Key string encapsulation and helper.</p>
+<p>Initialize a key.</p>
+<p>'key' may be a string or a list of strings.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi"><code class="flex name class">
+<span>class <span class="ident">Maapi</span></span>
+<span>(</span><span>ip='127.0.0.1', port=4565, path=None, load_schemas=True, msock=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class encapsulating a MAAPI connection.</p>
+<p>Create a Maapi instance.</p>
+<p>Arguments:</p>
+<ul>
+<li>ip &ndash; ConfD/NCS instance ip address (str, optional)</li>
+<li>port &ndash; ConfD/NCS instance port (int, optional)</li>
+<li>path &ndash; ConfD/NCS instance location path (str, optional)</li>
+<li>msock &ndash; already connected MAAPI socket (socket.socket, optional)
+(ip, port and path ignored)</li>
+<li>load_schemas &ndash; whether schemas should be loaded/reloaded or not
+LOAD_SCHEMAS_LOAD = load schemas unless already loaded
+LOAD_SCHEMAS_SKIP = do not load schemas
+LOAD_SCHEMAS_RELOAD = force reload of schemas</li>
+</ul>
+<p>The option LOAD_SCHEMAS_RELOAD can be used to force a reload of
+schemas, for example when connecting to a different ConfD/NSO node.
+Note that previously constructed maagic objects will be invalid and
+using them will lead to undefined behavior. Use this option with care,
+for example in a small script querying a list of running nodes.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="confd.maapi.Maapi.ip"><code class="name">var <span class="ident">ip</span></code></dt>
+<dd>
+<div class="desc"><p>Return address to connect to the IPC port</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<div class="desc"><p>Return path to connect to the IPC port</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.port"><code class="name">var <span class="ident">port</span></code></dt>
+<dd>
+<div class="desc"><p>Return port to connect to the IPC port</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.maapi.Maapi.apply_template"><code class="name flex">
+<span>def <span class="ident">apply_template</span></span>(<span>self, th, name, path, vars=None, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a template.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.attach"><code class="name flex">
+<span>def <span class="ident">attach</span></span>(<span>self, ctx_or_th, hashed_ns=0, usid=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attach to an existing transaction.</p>
+<p>'ctx_or_th' may be either a TransCtxRef or a transaction handle.
+The 'hashed_ns' argument is basically just there to save a call to
+set_namespace(). 'usid' is only used if 'ctx_or_th' is a transaction
+handle and if set to 0 the user session id that is the owner of the
+transaction will be used.</p>
+<p>Arguments:</p>
+<ul>
+<li>ctx_or_th (TransCtxRef or transaction handle)</li>
+<li>hashed_ns (int)</li>
+<li>usid (int)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>transaction object (maapi.Transaction)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.attach_init"><code class="name flex">
+<span>def <span class="ident">attach_init</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attach to phase0 for CDB initialization and upgrade.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.authenticate"><code class="name flex">
+<span>def <span class="ident">authenticate</span></span>(<span>self, user, password, n, src_addr=None, src_port=None, context=None, prot=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Authenticate a user using the AAA configuration.</p>
+<p>Use src_addr, src_port, context and prot to use an external
+authentication executable.
+Use the 'n' to get a list of n-1 groups that the user is a member of.
+Use n=1 if the function is used in a context where the group names
+are not needed.</p>
+<p>Returns 1 if accepted without groups. If the authentication failed
+or was accepted a tuple with first element status code, 0 for
+rejection and 1 for accepted is returned. The second element either
+contains the reason for the rejection as a string OR a list groupnames.</p>
+<p>Arguments:</p>
+<ul>
+<li>user - username (str)</li>
+<li>password - passwor d (str)</li>
+<li>n - number of groups to return (int)</li>
+<li>src_addr - source ip address (str)</li>
+<li>src_port - source port (int)</li>
+<li>context - context for the session (str)</li>
+<li>prot - protocol used by the client for connecting (int)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>status (int or tuple)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ends session and closes socket.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.cursor"><code class="name flex">
+<span>def <span class="ident">cursor</span></span>(<span>self, th, path, enum_cs_nodes=None, want_values=False, secondary_index=None, xpath_expr=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get an iterable list cursor.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.destroy_cursor"><code class="name flex">
+<span>def <span class="ident">destroy_cursor</span></span>(<span>self, mc)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Destroy cursor.</p>
+<p>Arguments:</p>
+<ul>
+<li>cursor (maapi.Cursor)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.detach"><code class="name flex">
+<span>def <span class="ident">detach</span></span>(<span>self, ctx_or_th)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detach the underlying MAAPI socket.</p>
+<p>Arguments:</p>
+<ul>
+<li>ctx_or_th (TransCtxRef or transaction handle)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.do_display"><code class="name flex">
+<span>def <span class="ident">do_display</span></span>(<span>self, th, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Do display.</p>
+<p>If the data model uses the YANG when or tailf:display-when
+statement, this function can be used to determine if the item
+given by the path should be displayed or not.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>path &ndash; path to the 'display-when' statement (str)</li>
+</ul>
+<p>Returns</p>
+<ul>
+<li>boolean</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.exists"><code class="name flex">
+<span>def <span class="ident">exists</span></span>(<span>self, th, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if path exists.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>path &ndash; path to the node in the data tree (str)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>boolean</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.find_next"><code class="name flex">
+<span>def <span class="ident">find_next</span></span>(<span>self, mc, type, inkeys)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find next.</p>
+<p>Update the cursor 'mc' with the key(s) for the list entry designated
+by the 'type' and 'inkeys' arguments. This function may be used to
+start a traversal from an arbitrary entry in a list. Keys for
+subsequent entries may be retrieved with the get_next() function.
+When no more keys are found, False is returned.</p>
+<p>The strategy to use is defined by 'type':</p>
+<pre><code>FIND_NEXT - The keys for the first list entry after the one
+            indicated by the 'inkeys' argument.
+FIND_SAME_OR_NEXT - If the values in the 'inkeys' array completely
+            identifies an actual existing list entry, the keys for
+            this entry are requested. Otherwise the same logic as
+            for FIND_NEXT above.
+</code></pre></div>
+</dd>
+<dt id="confd.maapi.Maapi.get_next"><code class="name flex">
+<span>def <span class="ident">get_next</span></span>(<span>self, mc)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate and get the keys for the next entry in a list.</p>
+<p>When no more keys are found, False is returned</p>
+<p>Arguments:</p>
+<ul>
+<li>cursor (maapi.Cursor)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>keys (list or boolean)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.get_objects"><code class="name flex">
+<span>def <span class="ident">get_objects</span></span>(<span>self, mc, n, nobj)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get objects.</p>
+<p>Read at most n values from each nobj lists starting at cursor mc.
+Returns a list of Value's.</p>
+<p>Arguments:</p>
+<ul>
+<li>mc (maapi.Cursor)</li>
+<li>n &ndash; at most n values will be read (int)</li>
+<li>nobj &ndash; number of nobj lists which n elements will be taken from (int)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>list of values (list)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.get_running_db_status"><code class="name flex">
+<span>def <span class="ident">get_running_db_status</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get running db status.</p>
+<p>Gets the status of the running db. Returns True if consistent and
+False otherwise.</p>
+<p>Returns:</p>
+<ul>
+<li>boolean</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.load_schemas"><code class="name flex">
+<span>def <span class="ident">load_schemas</span></span>(<span>self, use_maapi_socket=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load the schemas to Python (using shared memory if enabled).</p>
+<p>If 'use_maapi_socket' is set to True, the schmeas are loaded through
+the NSO daemon via a MAAPI socket.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.netconf_ssh_call_home"><code class="name flex">
+<span>def <span class="ident">netconf_ssh_call_home</span></span>(<span>self, host, port=4334)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initiate NETCONF SSH Call Home.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.netconf_ssh_call_home_opaque"><code class="name flex">
+<span>def <span class="ident">netconf_ssh_call_home_opaque</span></span>(<span>self, host, opaque, port=4334)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initiate NETCONF SSH Call Home w. opaque data.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.query_free_result"><code class="name flex">
+<span>def <span class="ident">query_free_result</span></span>(<span>self, qrs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deallocate QueryResult memory.</p>
+<p>Deallocated memory inside the QueryResult object 'qrs' returned from
+query_result(). It is not necessary to call this method as deallocation
+will be done when the Python library garbage collects the QueryResult
+object.</p>
+<p>Arguments:</p>
+<ul>
+<li>qrs &ndash; the query result structure to free</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_progress"><code class="name flex">
+<span>def <span class="ident">report_progress</span></span>(<span>self, th, verbosity, msg, package=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction/action progress.</p>
+<p>The 'package' argument is only available to NCS.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_progress_start"><code class="name flex">
+<span>def <span class="ident">report_progress_start</span></span>(<span>self, th, verbosity, msg, package=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction/action progress.</p>
+<p>Used for calculation of the duration between two events. The method
+returns a _Progress object to be passed to report_progress_stop()
+once the event has finished.</p>
+<p>The 'package' argument is only available to NCS.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_progress_stop"><code class="name flex">
+<span>def <span class="ident">report_progress_stop</span></span>(<span>self, th, progress, annotation=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction/action progress.</p>
+<p>Used for calculation of the duration between two events. The method
+takes a _Progress object returned from report_progress_start().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_service_progress"><code class="name flex">
+<span>def <span class="ident">report_service_progress</span></span>(<span>self, th, verbosity, msg, path, package=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction progress for a FASTMAP service.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_service_progress_start"><code class="name flex">
+<span>def <span class="ident">report_service_progress_start</span></span>(<span>self, th, verbosity, msg, path, package=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction progress for a FASTMAP service.</p>
+<p>Used for calculation of the duration between two events. The method
+returns a _Progress object to be passed to
+report_service_progress_stop() once the event has finished.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.report_service_progress_stop"><code class="name flex">
+<span>def <span class="ident">report_service_progress_stop</span></span>(<span>self, th, progress, annotation=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report transaction progress for a FASTMAP service.</p>
+<p>Used for calculation of the duration between two events. The method
+takes a _Progress object returned from report_service_progress_start().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.run_with_retry"><code class="name flex">
+<span>def <span class="ident">run_with_retry</span></span>(<span>self, fun, max_num_retries=10, commit_params=None, usid=0, flags=0, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run fun with a new read-write transaction against RUNNING.</p>
+<p>The transaction is applied if fun returns True. The fun is
+only retried in case of transaction conflicts. Each retry is
+run using a new transaction.</p>
+<p>The last conflict error.Error is thrown in case of max number of
+retries is reached.</p>
+<p>Arguments:</p>
+<ul>
+<li>fun - work fun (fun(maapi.Transaction) -&gt; bool)</li>
+<li>usid - user id (int)</li>
+<li>max_num_retries - maximum number of retries (int)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>bool True if transation was applied, else False.</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.safe_create"><code class="name flex">
+<span>def <span class="ident">safe_create</span></span>(<span>self, th, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Safe version of create.</p>
+<p>Create a new list entry, a presence container, or a leaf of
+type empty in the data tree - if it doesn't already exist.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>path &ndash; path to the new element (str)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.safe_delete"><code class="name flex">
+<span>def <span class="ident">safe_delete</span></span>(<span>self, th, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Safe version of delete.</p>
+<p>Delete an existing list entry, a presence container, or an
+optional leaf and all its children (if any) from the data
+tree. If it exists.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>path &ndash; path to the element (str)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.safe_get_elem"><code class="name flex">
+<span>def <span class="ident">safe_get_elem</span></span>(<span>self, th, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Safe version of get_elem.</p>
+<p>Read the element at 'path', returns 'None' if it doesn't
+exist.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>path &ndash; path to the element (str)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>configuration element</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.safe_get_object"><code class="name flex">
+<span>def <span class="ident">safe_get_object</span></span>(<span>self, th, n, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Safe version of get_object.</p>
+<p>This function reads at most 'n' values from the list entry or
+container specified by the 'path'. Returns 'None' the path is
+empty.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>n &ndash; at most n values (int)</li>
+<li>path &ndash; path to the object (str)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>configuration object</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.set_elem"><code class="name flex">
+<span>def <span class="ident">set_elem</span></span>(<span>self, th, value, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the node at 'path' to 'value'.</p>
+<p>If 'value' is not of type Value it will be converted to a string
+before calling set_elem2() under the hood.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>value &ndash; element value (Value or str)</li>
+<li>path &ndash; path to the element (str)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_apply_template"><code class="name flex">
+<span>def <span class="ident">shared_apply_template</span></span>(<span>self, th, name, path, vars=None, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of apply_template().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_copy_tree"><code class="name flex">
+<span>def <span class="ident">shared_copy_tree</span></span>(<span>self, th, from_path, to_path, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of copy_tree().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_create"><code class="name flex">
+<span>def <span class="ident">shared_create</span></span>(<span>self, th, path, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of create().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_insert"><code class="name flex">
+<span>def <span class="ident">shared_insert</span></span>(<span>self, th, path, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of insert().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_set_elem"><code class="name flex">
+<span>def <span class="ident">shared_set_elem</span></span>(<span>self, th, value, path, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of set_elem().</p>
+<p>If 'value' is not of type Value it will be converted to a string
+before calling shared_set_elem2() under the hood.</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.shared_set_values"><code class="name flex">
+<span>def <span class="ident">shared_set_values</span></span>(<span>self, th, values, path, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>FASTMAP version of set_values().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.start_read_trans"><code class="name flex">
+<span>def <span class="ident">start_read_trans</span></span>(<span>self, db=2, usid=0, flags=0, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a read transaction.</p>
+<p>For details see start_trans().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.start_trans"><code class="name flex">
+<span>def <span class="ident">start_trans</span></span>(<span>self, rw, db=2, usid=0, flags=0, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a transaction towards the 'db'.</p>
+<p>This function starts a new a new transaction towards the given
+data store.</p>
+<p>Arguments:</p>
+<ul>
+<li>rw &ndash; Either READ or READ_WRITE flag (ncs)</li>
+<li>db &ndash; Either CANDIDATE, RUNNING or STARTUP flag (cdb)</li>
+<li>usid &ndash; user id (int)</li>
+<li>flags &ndash; additional transaction flags (int)</li>
+<li>vendor &ndash; lock error information (str, optional)</li>
+<li>product &ndash; lock error information (str, optional)</li>
+<li>version &ndash; lock error information (str, optional)</li>
+<li>client_id &ndash; lock error information (str, optional)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>transaction (maapi.Transaction)</li>
+</ul>
+<p>Flags (maapi):</p>
+<ul>
+<li>FLAG_HINT_BULK</li>
+<li>FLAG_NO_DEFAULTS</li>
+<li>FLAG_CONFIG_ONLY</li>
+<li>FLAG_HIDE_INACTIVE</li>
+<li>FLAG_DELAYED_WHEN</li>
+<li>FLAG_NO_CONFIG_CACHE</li>
+<li>FLAG_CONFIG_CACHE_ONLY</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.start_trans_in_trans"><code class="name flex">
+<span>def <span class="ident">start_trans_in_trans</span></span>(<span>self, th, readwrite, usid=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a new transaction within a transaction.</p>
+<p>This function makes it possible to start a transaction with another
+transaction as backend, instead of an actual data store. This can be
+useful if we want to make a set of related changes, and then either
+apply or discard them all based on some criterion, while other changes
+remain unaffected. The thandle identifies the backend transaction to
+use. If 'usid' is 0, the transaction will be started within the user
+session associated with the MAAPI socket, otherwise it will be started
+within the user session given by usid. If we call apply() on this
+"transaction in a transaction" object, the changes (if any) will be
+applied to the backend transaction. To discard the changes, call
+finish() without calling apply() first.</p>
+<p>Arguments:</p>
+<ul>
+<li>th &ndash; transaction handle</li>
+<li>readwrite &ndash; Either READ or READ_WRITE flag (ncs)</li>
+<li>usid &ndash; user id (int)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>transaction (maapi.Transaction)</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Maapi.start_user_session"><code class="name flex">
+<span>def <span class="ident">start_user_session</span></span>(<span>self, user, context, groups=[], src_ip='127.0.0.1', src_port=0, proto=1, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a new user session.</p>
+<p>This method gives some resonable defaults.</p>
+<p>Arguments:</p>
+<ul>
+<li>user - username (str)</li>
+<li>context - context for the session (str)</li>
+<li>groups - groups (list)</li>
+<li>src_ip - source ip address (str)</li>
+<li>src_port - source port (int)</li>
+<li>proto - protocol used by for connecting (i.e. ncs.PROTO_TCP)</li>
+<li>vendor &ndash; lock error information (str, optional)</li>
+<li>product &ndash; lock error information (str, optional)</li>
+<li>version &ndash; lock error information (str, optional)</li>
+<li>client_id &ndash; lock error information (str, optional)</li>
+</ul>
+<p>Protocol flags (ncs):</p>
+<ul>
+<li>PROTO_CONSOLE</li>
+<li>PROTO_HTTP</li>
+<li>PROTO_HTTPS</li>
+<li>PROTO_SSH</li>
+<li>PROTO_SSL</li>
+<li>PROTO_SYSTEM</li>
+<li>PROTO_TCP</li>
+<li>PROTO_TLS</li>
+<li>PROTO_TRACE</li>
+<li>PROTO_UDP</li>
+</ul>
+<p>Example use:</p>
+<pre><code>maapi.start_user_session(
+      sock_maapi,
+      'admin',
+      'python',
+      [],
+      _ncs.ADDR,
+      _ncs.PROTO_TCP)
+</code></pre></div>
+</dd>
+<dt id="confd.maapi.Maapi.start_write_trans"><code class="name flex">
+<span>def <span class="ident">start_write_trans</span></span>(<span>self, db=2, usid=0, flags=0, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a write transaction.</p>
+<p>For details see start_trans().</p></div>
+</dd>
+<dt id="confd.maapi.Maapi.write_service_log_entry"><code class="name flex">
+<span>def <span class="ident">write_service_log_entry</span></span>(<span>self, path, msg, type, level)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write service log entries.</p>
+<p>This function makes it possible to write service log entries from
+FASTMAP code.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.maapi.Session"><code class="flex name class">
+<span>class <span class="ident">Session</span></span>
+<span>(</span><span>maapi, user, context, groups=[], src_ip='127.0.0.1', src_port=0, proto=1, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Encapsulate a MAAPI user session.</p>
+<p>Context manager for user sessions. This class makes it easy to use
+a single Maapi connection and switch user session along the way.
+For example:</p>
+<pre><code>with Maapi() as m:
+    for user, context, device in devlist:
+        with Session(m, user, context):
+            with m.start_write_trans() as t:
+                # ...
+                # do something using the correct user session
+                # ...
+                t.apply()
+</code></pre>
+<p>Initialize a Session object via start_user_session().</p>
+<p>Arguments:</p>
+<ul>
+<li>maapi &ndash; maapi object (maapi.Maapi)</li>
+<li>for all other arguments see start_user_session()</li>
+</ul></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.maapi.Session.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Close the user session.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.maapi.Transaction"><code class="flex name class">
+<span>class <span class="ident">Transaction</span></span>
+<span>(</span><span>maapi, th=None, rw=None, db=2, vendor=None, product=None, version=None, client_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that corresponds to a single MAAPI transaction.</p>
+<p>Initialize a Transaction object.</p>
+<p>When created one may access the maapi and th arguments like this:</p>
+<pre><code>trans = Transaction(mymaapi, th=myth)
+trans.maapi # the Maapi object
+trans.th # the transaction handle
+</code></pre>
+<p>An instance of this class is also a context manager:</p>
+<pre><code>with Transaction(mymaapi, th=myth) as trans:
+    # do something here...
+</code></pre>
+<p>When exiting the with statement, finish() will be called.</p>
+<p>If 'th' is left out (or None) a new transaction is started using
+the 'db' and 'rw' arguments, otherwise 'db' and 'rw' are ignored.</p>
+<p>Arguments:</p>
+<ul>
+<li>maapi &ndash; a Maapi object (maapi.Maapi)</li>
+<li>th &ndash; a transaction handle or None</li>
+<li>rw &ndash; Either READ or READ_WRITE flag (ncs)</li>
+<li>db &ndash; Either CANDIDATE, RUNNING or STARTUP flag (cdb)</li>
+<li>vendor &ndash; lock error information (optional)</li>
+<li>product &ndash; lock error information (optional)</li>
+<li>version &ndash; lock error information (optional)</li>
+<li>client_id &ndash; lock error information (optional)</li>
+</ul></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.maapi.Transaction.abort"><code class="name flex">
+<span>def <span class="ident">abort</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Abort the transaction.</p></div>
+</dd>
+<dt id="confd.maapi.Transaction.apply"><code class="name flex">
+<span>def <span class="ident">apply</span></span>(<span>self, keep_open=True, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply the transaction.</p>
+<p>Validates, prepares and eventually commits or aborts the
+transaction. If the validation fails and the 'keep_open'
+argument is set to True (default), the transaction is left
+open and the developer can react upon the validation errors.</p>
+<p>Arguments:</p>
+<ul>
+<li>keep_open &ndash; keep transaction open (boolean)</li>
+<li>flags - additional transaction flags (int)</li>
+</ul>
+<p>Flags (maapi):</p>
+<ul>
+<li>COMMIT_NCS_NO_REVISION_DROP</li>
+<li>COMMIT_NCS_NO_DEPLOY</li>
+<li>COMMIT_NCS_NO_NETWORKING</li>
+<li>COMMIT_NCS_NO_OUT_OF_SYNC_CHECK</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_BYPASS</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ASYNC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_SYNC</li>
+<li>COMMIT_NCS_NO_OVERWRITE</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_LOCK</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_BLOCK_OTHERS</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ATOMIC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_NONATOMIC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_CONTINUE_ON_ERROR</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ROLLBACK_ON_ERROR</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_STOP_ON_ERROR</li>
+<li>COMMIT_NCS_USE_LSA</li>
+<li>COMMIT_NCS_NO_LSA</li>
+<li>COMMIT_NCS_RECONCILE_KEEP_NON_SERVICE_CONFIG</li>
+<li>COMMIT_NCS_RECONCILE_DISCARD_NON_SERVICE_CONFIG</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Transaction.apply_params"><code class="name flex">
+<span>def <span class="ident">apply_params</span></span>(<span>self, keep_open=True, params=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply the transaction and return the result in form of dict().</p>
+<p>Validates, prepares and eventually commits or aborts the
+transaction. If the validation fails and the 'keep_open'
+argument is set to True (default), the transaction is left
+open and the developer can react upon the validation errors.</p>
+<p>The 'params' argument represent commit parameters. See CommitParams
+class for available commit parameters.</p>
+<p>The result is a dictionary representing the result of applying
+transaction. If dry-run was requested, then the resulting dictionary
+will have 'dry-run' key set along with the actual results. If commit
+through commit queue was requested, then the resulting dictionary
+will have 'commit-queue' key set. Otherwise the dictionary will
+be empty.</p>
+<p>Arguments:</p>
+<ul>
+<li>keep_open &ndash; keep transaction open (boolean)</li>
+<li>params &ndash; list of commit parameters (maapi.CommitParams)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>dict (see above)</li>
+</ul>
+<p>Example use:</p>
+<pre><code>with ncs.maapi.single_write_trans('admin', 'python') as t:
+    root = ncs.maagic.get_root(t)
+    dns_list = root.devices.device['ex1'].config.sys.dns.server
+    dns_list.create('192.0.2.1')
+    params = t.get_params()
+    params.dry_run_native()
+    result = t.apply_params(True, params)
+    print(result['device']['ex1'])
+    t.apply_params(True, t.get_params())
+</code></pre></div>
+</dd>
+<dt id="confd.maapi.Transaction.commit"><code class="name flex">
+<span>def <span class="ident">commit</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Commit the transaction.</p></div>
+</dd>
+<dt id="confd.maapi.Transaction.finish"><code class="name flex">
+<span>def <span class="ident">finish</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finish the transaction.</p>
+<p>This will finish the transaction. If the transaction is implemented
+by an external database, this will invoke the finish() callback.</p></div>
+</dd>
+<dt id="confd.maapi.Transaction.get_params"><code class="name flex">
+<span>def <span class="ident">get_params</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the current commit parameters for the transaction.</p>
+<p>The result is an instance of the CommitParams class.</p></div>
+</dd>
+<dt id="confd.maapi.Transaction.prepare"><code class="name flex">
+<span>def <span class="ident">prepare</span></span>(<span>self, flags=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prepare transaction.</p>
+<p>This function must be called as first part of two-phase commit. After
+this function has been called, commit() or abort() must be called.</p>
+<p>It will invoke the prepare callback in all participants in the
+transaction. If all participants reply with OK, the second phase of
+the two-phase commit procedure is commenced.</p>
+<p>Arguments:</p>
+<ul>
+<li>flags - additional transaction flags (int)</li>
+</ul>
+<p>Flags (maapi):</p>
+<ul>
+<li>COMMIT_NCS_NO_REVISION_DROP</li>
+<li>COMMIT_NCS_NO_DEPLOY</li>
+<li>COMMIT_NCS_NO_NETWORKING</li>
+<li>COMMIT_NCS_NO_OUT_OF_SYNC_CHECK</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_BYPASS</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ASYNC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_SYNC</li>
+<li>COMMIT_NCS_NO_OVERWRITE</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_LOCK</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_BLOCK_OTHERS</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ATOMIC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_NONATOMIC</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_CONTINUE_ON_ERROR</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_ROLLBACK_ON_ERROR</li>
+<li>COMMIT_NCS_COMMIT_QUEUE_STOP_ON_ERROR</li>
+<li>COMMIT_NCS_USE_LSA</li>
+<li>COMMIT_NCS_NO_LSA</li>
+<li>COMMIT_NCS_RECONCILE_KEEP_NON_SERVICE_CONFIG</li>
+<li>COMMIT_NCS_RECONCILE_DISCARD_NON_SERVICE_CONFIG</li>
+</ul></div>
+</dd>
+<dt id="confd.maapi.Transaction.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>self, unlock, forcevalidation=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validate the transaction.</p>
+<p>This function validates all data written in the transaction. This
+includes all data model constraints and all defined semantic
+validation, i.e. user programs that have registered functions under
+validation points.</p>
+<p>If 'unlock' is True, the transaction is open for further editing even
+if validation succeeds. If 'unlock' is False and the function succeeds
+next function to be called MUST be prepare() or finish().</p>
+<p>'unlock = True' can be used to implement a 'validate' command which
+can be given in the middle of an editing session. The first thing that
+happens is that a lock is set. If 'unlock' == False, the lock is
+released on success. The lock is always released on failure.</p>
+<p>The 'forcevalidation' argument should normally be False. It has no
+effect for a transaction towards the running or startup data stores,
+validation is always performed. For a transaction towards the
+candidate data store, validation will not be done unless
+'forcevalidation' is True. Avoiding this validation is preferable if
+we are going to commit the candidate to running, since otherwise the
+validation will be done twice. However if we are implementing a
+'validate' command, we should give a True value for 'forcevalidation'.</p>
+<p>Arguments:</p>
+<ul>
+<li>unlock (boolean)</li>
+<li>forcevalidation (boolean)</li>
+</ul></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="confd" href="index.html">confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="confd.maapi.connect" href="#confd.maapi.connect">connect</a></code></li>
+<li><code><a title="confd.maapi.retry_on_conflict" href="#confd.maapi.retry_on_conflict">retry_on_conflict</a></code></li>
+<li><code><a title="confd.maapi.single_read_trans" href="#confd.maapi.single_read_trans">single_read_trans</a></code></li>
+<li><code><a title="confd.maapi.single_write_trans" href="#confd.maapi.single_write_trans">single_write_trans</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="confd.maapi.CommitParams" href="#confd.maapi.CommitParams">CommitParams</a></code></h4>
+<ul class="">
+<li><code><a title="confd.maapi.CommitParams.commit_queue_async" href="#confd.maapi.CommitParams.commit_queue_async">commit_queue_async</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_atomic" href="#confd.maapi.CommitParams.commit_queue_atomic">commit_queue_atomic</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_block_others" href="#confd.maapi.CommitParams.commit_queue_block_others">commit_queue_block_others</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_bypass" href="#confd.maapi.CommitParams.commit_queue_bypass">commit_queue_bypass</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_error_option" href="#confd.maapi.CommitParams.commit_queue_error_option">commit_queue_error_option</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_lock" href="#confd.maapi.CommitParams.commit_queue_lock">commit_queue_lock</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_non_atomic" href="#confd.maapi.CommitParams.commit_queue_non_atomic">commit_queue_non_atomic</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_sync" href="#confd.maapi.CommitParams.commit_queue_sync">commit_queue_sync</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.commit_queue_tag" href="#confd.maapi.CommitParams.commit_queue_tag">commit_queue_tag</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_cli" href="#confd.maapi.CommitParams.dry_run_cli">dry_run_cli</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_cli_c" href="#confd.maapi.CommitParams.dry_run_cli_c">dry_run_cli_c</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_cli_c_reverse" href="#confd.maapi.CommitParams.dry_run_cli_c_reverse">dry_run_cli_c_reverse</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_native" href="#confd.maapi.CommitParams.dry_run_native">dry_run_native</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_native_reverse" href="#confd.maapi.CommitParams.dry_run_native_reverse">dry_run_native_reverse</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.dry_run_xml" href="#confd.maapi.CommitParams.dry_run_xml">dry_run_xml</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_commit_queue_error_option" href="#confd.maapi.CommitParams.get_commit_queue_error_option">get_commit_queue_error_option</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_commit_queue_sync_timeout" href="#confd.maapi.CommitParams.get_commit_queue_sync_timeout">get_commit_queue_sync_timeout</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_commit_queue_tag" href="#confd.maapi.CommitParams.get_commit_queue_tag">get_commit_queue_tag</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_dry_run_outformat" href="#confd.maapi.CommitParams.get_dry_run_outformat">get_dry_run_outformat</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_trace_id" href="#confd.maapi.CommitParams.get_trace_id">get_trace_id</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.get_wait_devices" href="#confd.maapi.CommitParams.get_wait_devices">get_wait_devices</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_async" href="#confd.maapi.CommitParams.is_commit_queue_async">is_commit_queue_async</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_atomic" href="#confd.maapi.CommitParams.is_commit_queue_atomic">is_commit_queue_atomic</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_block_others" href="#confd.maapi.CommitParams.is_commit_queue_block_others">is_commit_queue_block_others</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_bypass" href="#confd.maapi.CommitParams.is_commit_queue_bypass">is_commit_queue_bypass</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_lock" href="#confd.maapi.CommitParams.is_commit_queue_lock">is_commit_queue_lock</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_non_atomic" href="#confd.maapi.CommitParams.is_commit_queue_non_atomic">is_commit_queue_non_atomic</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_commit_queue_sync" href="#confd.maapi.CommitParams.is_commit_queue_sync">is_commit_queue_sync</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_dry_run" href="#confd.maapi.CommitParams.is_dry_run">is_dry_run</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_dry_run_reverse" href="#confd.maapi.CommitParams.is_dry_run_reverse">is_dry_run_reverse</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_deploy" href="#confd.maapi.CommitParams.is_no_deploy">is_no_deploy</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_lsa" href="#confd.maapi.CommitParams.is_no_lsa">is_no_lsa</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_networking" href="#confd.maapi.CommitParams.is_no_networking">is_no_networking</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_out_of_sync_check" href="#confd.maapi.CommitParams.is_no_out_of_sync_check">is_no_out_of_sync_check</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_overwrite" href="#confd.maapi.CommitParams.is_no_overwrite">is_no_overwrite</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_no_revision_drop" href="#confd.maapi.CommitParams.is_no_revision_drop">is_no_revision_drop</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_reconcile_discard_non_service_config" href="#confd.maapi.CommitParams.is_reconcile_discard_non_service_config">is_reconcile_discard_non_service_config</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_reconcile_keep_non_service_config" href="#confd.maapi.CommitParams.is_reconcile_keep_non_service_config">is_reconcile_keep_non_service_config</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.is_use_lsa" href="#confd.maapi.CommitParams.is_use_lsa">is_use_lsa</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_deploy" href="#confd.maapi.CommitParams.no_deploy">no_deploy</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_lsa" href="#confd.maapi.CommitParams.no_lsa">no_lsa</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_networking" href="#confd.maapi.CommitParams.no_networking">no_networking</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_out_of_sync_check" href="#confd.maapi.CommitParams.no_out_of_sync_check">no_out_of_sync_check</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_overwrite" href="#confd.maapi.CommitParams.no_overwrite">no_overwrite</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.no_revision_drop" href="#confd.maapi.CommitParams.no_revision_drop">no_revision_drop</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.reconcile_discard_non_service_config" href="#confd.maapi.CommitParams.reconcile_discard_non_service_config">reconcile_discard_non_service_config</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.reconcile_keep_non_service_config" href="#confd.maapi.CommitParams.reconcile_keep_non_service_config">reconcile_keep_non_service_config</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.set_dry_run_outformat" href="#confd.maapi.CommitParams.set_dry_run_outformat">set_dry_run_outformat</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.trace_id" href="#confd.maapi.CommitParams.trace_id">trace_id</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.use_lsa" href="#confd.maapi.CommitParams.use_lsa">use_lsa</a></code></li>
+<li><code><a title="confd.maapi.CommitParams.wait_device" href="#confd.maapi.CommitParams.wait_device">wait_device</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.maapi.DryRunOutformat" href="#confd.maapi.DryRunOutformat">DryRunOutformat</a></code></h4>
+<ul class="">
+<li><code><a title="confd.maapi.DryRunOutformat.CLI" href="#confd.maapi.DryRunOutformat.CLI">CLI</a></code></li>
+<li><code><a title="confd.maapi.DryRunOutformat.CLI_C" href="#confd.maapi.DryRunOutformat.CLI_C">CLI_C</a></code></li>
+<li><code><a title="confd.maapi.DryRunOutformat.NATIVE" href="#confd.maapi.DryRunOutformat.NATIVE">NATIVE</a></code></li>
+<li><code><a title="confd.maapi.DryRunOutformat.XML" href="#confd.maapi.DryRunOutformat.XML">XML</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.maapi.Key" href="#confd.maapi.Key">Key</a></code></h4>
+</li>
+<li>
+<h4><code><a title="confd.maapi.Maapi" href="#confd.maapi.Maapi">Maapi</a></code></h4>
+<ul class="">
+<li><code><a title="confd.maapi.Maapi.apply_template" href="#confd.maapi.Maapi.apply_template">apply_template</a></code></li>
+<li><code><a title="confd.maapi.Maapi.attach" href="#confd.maapi.Maapi.attach">attach</a></code></li>
+<li><code><a title="confd.maapi.Maapi.attach_init" href="#confd.maapi.Maapi.attach_init">attach_init</a></code></li>
+<li><code><a title="confd.maapi.Maapi.authenticate" href="#confd.maapi.Maapi.authenticate">authenticate</a></code></li>
+<li><code><a title="confd.maapi.Maapi.close" href="#confd.maapi.Maapi.close">close</a></code></li>
+<li><code><a title="confd.maapi.Maapi.cursor" href="#confd.maapi.Maapi.cursor">cursor</a></code></li>
+<li><code><a title="confd.maapi.Maapi.destroy_cursor" href="#confd.maapi.Maapi.destroy_cursor">destroy_cursor</a></code></li>
+<li><code><a title="confd.maapi.Maapi.detach" href="#confd.maapi.Maapi.detach">detach</a></code></li>
+<li><code><a title="confd.maapi.Maapi.do_display" href="#confd.maapi.Maapi.do_display">do_display</a></code></li>
+<li><code><a title="confd.maapi.Maapi.exists" href="#confd.maapi.Maapi.exists">exists</a></code></li>
+<li><code><a title="confd.maapi.Maapi.find_next" href="#confd.maapi.Maapi.find_next">find_next</a></code></li>
+<li><code><a title="confd.maapi.Maapi.get_next" href="#confd.maapi.Maapi.get_next">get_next</a></code></li>
+<li><code><a title="confd.maapi.Maapi.get_objects" href="#confd.maapi.Maapi.get_objects">get_objects</a></code></li>
+<li><code><a title="confd.maapi.Maapi.get_running_db_status" href="#confd.maapi.Maapi.get_running_db_status">get_running_db_status</a></code></li>
+<li><code><a title="confd.maapi.Maapi.ip" href="#confd.maapi.Maapi.ip">ip</a></code></li>
+<li><code><a title="confd.maapi.Maapi.load_schemas" href="#confd.maapi.Maapi.load_schemas">load_schemas</a></code></li>
+<li><code><a title="confd.maapi.Maapi.netconf_ssh_call_home" href="#confd.maapi.Maapi.netconf_ssh_call_home">netconf_ssh_call_home</a></code></li>
+<li><code><a title="confd.maapi.Maapi.netconf_ssh_call_home_opaque" href="#confd.maapi.Maapi.netconf_ssh_call_home_opaque">netconf_ssh_call_home_opaque</a></code></li>
+<li><code><a title="confd.maapi.Maapi.path" href="#confd.maapi.Maapi.path">path</a></code></li>
+<li><code><a title="confd.maapi.Maapi.port" href="#confd.maapi.Maapi.port">port</a></code></li>
+<li><code><a title="confd.maapi.Maapi.query_free_result" href="#confd.maapi.Maapi.query_free_result">query_free_result</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_progress" href="#confd.maapi.Maapi.report_progress">report_progress</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_progress_start" href="#confd.maapi.Maapi.report_progress_start">report_progress_start</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_progress_stop" href="#confd.maapi.Maapi.report_progress_stop">report_progress_stop</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_service_progress" href="#confd.maapi.Maapi.report_service_progress">report_service_progress</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_service_progress_start" href="#confd.maapi.Maapi.report_service_progress_start">report_service_progress_start</a></code></li>
+<li><code><a title="confd.maapi.Maapi.report_service_progress_stop" href="#confd.maapi.Maapi.report_service_progress_stop">report_service_progress_stop</a></code></li>
+<li><code><a title="confd.maapi.Maapi.run_with_retry" href="#confd.maapi.Maapi.run_with_retry">run_with_retry</a></code></li>
+<li><code><a title="confd.maapi.Maapi.safe_create" href="#confd.maapi.Maapi.safe_create">safe_create</a></code></li>
+<li><code><a title="confd.maapi.Maapi.safe_delete" href="#confd.maapi.Maapi.safe_delete">safe_delete</a></code></li>
+<li><code><a title="confd.maapi.Maapi.safe_get_elem" href="#confd.maapi.Maapi.safe_get_elem">safe_get_elem</a></code></li>
+<li><code><a title="confd.maapi.Maapi.safe_get_object" href="#confd.maapi.Maapi.safe_get_object">safe_get_object</a></code></li>
+<li><code><a title="confd.maapi.Maapi.set_elem" href="#confd.maapi.Maapi.set_elem">set_elem</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_apply_template" href="#confd.maapi.Maapi.shared_apply_template">shared_apply_template</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_copy_tree" href="#confd.maapi.Maapi.shared_copy_tree">shared_copy_tree</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_create" href="#confd.maapi.Maapi.shared_create">shared_create</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_insert" href="#confd.maapi.Maapi.shared_insert">shared_insert</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_set_elem" href="#confd.maapi.Maapi.shared_set_elem">shared_set_elem</a></code></li>
+<li><code><a title="confd.maapi.Maapi.shared_set_values" href="#confd.maapi.Maapi.shared_set_values">shared_set_values</a></code></li>
+<li><code><a title="confd.maapi.Maapi.start_read_trans" href="#confd.maapi.Maapi.start_read_trans">start_read_trans</a></code></li>
+<li><code><a title="confd.maapi.Maapi.start_trans" href="#confd.maapi.Maapi.start_trans">start_trans</a></code></li>
+<li><code><a title="confd.maapi.Maapi.start_trans_in_trans" href="#confd.maapi.Maapi.start_trans_in_trans">start_trans_in_trans</a></code></li>
+<li><code><a title="confd.maapi.Maapi.start_user_session" href="#confd.maapi.Maapi.start_user_session">start_user_session</a></code></li>
+<li><code><a title="confd.maapi.Maapi.start_write_trans" href="#confd.maapi.Maapi.start_write_trans">start_write_trans</a></code></li>
+<li><code><a title="confd.maapi.Maapi.write_service_log_entry" href="#confd.maapi.Maapi.write_service_log_entry">write_service_log_entry</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.maapi.Session" href="#confd.maapi.Session">Session</a></code></h4>
+<ul class="">
+<li><code><a title="confd.maapi.Session.close" href="#confd.maapi.Session.close">close</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.maapi.Transaction" href="#confd.maapi.Transaction">Transaction</a></code></h4>
+<ul class="two-column">
+<li><code><a title="confd.maapi.Transaction.abort" href="#confd.maapi.Transaction.abort">abort</a></code></li>
+<li><code><a title="confd.maapi.Transaction.apply" href="#confd.maapi.Transaction.apply">apply</a></code></li>
+<li><code><a title="confd.maapi.Transaction.apply_params" href="#confd.maapi.Transaction.apply_params">apply_params</a></code></li>
+<li><code><a title="confd.maapi.Transaction.commit" href="#confd.maapi.Transaction.commit">commit</a></code></li>
+<li><code><a title="confd.maapi.Transaction.finish" href="#confd.maapi.Transaction.finish">finish</a></code></li>
+<li><code><a title="confd.maapi.Transaction.get_params" href="#confd.maapi.Transaction.get_params">get_params</a></code></li>
+<li><code><a title="confd.maapi.Transaction.prepare" href="#confd.maapi.Transaction.prepare">prepare</a></code></li>
+<li><code><a title="confd.maapi.Transaction.validate" href="#confd.maapi.Transaction.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

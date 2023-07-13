@@ -1,0 +1,85 @@
+Data-provider with server-side filtering example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example shows how simple server-side filtering can be implemented.  It
+uses the same data model and the same approach as the introductory example #5,
+but adds server-side filtering capabilities.
+
+
+Server-side filtering
+~~~~~~~~~~~~~~~~~~~~~
+
+When querying a north-bound ConfD interface (e.g. through NETCONF), the
+operator has a number of options how to limit the amount of retrieved data.
+Without server-side filtering, the data provider still needs to respond with
+the complete set of entries for every data model list queried by confd.  This
+may have considerable performance implications, the data provider may loop over
+many entries that are immediately discarded by ConfD.
+
+Server-side filtering allows the data provider to eliminate this inefficiency.
+What needs to be done:
+
+ * set the `CONFD_DATA_WANT_FILTER` flag when registering the callbacks
+
+ * upon receiving one of `get_next`, `get_next_object`, `find_next`, or
+   `find_next_object` callbacks for the first time in a list traversal,
+   retrieve the filter using `confd_data_get_list_filter`
+
+ * use the filter when retrieving the data from the system and set the flag
+   `CONFD_TRANS_CB_FLAG_FILTERED` when calling the corresponding reply
+   function; or, if the filter cannot be used or the data may contain entries
+   not matching the filter, do not set the flag and ConfD does further
+   filtering for you.
+
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+
+The introductory example runs '/sbin/arp -an' as the source of data.  The
+command accepts some parameters that make it possible to do very simple
+filtering on the system level: '[-i if]' for arp entries from given interface,
+or '[hostname]' for arp entries of that host.
+
+The example uses these parameters to filter already on the system level
+whenever possible; when the operator requests arp entries only for certain
+interface, e.g. with a XPath filter like
+
+    /arpentries/arpe[ifname="eth0"]
+
+the filter is passed to the data provider which can in turn use the right
+command options.  This is the ideal situation - the real source of data (the
+operating system, in this case) provides exactly the data required by ConfD.
+If the filter cannot be realized this way, it still makes sense to filter in
+the data provider: fewer list entries reported by the data provider means fewer
+callbacks from ConfD, which is often the performance bottleneck.  This example
+does this when filtering by HW address.  All other filter types (including any
+filter that uses other operators then equation) are not handled by the data
+provider, so it must not set the flag `TRANS_CB_FLAG_FILTERED` in such cases to
+tell confd to do filtering on the returned data.
+
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+ 1. Build the necessary files and start ConfD by typing
+
+        $ make all start
+
+ 2. To see what's happening inside ConfD, optionally tail the ConfD devel log
+    file.  Unless you have changed the default configuration for this example
+    (see confd.conf) the command would be
+
+        $ tail -f ./confd.log
+
+ 3. You can also compose the same queries using NETCONF. Try the query examples:
+
+       netconf-console --get -x '/arpentries/arpe[ip="10.0.0.1"]'
+       netconf-console --get -x '/arpentries/arpe[ifname="eth0"]'
+
+
+Further Reading
+~~~~~~~~~~~~~~~
+
++ ConfD Manual: Operational Data / Using List Filters
++ man 3 confd_lib_dp
++ man 3 confd_types

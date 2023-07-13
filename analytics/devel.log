@@ -1,0 +1,26 @@
+<INFO> 7-Jul-2023::04:45:54.636 ubuntu confd[<0.69.0>]: confd embedded apps in early_phase0:
+	[]
+<INFO> 7-Jul-2023::04:45:54.956 ubuntu confd[<0.97.0>]: confd mmap_schema handle_info got msg: timeout
+<INFO> 7-Jul-2023::04:45:54.978 ubuntu confd[<0.9.0>]: confd embedded apps in phase0:
+	[]
+<INFO> 7-Jul-2023::04:45:55.114 ubuntu confd[<0.134.0>]: devel-cdb Loaded oper data from ./confd-cdb/O.cdb (0 bytes data in 0.000s)
+<INFO> 7-Jul-2023::04:45:55.182 ubuntu confd[<0.135.0>]: devel-cdb Loaded configuration from ./confd-cdb/A.cdb (0 bytes data, 0 transactions in 0.000s)
+<INFO> 7-Jul-2023::04:45:55.213 ubuntu confd[<0.9.0>]: devel-cdb init files found in ./confd-cdb: aaa_init.xml
+<INFO> 7-Jul-2023::04:45:55.296 ubuntu confd[<0.69.0>]: confd Set running datastore status to valid
+<INFO> 7-Jul-2023::04:45:55.372 ubuntu confd[<0.135.0>]: devel-cdb Compacted CDB journal file: 1 ms (93 nodes in memory, disk size 4 bytes -> 1.39 KiB)
+<INFO> 7-Jul-2023::04:45:55.384 ubuntu confd[<0.68.0>]: confd encryptedStrings keys provided from config
+<INFO> 7-Jul-2023::04:45:55.384 ubuntu confd[<0.9.0>]: confd embedded apps in phase1:
+	[]
+<INFO> 7-Jul-2023::04:45:55.419 ubuntu confd[<0.172.0>]: confd initializing kickers
+<INFO> 7-Jul-2023::04:45:55.427 ubuntu confd[<0.172.0>]: confd initializing kickers: ok (0.007 s)
+<ERR> 7-Jul-2023::04:45:55.457 ubuntu confd[<0.198.0>]: devel-aaa Module "tailf-webui" in access rule "any-group/tailf-webui-user" does not exist - ignoring rule
+<INFO> 7-Jul-2023::04:45:55.463 ubuntu confd[<0.231.0>]: confd delete "./confd-cdb/rollback0.confirm" resulted in enoent
+
+<INFO> 7-Jul-2023::04:45:55.463 ubuntu confd[<0.231.0>]: confd delete "./confd-cdb/rollback0.confirm.bup" resulted in enoent
+
+<INFO> 7-Jul-2023::04:45:55.475 ubuntu confd[<0.9.0>]: confd embedded apps in phase1_delayed:
+	[]
+<INFO> 7-Jul-2023::04:45:55.481 ubuntu confd[<0.9.0>]: confd embedded apps in phase2:
+	[]
+<INFO> 7-Jul-2023::04:45:55.615 ubuntu confd[<0.9.0>]: confd Erlang emulator PID: 118021
+<INFO> 7-Jul-2023::04:46:15.269 ubuntu confd[<0.289.0>]: confd Getting delta diff, no alt-name: true

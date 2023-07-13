@@ -1,0 +1,19 @@
+<edit-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda"
+  xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+  <datastore>ds:running</datastore>
+  <config>
+    <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces"
+      xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">
+      <interface>
+        <name>eth0</name>
+        <type>ianaift:l2vlan</type>
+        <enabled>true</enabled>
+      </interface>
+      <interface>
+        <name>eth4</name>
+        <type>ianaift:coffee</type>
+        <enabled>true</enabled>
+      </interface>
+    </interfaces>
+  </config>
+</edit-data>

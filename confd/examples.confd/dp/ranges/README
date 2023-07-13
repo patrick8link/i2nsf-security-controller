@@ -1,0 +1,105 @@
+ConfD DP API callback range registration example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example shows usage of confd-lib procedure confd_register_range_data_cb().
+It is a variant of confd_register_data_cb() which registers a set of callbacks
+for a range of list entries. There can thus be multiple sets of C functions
+registered on the same callpoint, even by different daemons.
+
+
+What the Example does
+~~~~~~~~~~~~~~~~~~~~~
+
+Example's YANG model - ranges.yang defines an operational data list "nodes".
+It includes a data provider daemon that shows the most simple case - single
+application registering multiple range callbacks on a list managed by callpoint.
+
+For this simple case, we register three different callback sets:
+    - for key values between 0 and 100
+    - for key values between 101 and 200
+    - for any other key values - "default" handler
+
+Except for a standard data responses to ConfD, example data provider prints
+customized messages to a standard output, to demonstrate how different range
+callbacks are invoked by confd-lib when iterating / accessing a list.
+
+To see more details on range registration and how different callbacks print
+customized messages, please dig into the sources of included data provider.
+
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+Similar to other ConfD examples, "make all; make start" command sequence can be
+used to build & start the example environment. The "make start" starts ConfD
+and runs the data provider on foreground, effectively "blocking" the current
+shell session, waiting for requests from ConfD, to serve data and print info to
+standard output:
+
+    $ make start
+    ...
+    # app daemon starts in this thread running in infinite loop!
+    # use another shell session to run e.g. CLI or NETCONF query towards
+    # the running ConfD instance.
+    ./build/ranges_app 2>&1
+    range registered - rAAA
+    range registered - rBBB
+    range registered - rDEFAULT
+    entering poll loop
+
+You can verify registered range callbacks using the "confd --status" command.
+Its output should, include following (or very similar) lines when executed with
+the example daemon already running:
+
+  ...
+  callpoints:
+    id=int-callpoint path=/ranges:ranges/nodes
+       {0} - {100} daemonId=0 daemonName=./build/ranges_app
+       {101} - {200} daemonId=0 daemonName=./build/ranges_app
+       default       daemonId=0 daemonName=./build/ranges_app
+  ...
+
+Main point of interest is how specific data provider callbacks are invoked by
+confd-lib when iterating the list. There are multiple ways to start the request.
+
+Try running ConfD CLI via "make cli", and show data in the examples YANG model:
+
+    admin@dev2> show ranges
+    NODE
+    ID    PAYLOAD
+    ------------------------
+    10    rAAA-payload-10
+    20    rAAA-payload-20
+    100   rAAA-payload-100
+    110   rBBB-payload-110
+    200   rBBB-payload-200
+
+    [ok][2018-06-21 16:33:10]
+    admin@dev2>
+
+The list iteration invokes a registered callbacks, printing on the output of
+main shell running the DP daemon:
+
+    rAAA get_next(-1)
+    rAAA get_next(-1)
+    rAAA get_elem("payload", 10)
+    rAAA get_next(0)
+    rAAA get_elem("payload", 20)
+    rAAA get_next(1)
+    rAAA get_elem("payload", 100)
+    rAAA get_next(2)
+    rBBB get_next(-1)
+    rBBB get_elem("payload", 110)
+    rBBB get_next(0)
+    rBBB get_elem("payload", 200)
+    rBBB get_next(1)
+    rDEFAULT get_next(-1)
+
+Alternate way to invoke data provider is to run "make query" that executes
+NETCONF --get operation towards the running ConfD and the "nodes" list.
+
+
+Further reading
+~~~~~~~~~~~~~~~
+
++ man 3 confd_lib_dp

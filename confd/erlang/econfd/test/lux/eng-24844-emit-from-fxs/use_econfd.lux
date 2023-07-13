@@ -1,0 +1,32 @@
+[doc ENG-24844, generate hrl, then verify it can be used towards ConfD]
+
+[config require=MAKE]
+
+[global CONFDC=$CONFD_DIR/bin/confdc]
+[global fail_pattern=[Ee][Rr][Rr][Oo][Rr]]
+
+[include ../include/macros.luxinc]
+
+[shell confd]
+    -$fail_pattern
+    [invoke eval "$MAKE start"]
+
+[shell testshell]
+    # First, generate the hrl file that we want to get constants from
+    !$CONFDC --emit-hrl withdef.hrl --builtin ietf-netconf-with-defaults.fxs
+    ?SH-PROMPT
+
+    # Then, compile the actual erlang program that will use above header file
+    !$MAKE compile_erl
+    ?SH-PROMPT
+
+    # then run the test program and expect a certain enum in response
+    !$MAKE run_erl
+    ???result:{ok,{28,1}}
+    ?SH-PROMPT
+
+[cleanup]
+    [invoke eval "$MAKE stop"]
+    [invoke confd_check]
+    !rm -f withdef.hrl
+    ?SH-PROMPT

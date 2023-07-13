@@ -1,0 +1,140 @@
+ConfD error formatting callback example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example shows usage of confd-lib procedure confd_register_error_cb().
+It is used to register error formatting callback that allows customization of
+the specific error type messages. An application daemon can only register one
+error formatting callback, and only one daemon can register for each error type.
+
+
+What the Example does
+~~~~~~~~~~~~~~~~~~~~~
+
+For details on customizing the error messages, see "ERROR FORMATTING CALLBACK"
+section in ConfD user guide. The file "$CONFD_DIR/src/confd/errors/errcode.xml"
+lists all the customizable error messages, including their default formats and
+error codes.
+
+Example includes an artificial YANG model - "error-formatting.yang", that has
+a few generic data elements. It is used as a placeholder for a user to invoke
+CLI commands (or NETCONF/other northbound APIs requests) to show a custom error
+messages.
+
+The application "error-formatting-app" is started, registering for the specific
+error types. Whenever such errors occur, ConfD invokes the registered callback,
+and it's "format_error()" procedure. It's up to code to customize the error
+message, and return it to ConfD by calling the "confd_error_seterr()" procedure.
+
+The annotated/commented code shows how to modify messages of some error types,
+or how to use the default ones defined in "errcode.xml" for specific cases.
+
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+Similar to other ConfD examples, "make all; make start" command sequence can be
+used to build & start the example environment. The "make start" starts ConfD
+and runs the callback daemon on foreground, effectively "blocking" the current
+shell session, waiting for requests from ConfD, to serve data and print info to
+standard output:
+
+    $ make start
+    ...
+    # app daemon starts in this thread running in infinite loop!
+    # use another shell session to run e.g. CLI or NETCONF query towards
+    # the running ConfD instance.
+    ./build/error-formatting-app 2>&1
+    error formatting callback registered
+    entering poll loop
+
+The daemon prints/traces several lines to standard output while servicing the
+error formatting requests from ConfD. This is to show some extra information
+when debugging/learning how the callback works. Please see the daemons source
+code for extra details (lines with TRACE() macros).
+
+You can verify registered error formatting callbacks using the "confd --status"
+command. Its output should, include following (or very similar) lines when run
+with the example daemon already running:
+
+    ...
+    error formatting callbacks:
+      type=bad_value daemonId=0 daemonName=./build/error-formatting-app
+      type=misc daemonId=0 daemonName=./build/error-formatting-app
+      type=validation daemonId=0 daemonName=./build/error-formatting-app
+    ...
+
+At this point, ConfD should be up & running, ready to test some changes on the
+included YANG model.
+
+    $ make cli-c
+    ...
+
+    dev# config
+    Entering configuration mode terminal
+    dev(config)# err-example numeric 100
+    ----------------------------------------^
+    syntax error: OOOPS! "100" is out of range.
+    dev(config)# err-example numeric 1500
+    dev(config)#
+
+versus default message:
+
+    syntax error: "100" is out of range.
+
+Going further:
+
+    dev(config)# err-example stringy hello
+    ----------------------------------------^
+    syntax error: OOOPS! "hello" has a bad length/size.
+    dev(config)# err-example stringy helloHELLO
+    dev(config)#
+
+versus default message:
+
+    syntax error: "hello" has a bad length/size.
+
+Going further:
+
+    dev(config)# do show err-example oper-leaf
+    Error: My data provider has problems!
+
+versus default message:
+
+    Error: application communication failure
+
+Going further:
+
+    dev(config)# err-example person bob
+    dev(config-person-bob)# commit
+    Aborted: I definitely need: "/err-example/person{bob}/indispensable-leaf"!
+    dev(config-person-bob)# err-example person bob indispensable-leaf
+    dev(config-person-bob)# commit
+    Commit complete.
+    dev(config)#
+
+versus default message:
+
+    Aborted: 'err-example person bob indispensable-leaf' is not configured
+
+Going further:
+
+    dev(config-person-bob)# top
+    dev(config)# err-example numeric 1234
+    dev(config)# commit
+    Aborted: bob's MUST must NOT fail!
+    dev(config)#
+
+versus default message:
+
+    Aborted: 'err-example person bob indispensable-leaf' : \
+    the 'must' expression "/err-example/numeric != 1234" failed
+
+This is just to show a few examples of various error types. Depending on YANG
+model complexity, and/or specific use-cases, error messages can be customized
+or made more variable, according to requirements.
+
+
+Further reading
+~~~~~~~~~~~~~~~
+
++ man 3 confd_lib_dp

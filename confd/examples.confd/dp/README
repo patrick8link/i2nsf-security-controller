@@ -1,0 +1,20 @@
+
+Examples of specific data provider functionality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- delayed_reply - data provider and CONFD_DELAYED_RESPONSE
+
+- find_next - implementation of the find_next() callback
+
+- performance - implementation of the callbacks optimal for performance
+
+- ranges - several confd_register_range_data_cb() in single application
+
+- ranges-multi - "ranges" example variant with two standalone daemons
+                 registering for list ranges
+
+- filters - server-side filtering of operational data
+
+- python - some of these examples rewritten using Python API
+
+See the README file in the respective directory for further details.

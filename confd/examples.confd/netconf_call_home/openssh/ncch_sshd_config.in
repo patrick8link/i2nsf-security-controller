@@ -1,0 +1,5 @@
+Port 2592
+UsePrivilegeSeparation no
+TCPKeepAlive yes
+AuthorizedKeysFile %PWD%/authorized_keys
+Subsystem     netconf   %PWD%/netconf-subsys

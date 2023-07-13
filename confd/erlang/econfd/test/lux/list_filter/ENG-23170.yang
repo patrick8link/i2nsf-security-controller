@@ -1,0 +1,30 @@
+module ENG-23170 {
+  namespace urn:test:ENG-23170;
+  prefix E23170;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  container interfaces {
+    tailf:callpoint interfaceCP {
+      tailf:operational;
+    }
+    list interface {
+      key name;
+      leaf name {
+        type string;
+      }
+      leaf ip-address {
+        type inet:ip-address;
+      }
+      leaf mtu {
+        type uint16;
+      }
+    }
+  }
+}

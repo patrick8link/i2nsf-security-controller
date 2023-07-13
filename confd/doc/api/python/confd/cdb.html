@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>confd.cdb API documentation</title>
+<meta name="description" content="CDB high level module …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>confd.cdb</code></h1>
+</header>
+<section id="section-intro">
+<p>CDB high level module.</p>
+<p>This module implements a couple of classes for subscribing
+to CDB events.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="confd.cdb.OperSubscriber"><code class="flex name class">
+<span>class <span class="ident">OperSubscriber</span></span>
+<span>(</span><span>app=None, log=None, host='127.0.0.1', port=4565)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CDB Subscriber for oper data.</p>
+<p>Use this class when subscribing on operational data. In all other means
+the behavior is the same as for Subscriber().</p>
+<p>Initialize an OperSubscriber.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="confd.cdb.Subscriber" href="#confd.cdb.Subscriber">Subscriber</a></li>
+<li><a title="threading.Thread" href="https://docs.python.org/3/library/typing.html#typing.threading.Thread">threading.Thread</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="confd.cdb.Subscriber" href="#confd.cdb.Subscriber">Subscriber</a></b></code>:
+<ul class="hlist">
+<li><code><a title="confd.cdb.Subscriber.init" href="#confd.cdb.Subscriber.init">init</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.register" href="#confd.cdb.Subscriber.register">register</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.run" href="#confd.cdb.Subscriber.run">run</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.start" href="#confd.cdb.Subscriber.start">start</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.stop" href="#confd.cdb.Subscriber.stop">stop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="confd.cdb.Subscriber"><code class="flex name class">
+<span>class <span class="ident">Subscriber</span></span>
+<span>(</span><span>app=None, log=None, host='127.0.0.1', port=4565, subtype=1, name='')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CDB Subscriber for config data.</p>
+<p>Supports the pattern of collecting changes and then handle the changes in
+a separate thread. For each subscription point a handler object must be
+registered. The following methods will be called on the handler:</p>
+<ul>
+<li>
+<p>pre_iterate() (optional)</p>
+<p>Called just before iteration starts, may return a state object
+which will be passed on to the iterate method. If not implemented,
+the state object will be None.</p>
+</li>
+<li>
+<p>iterate(kp, op, oldv, newv, state) (mandatory)</p>
+<p>Called for each change in the change set.</p>
+</li>
+<li>
+<p>post_iterate(state) (optional)</p>
+<p>Runs in a separate thread once iteration has finished and the
+subscription socket has been synced. Will receive the final state
+object from iterate() as an argument.</p>
+</li>
+<li>
+<p>should_iterate() (optional)</p>
+<p>Called to check if the subscriber wants to iterate. If this method
+returns False, neither pre_iterate() nor iterate() will be called.
+Can e.g. be used by HA secondary nodes to skip iteration. If not
+implemented, pre_iterate() and iterate() will always be called.</p>
+</li>
+<li>
+<p>should_post_iterate(state) (optional)</p>
+<p>Called to determine whether post_iterate() should be called
+or not. It is recommended to implement this method to prevent
+the subscriber from calling post_iterate() when not needed.
+Should return True if post_iterate() should run, otherwise False.
+If not implemented, post_iterate() will always be called.</p>
+</li>
+</ul>
+<p>Example iterator object:</p>
+<pre><code>class MyIter(object):
+    def pre_iterate(self):
+        return []
+
+    def iterate(self, kp, op, oldv, newv, state):
+        if op is ncs.MOP_VALUE_SET:
+            state.append(newv)
+        return ncs.ITER_RECURSE
+
+    def post_iterate(self, state):
+        for item in state:
+            print(item)
+
+    def should_post_iterate(self, state):
+        return state != []
+</code></pre>
+<p>The same handler may be registered for multiple subscription points.
+In that case, pre_iterate() will only be called once, followed by iterate
+calls for all subscription points, and finally a single call to
+post_iterate().</p>
+<p>Initialize a Subscriber.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="threading.Thread" href="https://docs.python.org/3/library/typing.html#typing.threading.Thread">threading.Thread</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="confd.cdb.OperSubscriber" href="#confd.cdb.OperSubscriber">OperSubscriber</a></li>
+<li><a title="confd.cdb.TwoPhaseSubscriber" href="#confd.cdb.TwoPhaseSubscriber">TwoPhaseSubscriber</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.cdb.Subscriber.init"><code class="name flex">
+<span>def <span class="ident">init</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Custom initialization.</p>
+<p>Override this method to do custom initialization without needing
+to override <strong>init</strong>.</p></div>
+</dd>
+<dt id="confd.cdb.Subscriber.register"><code class="name flex">
+<span>def <span class="ident">register</span></span>(<span>self, path, iter_obj=None, iter_flags=1, priority=0, flags=0, subtype=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Register an iterator object at a specific path.</p>
+<p>Setting 'iter_obj' to None will internally use 'self' as the iterator
+object which means that Subscriber needs to be sub-classed.</p>
+<p>Operational and configuration subscriptions can be done on the
+same Subscriber, but in that case the notifications may be
+arbitrarily interleaved, including operational notifications
+arriving between different configuration notifications for the
+same transaction. If this is a problem, use separate
+Subscriber instances for operational and configuration
+subscriptions.</p>
+<p>Arguments:</p>
+<ul>
+<li>path &ndash; path to node (str)</li>
+<li>iter_object &ndash; iterator object (obj, optional)</li>
+<li>iter_flags &ndash; iterator flags (int, optional)</li>
+<li>priority &ndash; priority order for subscribers (int)</li>
+<li>flags &ndash; additional subscriber flags (int)</li>
+<li>subtype &ndash; subscriber type SUB_RUNNING, SUB_RUNNING_TWOPHASE,
+SUB_OPERATIONAL (cdb)</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>subscription point (int)</li>
+</ul>
+<p>Flags (cdb):</p>
+<ul>
+<li>SUB_WANT_ABORT_ON_ABORT</li>
+</ul>
+<p>Iterator Flags (ncs):</p>
+<ul>
+<li>ITER_WANT_PREV</li>
+<li>ITER_WANT_ANCESTOR_DELETE</li>
+<li>ITER_WANT_ATTR</li>
+<li>ITER_WANT_CLI_STR</li>
+<li>ITER_WANT_SCHEMA_ORDER</li>
+<li>ITER_WANT_LEAF_FIRST_ORDER</li>
+<li>ITER_WANT_LEAF_LAST_ORDER</li>
+<li>ITER_WANT_REVERSE</li>
+<li>ITER_WANT_P_CONTAINER</li>
+<li>ITER_WANT_LEAF_LIST_AS_LEAF</li>
+<li>ITER_WANT_CLI_ORDER</li>
+</ul></div>
+</dd>
+<dt id="confd.cdb.Subscriber.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Main processing loop.</p></div>
+</dd>
+<dt id="confd.cdb.Subscriber.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start the subscriber.</p></div>
+</dd>
+<dt id="confd.cdb.Subscriber.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stop the subscriber.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.cdb.TwoPhaseSubscriber"><code class="flex name class">
+<span>class <span class="ident">TwoPhaseSubscriber</span></span>
+<span>(</span><span>name, app=None, log=None, host='127.0.0.1', port=4565)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CDB Subscriber for config data with support for aborting transactions.</p>
+<p>Subscriber that is capable of aborting transactions during the
+prepare phase of a transaction.</p>
+<p>The following methods will be called on the handler in addition to
+the methods described in Subscriber:</p>
+<ul>
+<li>
+<p>prepare(kp, op, oldv, newv, state) (mandatory)</p>
+<p>Called in the transaction prepare phase. If an exception occurs
+during the invocation of prepare the transaction is aborted.</p>
+</li>
+<li>
+<p>cleanup(state) (optional)</p>
+<p>Called after a prepare failure if available. Use to cleanup
+resources allocated by prepare.</p>
+</li>
+<li>
+<p>abort(kp, op, oldv, newv, state) (mandatory)</p>
+<p>Called if another subscriber aborts the transaction and this
+transaction has been prepared.</p>
+</li>
+</ul>
+<p>Methods are called in the following order:</p>
+<ol>
+<li>should_iterate -&gt; pre_iterate ( -&gt; cleanup, on exception)</li>
+<li>should_iterate -&gt; iterate -&gt; post_iterate</li>
+<li>should_iterate -&gt; abort, if transaction is aborted by other subscriber</li>
+</ol>
+<p>Initialize a Subscriber.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="confd.cdb.Subscriber" href="#confd.cdb.Subscriber">Subscriber</a></li>
+<li><a title="threading.Thread" href="https://docs.python.org/3/library/typing.html#typing.threading.Thread">threading.Thread</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.cdb.TwoPhaseSubscriber.register"><code class="name flex">
+<span>def <span class="ident">register</span></span>(<span>self, path, iter_obj=None, iter_flags=1, priority=0, flags=0, subtype=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Register an iterator object at a specific path.</p>
+<p>Setting 'iter_obj' to None will internally use 'self' as the iterator
+object which means that TwoPhaseSubscriber needs to be sub-classed.</p>
+<p>Operational and configuration subscriptions can be done on the
+same TwoPhaseSubscriber, but in that case the notifications may be
+arbitrarily interleaved, including operational notifications
+arriving between different configuration notifications for the
+same transaction. If this is a problem, use separate
+TwoPhaseSubscriber instances for operational and configuration
+subscriptions.</p>
+<p>For arguments and flags, see Subscriber.register()</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="confd.cdb.Subscriber" href="#confd.cdb.Subscriber">Subscriber</a></b></code>:
+<ul class="hlist">
+<li><code><a title="confd.cdb.Subscriber.init" href="#confd.cdb.Subscriber.init">init</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.run" href="#confd.cdb.Subscriber.run">run</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.start" href="#confd.cdb.Subscriber.start">start</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.stop" href="#confd.cdb.Subscriber.stop">stop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="confd" href="index.html">confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="confd.cdb.OperSubscriber" href="#confd.cdb.OperSubscriber">OperSubscriber</a></code></h4>
+</li>
+<li>
+<h4><code><a title="confd.cdb.Subscriber" href="#confd.cdb.Subscriber">Subscriber</a></code></h4>
+<ul class="">
+<li><code><a title="confd.cdb.Subscriber.init" href="#confd.cdb.Subscriber.init">init</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.register" href="#confd.cdb.Subscriber.register">register</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.run" href="#confd.cdb.Subscriber.run">run</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.start" href="#confd.cdb.Subscriber.start">start</a></code></li>
+<li><code><a title="confd.cdb.Subscriber.stop" href="#confd.cdb.Subscriber.stop">stop</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.cdb.TwoPhaseSubscriber" href="#confd.cdb.TwoPhaseSubscriber">TwoPhaseSubscriber</a></code></h4>
+<ul class="">
+<li><code><a title="confd.cdb.TwoPhaseSubscriber.register" href="#confd.cdb.TwoPhaseSubscriber.register">register</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

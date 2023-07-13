@@ -1,0 +1,85 @@
+module ietf-netconf-monitoring-ann {
+  namespace "urn:dummy";
+  prefix dummy;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import ietf-netconf-monitoring {
+    prefix ncm;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "Annotation module for ietf-netconf-monitoring.
+
+     Adds tailf:info statements for a better CLI / WebUI experience,
+     and adds the callpoints necessary for using this module with
+     ConfD.
+
+     Copyright 2019-2023 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification.";
+
+  revision 2023-02-21 {
+    description
+      "Released as part of ConfD-8.0.3 / NCS-6.0.3.
+
+       Annotate module as an internal data provider with tailf:internal-dp.";
+  }
+
+  tailf:annotate-module "ietf-netconf-monitoring" {
+    tailf:internal-dp;
+  }
+
+  tailf:annotate "/ncm:netconf-state" {
+    tailf:callpoint "ncagent" {
+      tailf:internal;
+    }
+    tailf:info "Statistics about NETCONF";
+
+    tailf:annotate "ncm:capabilities" {
+      tailf:info "Capabilities supported by the NETCONF server";
+
+      tailf:annotate "ncm:capability" {
+        tailf:info "Capabilities supported by the NETCONF server";
+        tailf:cli-list-syntax;
+      }
+    }
+    tailf:annotate "ncm:datastores" {
+      tailf:info "Available datastores";
+      tailf:annotate "ncm:datastore" {
+        tailf:cli-suppress-show-path;
+      }
+    }
+    tailf:annotate "ncm:schemas" {
+      tailf:info "Data models supported by the NETCONF server";
+      tailf:annotate "ncm:schema" {
+        tailf:cli-suppress-show-path;
+      }
+    }
+    tailf:annotate "ncm:sessions" {
+      tailf:info "Currently active sessions";
+      tailf:annotate "ncm:session" {
+        tailf:cli-suppress-show-path;
+      }
+    }
+    tailf:annotate "ncm:statistics" {
+      tailf:info "Statistics related to the NETCONF server";
+      tailf:annotate "*" {
+        tailf:cli-suppress-show-path;
+      }
+    }
+  }
+
+  tailf:annotate "/ncm:get-schema" {
+    tailf:actionpoint "ncagent" {
+      tailf:internal;
+    }
+    // make sure get-schema cannot be called from CLI and WebUI
+    tailf:hidden "netconf-only";
+  }
+}
+

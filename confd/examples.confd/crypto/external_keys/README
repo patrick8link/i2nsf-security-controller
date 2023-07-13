@@ -1,0 +1,31 @@
+Loading crypto keys from an external application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates how to use an external application to
+configure the encryption keys used by the built in ConfD crypto types.
+
+The application external_crypto_keys will read the encryption keys
+from the file pointed to by the environment variable
+CONFD_EXTERNAL_KEYS_ARGUMENT. CONFD_EXTERNAL_KEYS_ARGUMENT contains the
+/confdConfig/encryptedStrings/externalKeys/commandArgument value from
+confd.conf.
+
+Try "make test" and follow what it does to get the idea. Then if you
+want to experiment on your own you can:
+
+
+    make all      - build everything
+
+    make start    - start the confd daemon
+
+    make load     - store some secrets in the database
+
+    make query    - show database contents
+
+    make stop     - stop the confd daemon
+
+
+To create new configuration keys try
+
+    rm -f confd.encryptedStrings
+    make confd.encryptedStrings

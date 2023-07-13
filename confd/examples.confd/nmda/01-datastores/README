@@ -1,0 +1,51 @@
+This example demonstrates the usage of new datastores defined RFC8342
+Network Management Datastore Architecture (NMDA) and NETCONF extension
+to support datastores.
+
+About the NETCONF Client used in the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A NETCONF client 'netconf-console', which is part of the ConfD
+installation, is used in this example. This client communicates with
+ConfD over SSH and requires Python Paramiko package (on Ubuntu you can
+install it by command 'apt-get install python-paramiko'). In case SSH
+cannot be used, there is 'netconf-console-tcp' variant. To use
+'netconf-console-tcp', update 'confd.conf' to enable
+'netconf/transport/tcp' and change all 'netconf-console' calls to
+'netconf-console-tcp'.
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+The data provider module 'interface_dp.py' collects interface
+configuration data according to example interface data model and
+updates operational-state.
+
+A test interface is pre-configured via a CDB init file
+(intended_init.xml) and it appears as content of <intended>. This test
+interface does not exists in the system thus it does not appear in
+<operational>. However, the system detects other interfaces such as
+the loopback interface. Even though no configuration for the loopback
+interface appears in <intended>, <operational> will show
+system-provided data.
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+ 1. Build the necessary files and start ConfD.
+    interface_dp.py will be running in the foreground.
+
+    $ make all start
+
+ 2. In another window, retrieve the content of intended using netconf-console
+
+    $ netconf-console --get-data --db intended -x /interfaces
+
+ 3. Retrieve the content of operational-state.
+    Typing the following command will show all interfaces that are
+    provided by the system.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+
+ 4. Retrieve the config false content of operational-state.
+    Typing the following command will show all interfaces that are
+    provided by the system.
+
+    $ netconf-console --get-data --db operational --config-filter false -x /interfaces

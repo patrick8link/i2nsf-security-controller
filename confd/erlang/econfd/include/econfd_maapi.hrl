@@ -1,0 +1,27 @@
+%% This file is generated from ../confd/src/maapi_proto.hrl by gen-maapi-hrls
+-define(MAAPI_CONFIG_XML,              (1 bsl 0)).
+-define(MAAPI_CONFIG_J,                (1 bsl 1)).
+-define(MAAPI_CONFIG_C,                (1 bsl 2)).
+-define(MAAPI_CONFIG_WITH_DEFAULTS,    (1 bsl 3)).
+-define(MAAPI_CONFIG_SHOW_DEFAULTS,    (1 bsl 4)).
+-define(MAAPI_CONFIG_C_IOS,            (1 bsl 5)).
+-define(MAAPI_CONFIG_MERGE,            (1 bsl 6)).
+-define(MAAPI_CONFIG_WITH_OPER,        (1 bsl 7)).
+-define(MAAPI_CONFIG_XPATH,            (1 bsl 8)).
+-define(MAAPI_CONFIG_XML_PRETTY,       (1 bsl 9)).
+-define(MAAPI_CONFIG_REPLACE,         (1 bsl 10)).
+-define(MAAPI_CONFIG_HIDE_ALL,        (1 bsl 11)).
+-define(MAAPI_CONFIG_UNHIDE_ALL,      (1 bsl 12)).
+-define(MAAPI_CONFIG_AUTOCOMMIT,      (1 bsl 13)).
+-define(MAAPI_CONFIG_CONTINUE_ON_ERROR, (1 bsl 14)).
+-define(MAAPI_CONFIG_SUPPRESS_ERRORS, (1 bsl 15)).
+-define(MAAPI_CONFIG_XML_LOAD_LAX,    (1 bsl 16)).
+-define(MAAPI_CONFIG_JSON,            (1 bsl 17)).
+-define(MAAPI_CONFIG_WITH_SERVICE_META, (1 bsl 18)).
+-define(MAAPI_CONFIG_NO_PARENTS,      (1 bsl 19)).
+-define(MAAPI_CONFIG_OPER_ONLY,       (1 bsl 20)).
+-define(MAAPI_CONFIG_NO_BACKQUOTE,    (1 bsl 21)).
+-define(MAAPI_CONFIG_CDB_ONLY,        (1 bsl 22)).
+-define(MAAPI_CONFIG_TURBO_C,        (1 bsl 23)).
+-define(MAAPI_CONFIG_UNSUPPORTED_J_OPER, (1 bsl 24)).% Deprecated on 7.1
+-define(MAAPI_CONFIG_READ_WRITE_ACCESS_ONLY, (1 bsl 25)).

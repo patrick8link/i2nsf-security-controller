@@ -1,0 +1,2086 @@
+ConfD-8.0.4 [March 24, 2023]
+============================
+
+Enhancements:
+
+  - ha: ConfD now ensures the authentication of a new secondary node joining
+    a HA cluster is handled independently from the distribution, allowing
+    ongoing transactions to progress while the connection is being
+    authenticated.
+
+    (ENG-30864, CSCwe36703, BEMS01533566)
+
+  - json-rpc: The JSON-RPC API call show_config with result_as=json is now
+    an order of magnitude faster for large configs.
+
+    (ENG-30830)
+
+  - xpath: Improved performance of XPath cache usage when XPath is used
+    frequently.
+
+    (ENG-30588, RT:50010, PS-45139, CSCwd99879)
+
+  - yanger: The tree plugin will now print an additional warning about not
+    applying deviation to augments when the deviating target module is not
+    provided.
+
+    (ENG-30105, RT:49834, PS-44960, CSCwd37112)
+
+Corrections:
+
+  - c-api: In some scenarios ConfD failed to forward a list filter
+    expression to external data providers, for instance when evaluating
+    XPath expressions only referring to one key of a multi key list. The
+    list filter is now forwarded to the external data provider.
+
+    (ENG-30510, RT:49791, PS-44917, CSCwd92219)
+
+  - c-api: Fixed an issue in MAAPI where setting xpath_expr on maapi_cursor
+    when attaching to a transaction would cause an internal error.
+
+    (ENG-27973, RT:48102, PS-43217, CSCwa45996)
+
+  - cdb: Fixed a leaking CDB agent process issue when a read-write
+    transaction restarts at prepare phase.
+
+    (ENG-31014, CSCwe45411, BEMS01554846)
+
+  - cli: Corrected completion results when completing a case inside a nested
+    choice, so other ancestor case nodes are excluded from the results.
+
+    (ENG-30762, RT:50072, PS-45199, CSCwe17786)
+
+  - cli: Incorrect handling of device descriptions with some types of
+    command parameters could cause an internal error.
+
+    (ENG-30703, CSCwe28311, BEMS01551620)
+
+  - cli: The CLI command `show configuration diff` could present duplicate
+    entries when structures contain `leafref` elements. This has been
+    corrected to behave similarly to the `show configuration` command.
+
+    (ENG-30497, RT:49897, PS-45024, CSCwd90002)
+
+  - cli: The pipe command 'display local-time/universal-time' will now have
+    an effect when displaying oper data in table format.
+
+    (ENG-30336, CSCwe18558, BEMS01532322)
+
+  - cli: When using a leafref (or tailf:cli-diff-delete-before), it was
+    discovered that if the leafref pointed out from a sub-tree and then at
+    the new sub-tree, another leafref was referencing back into the first
+    subtree that during deletion or creation, some nodes would not retain
+    the ordering defined by the leafref or a diff-dependency. This has been
+    fixed by reaffirming the ordering.
+
+    (ENG-30319, RT:49924, PS-45051, CSCwd68104)
+
+  - cs_trans: If there is a node that contains a leaf with a "default" value
+    and a "when" expression evaluating to false, then deleting and
+    re-creating the node in delayed-when mode (load replace XML) caused an
+    issue as the leaf was considered as existing. Therefore, the use-case
+    has been corrected, i.e., the leaf is considered non-existent.
+
+    (ENG-31103, RT:50150, PS-45278, CSCwe53871)
+
+  - cs_trans: If a non-presence container with a "when" statement XPath
+    expression contained a mandatory leaf, there was an issue when a user
+    deleted the mandatory leaf before setting the "when" expression to
+    false. The problem caused the mandatory leaf not to be deleted after the
+    transaction commit. The scenario has been corrected, so the mandatory
+    leaf will be deleted after the transaction commits.
+
+    (ENG-30979, RT:50103, PS-45230, CSCwe42075)
+
+  - kickers: Fixed memory leak issue when the northbound interface client
+    keeps committing a transaction a subscriber aborts in the prepare phase.
+
+    (ENG-31134, RT:50170, PS-45300, CSCwe57357)
+
+  - maapi: Fixed an issue where the MAAPI C API function
+    maapi_get_user_sessions would return negative values for session numbers
+    between 128 and 255.
+
+    (ENG-30848, RT:50054, PS-45184, CSCwe30683)
+
+  - observability: When the OS information was collected by invoking the
+    "-debug-dump" command containing characters outside the Latin-1 range,
+    an internal error terminated the running system.
+    Now, only the locales for the debug-dump process are overridden to fix
+    the use case issue.
+
+    (ENG-30813, RT:50116, PS-45243, CSCwe25425)
+
+  - python-api: _confd.DateTime values were incorrectly parsed and could
+    cause memory corruption.
+
+    (ENG-30988)
+
+  - python-api: Change from 'fork' to 'spawn' start method for Python
+    multiprocessing.
+
+    (ENG-30815)
+
+  - python-api: Fix an error when using a maapi call with a '%' character in
+    the key string through the Python API.
+
+    (ENG-30792)
+
+  - restconf: RESTCONF API query rollback-id with no supplied value would
+    lead to 500 internal error. However, according to RFC-8040, the error
+    message should be a 400 invalid value. Therefore, the query parameter
+    rollback-id will now respond with a 400 invalid value.
+
+    (ENG-30534)
+
+  - restconf: Fixed incorrect check for the Yang-Patch payload to be
+    consistent with the given URL and Yang-Patch Target.
+
+    (ENG-29526, RT:49527, PS-44652, CSCwc57537)
+
+  - schema: Fixed an issue where shared memory-mapped schema file wouldn't
+    be generated when IPC access-check is enabled. This would lead to
+    increased start-up time for python packages and other packages that
+    utilize the memory-mapped schema file.
+
+    (ENG-30961, CSCwe40702, BEMS01559793)
+
+  - toolchain: Fix a confdc issue when compiling a MIB module (.mib file) to
+    a .bin file using a YANG module with a smiv2:opaque data type.
+
+    (ENG-30708, RT:50080, PS-45207, CSCwe14032)
+
+  - upgrade: Fixed a CDB upgrade degradation after ENG-23014 NED migration
+    improvements.
+
+    (ENG-30934, RT:50143, PS-45270, CSCwe38218)
+
+  - yanger: Fix incorrect circular dependency errors produced by faulty
+    deviation module dependencies.
+
+    (ENG-27519, RT:47631, PS-42752, CSCvz99252)
+
+
+ConfD-8.0.3 [February 23, 2023]
+===============================
+
+Enhancements:
+
+  - ned: Speed up namespace lookup using a hash representation instead of a
+    string.
+
+    (ENG-30704, RT:49679, PS-44807, CSCwc92195)
+
+  - netconf: New parameter '/confdConf/netconf/transport/ssh/ncChunkSize' is
+    introduced to control buffering of data coming in over NETCONF in order
+    to lower memory consumption in case of limited RAM availability. Man
+    page confd.conf(5) and User Guide are updated accordingly.
+
+    (ENG-30246, RT:47265, RT:49913, PS-42386, PS-45040, CSCvz48927)
+
+Corrections:
+
+  - confd: Transactions with a lot of data that require validation in
+    combination with commit diff subscribers could cause ConfD to lock up
+    for a period of time after the transaction was committed. Low-level
+    scheduling has been tweaked to mitigate this.
+
+    (ENG-30801, RT:49944, PS-45071, CSCwe23864)
+
+  - confd: The heartbeat interval parameter is no longer ignored when
+    registering heartbeat notification subscribers.
+
+    (ENG-30284)
+
+  - cdb: Manually calling cdb_journal_compaction would lead to a crash if
+    the '/confdConfig/cdb/operational/persistent' was set to 'never'. This
+    has now been fixed.
+
+    (ENG-30829)
+
+  - cdb: If a south session is established at prepare phase of an ongoing
+    read-write transaction to access the operational datastore, and the
+    session uses cdb_cd() to change the context node to a nonexistence
+    configurational list or leaf-list with index as key, then this session
+    was forcefully closed due to an internal error in CDB subsystem. CDB now
+    returns the correct reply.
+
+    (ENG-30774, RT:50089, PS-45216, CSCwe18930)
+
+  - cdb: A bug has been fixed where a transaction using MAAPI set_attr() on
+    a non-existent list element created an invalid changeset, causing ConfD
+    to crash in the commit phase.
+
+    (ENG-30631, CSCwe04021, BEMS01547832)
+
+  - cdb: When subscription reads the modification data while the internal
+    write operation executes, the write session is blocked and internal
+    error is reported. This issue is resolved so that when a read session is
+    running, the write session will be put into a pending queue. After the
+    read session releases, write session can continue to process as normal.
+
+    (ENG-30568, RT:50001, PS-45129, CSCwd97448)
+
+  - cdb: An informative error message replaces the internal error caused by
+    using the CLI "rename" command with an incorrect key format.
+
+    (ENG-30540, RT:50015, PS-45144)
+
+  - cdb: ConfD now triggers set-hooks when a mandatory node is not set,
+    allowing an external data provider to act on the information.
+
+    (ENG-29020, RT:49300, PS-44415, CSCwb83239)
+
+  - cli: When switching from CLI configuration mode to operational mode, the
+    history of operational mode was incorrectly discarded.
+
+    (ENG-30622, RT:50022, PS-45151, CSCwe02109)
+
+  - cli: The CLI must skip an empty row when emitting table output in CSV
+    format, which would otherwise cause an internal error.
+
+    (ENG-30153, RT:49835, PS-44961, CSCwd46058)
+
+  - cli: It is no longer possible to execute an incomplete command to enter
+    the C- or I-style CLI mode of a container that combines the
+    tailf:cli-add-mode and tailf:cli-incomplete-command YANG extensions.
+
+    (ENG-16075)
+
+  - cs_trans: ENG-25232 introduced a performance optimization improving the
+    "when" statement XPath expression evaluations on large lists. Due to
+    incorrect path handling, certain "when" expressions could cause a crash
+    during evaluation.
+
+    (ENG-30667, RT:50075, RT:50004, PS-45202, PS-45133, CSCwe07692)
+
+  - cs_trans: Removed a "must" statement violation error that occurred after
+    an upgrade.
+
+    (ENG-30381, RT:50084, RT:49932, PS-45211, PS-45059, CSCwd74147)
+
+  - cs_trans: Fix an internal error when invoking 'confd --check-callbacks'
+    on an rpc or action with an output node. Introduced a new tailf YANG
+    extension 'tailf:internal-dp', which can be used in a model when we want
+    to skip check-callbacks for that module.
+
+    (ENG-29862, RT:47795, RT:49739, PS-42918, PS-44867, CSCwd05767)
+
+  - cs_trans: Display the default values of nodes in containers with 'when'
+    expressions at the time the 'when' expressions evaluate to 'true'.
+
+    (ENG-29374, RT:49171, PS-44284, CSCwc24588)
+
+  - json-rpc: When there has been a conflict due to parallel edits of an OBU
+    list, resolve_trans will now give an error message that the transaction
+    needs to be resolved. Note that due to how the transaction engine works,
+    the conflicting transaction needs to be closed and recreated to be able
+    to commit it.
+
+    (ENG-30697, RT:49780, PS-44906)
+
+  - json-rpc: The get_schema method result for a YANG augmented choice node
+    no longer includes the namespace as part of the "name" field to be
+    consistent with other augmented nodes.
+
+    (ENG-30415, RT:49934, PS-45061, CSCwd81524)
+
+  - python-api: Allow to get/create/delete a list-instance with a '%'
+    character in the keystring through Python API.
+
+    (ENG-30535, RT:49967, PS-45094)
+
+  - rollback: The CLI's rollback command behavior when specifying a subtree
+    path was corrected.
+
+    (ENG-30071, CSCwd30764, BEMS01438636)
+
+  - snmp-agent: Will not skip objects for get_next requests on non-existent
+    columns.
+
+    (ENG-27488, RT:47653, PS-42775, CSCvz96020)
+
+  - toolchain: The CLI turbo parser was corrected to prevent an internal
+    error that could occur when the tailf:cli-prefix-key YANG extension is
+    used.
+
+    (ENG-30533, RT:50011, PS-45140)
+
+  - yanger: Fix a regression where "must" expressions containing not() were
+    not evaluated in some cases.
+
+    (ENG-30448, RT:49965, PS-45092, CSCwd85508)
+
+
+ConfD-8.0.2 [January 20, 2023]
+==============================
+
+Removals:
+
+  - confd: Removed the unused tailf-rest-error.yang model.
+
+    (ENG-30118)
+
+  - netconf: The setting sendDefaults in confd.conf is now obsolete and will
+    no longer have any effect. Instead it is recommended to use
+    defaultHandlingMode which is derived from RFC 6243.
+
+    (ENG-28637)
+
+Enhancements:
+
+  - json-rpc: JSON-RPC logging now performs better and scales with the
+    number of logged items. For example, logging the creation of 10000 list
+    items is more than twenty times faster.
+
+    (ENG-29423)
+
+  - netconf: New parameter ncChunkSize is introduced to control buffering of
+    data coming in over NETCONF in order to lower memory consumption in case
+    of limited RAM availability. Man page confd.conf(5) and User Guide are
+    updated accordingly.
+
+    (ENG-30246, RT:47265, RT:49913, PS-42386, PS-45040, CSCvz48927)
+
+  - restconf: Add rollback-commit-result to yang-patch-status replies when
+    the query parameter ?rollback-id=true is used.
+
+    (ENG-30159, CSCwd46325, BEMS01498190)
+
+Corrections:
+
+  - confd: In some scenarios in the validation phase ConfD could fail with
+    an internal error. The error would only occur when the validation
+    affected multiple list instances with a non string key.
+
+    (ENG-30392)
+
+  - confd: The standard model 'ietf-yang-patch' was listed in yang-library
+    as conformance 'implement', even though it has no data nodes. The model
+    is now correctly listed as 'import' in yang-library.
+
+    (ENG-23723)
+
+  - cli: CLI commands that use external binaries via
+    cmdwrapper/cmdptywrapper failed to execute when ConfD was configured to
+    use network namespaces for IPC communication because of an incorrect
+    check on support for network namespaces. Now the faulty check is
+    removed.
+
+    (ENG-29503, RT:49501, PS-44625, CSCwc51829)
+
+  - cs_trans: Fix validation issue with rolling back configuration where a
+    "when" statement XPath expression evaluated to false but the nodes under
+    the "when" statement was still validated.
+
+    (ENG-27556, RT:47736, PS-42859, CSCwa04744)
+
+  - ha: Changing /confdConfig/ha/enabled from true to false in confd.conf(5)
+    and running the "confd --reload" command caused the HA subsystem to
+    crash. Changing /confdConfig/ha/enabled from false to true and running
+    the "confd --reload" command didn't start the HA subsystem. Both issues
+    have been addressed, the HA subsystem is shutting down without a crash
+    when disabled and is started once enabled.
+
+    (ENG-30529)
+
+  - json-rpc: Calling "get_schema" with "insert_values": true would fail
+    with an internal error if the data contained nested choices with data
+    created in the current transaction.
+
+    (ENG-30352, RT:49931, PS-45058, CSCwd71317)
+
+  - json-rpc: When a tailf:key-default was used in a YANG model, key-default
+    was not part of the response from the JSON-RPC operation get-schema.
+    Now, the key-default is part of the response for the JSON-RPC get-schema
+    operation.
+
+    (ENG-28295)
+
+  - kickers: Evaluating a monitor expression with a predicate where the
+    left-hand side of the equality condition references an invalid node,
+    e.g., /a/b[id=/invalid/path], no longer generates an internal error.
+
+    (ENG-30220)
+
+  - netconf: Loading XML config, which sets an attribute on a non-presence
+    container under a choice case, caused an internal error. After this fix,
+    the attribute will be loaded successfully if the non-presence container
+    contains a child node. Otherwise, ConfD will return an error that the
+    container does not exist.
+
+    (ENG-30216, CSCwd52866, BEMS01499836)
+
+  - netconf: When a stream subscription was created, and the request
+    contained a subtree filter with elements or namespaces unknown to the
+    system, the corresponding subtree in the filter was silently removed.
+    Now such a request will be responded to with a subtree filter error.
+
+    (ENG-29973)
+
+  - netconf: Increased the number of characters that can be given to the
+    '-g' (groups) switch to the netconf-console command.
+
+    (ENG-27915, RT:47977, PS-43092, CSCwa40470)
+
+  - python-api: The underlying C implementation for C_UINT32, C_BIT32, and
+    C_DECIMAL64 was incorrect on 32-bit platforms. This could result in
+    invalid values due to overflow, such as negative values on C_UINT32
+    types.
+
+    (ENG-30434)
+
+  - toolchain: It is now possible emit header files for builtin YANG models
+    even when webui and restconf dirs have been removed.
+
+    (ENG-29373, RT:49455, PS-44575, CSCwc24554)
+
+  - toolchain: The standard model 'ietf-restconf' was listed in yang-library
+    as conformance 'implement', even though it has no data nodes. The model
+    is now correctly listed as 'import' in yang-library.
+
+    (ENG-22731)
+
+  - xpath: Corrected an issue with the XPath evaluation that could occur
+    when the XPath contains a count() function of a leaf-list.
+
+    (ENG-30189, RT:49868, PS-44994, CSCwd48736)
+
+  - yanger: Mitigate an internal error when using a default value for a
+    leafref within a union.
+
+    (ENG-29793, RT:49705, PS-44833, CSCwc96446)
+
+
+ConfD-8.0.1 [December 14, 2022]
+===============================
+
+Non-backwards compatible enhancements:
+
+  - cdb: The confd_cmd tool "get_attrs" command now returns attribute names
+    together with attribute values.
+
+    (ENG-30143)
+
+  - cli: Improved the "xpath eval" command when there is an error returned
+    from the internal data reader.
+
+    (ENG-20549)
+
+  - ha: If a node has a different tick timeout configuration from the
+    primary, it will no longer be allowed to join the HA cluster. See the
+    confd.conf(5) man page under "/confdConfig/ha/tickTimeout" and the ConfD
+    User Guide for details.
+
+    (ENG-30190)
+
+Non-backwards compatible corrections:
+
+  - cdb-capi: Corrected reading operational data from a CDB API session
+    during a mixed mode transaction's prepare and commit phase.
+
+    (ENG-29537, RT:49562, PS-44687, CSCwc60777)
+
+  - ha: Do not allow the user to use "--reload" or "--areload" to change
+    high-availability tick timeout while the node is in "primary" or
+    "secondary" mode.
+
+    (ENG-30280, CSCwd62523, BEMS01500229)
+
+Enhancements:
+
+  - confd: A restriction against the usage of 'confd --cdb-compact' while
+    ConfD is running has been added in order to prevent misuse of the
+    command.
+
+    (ENG-30125, RT:49861, PS-44987, CSCwd41377)
+
+  - confd: Reduce the time of schema validation for lists. This optimisation
+    applies to lists with relative leafrefs not escaping outside the list
+    itself.
+
+    (ENG-29918)
+
+  - c-api: Use of confd_load_schemas() and confd_load_schemas_list() is
+    discouraged in favor of maapi_load_schemas() and
+    maapi_load_schemas_list(). See documentation for further details.
+
+    (ENG-29716, RT:49676, PS-44804, CSCwc87588)
+
+  - cdb: A performance regression was found in the "write changeset" phase
+    as a side-effect of additional validation steps.
+    The overhead came from expensive key comparisons when compound keys were
+    used.
+    The way insertions were done has been improved to reduce the number of
+    key comparisons, reducing the time spent in the "write changeset" phase
+    while keeping the additional validation steps.
+
+    (ENG-30010, CSCwd26452, BEMS01487639)
+
+  - cli: The C-style diff-calculation as part of 'show configuration' after
+    simple additions (no re-ordering) to an ordered-by user list will now be
+    faster.
+
+    (ENG-23219, RT:47491, PS-42612)
+
+  - cs_trans: When receiving data in XML format, the system tried to skip
+    evaluating "when" statement XPath expressions on non-presence containers
+    if possible. Now, the system will evaluate "when" expressions on
+    non-presence containers to remove dependencies on data providers.
+
+    (ENG-30106)
+
+  - cs_trans: Reduce the number of "when" expression evaluations when
+    receiving data in XML format.
+
+    (ENG-20173, RT:35989, PS-31068)
+
+  - python-api: Added the possibility to reload cached schemas in
+    confd.maapi.Maapi.__init__(), confd.maapi.single_read_trans() and
+    confd.maapi.single_write_trans() using a "load_schemas" argument. See
+    the ConfD Python API documentation for details.
+
+    (ENG-27042, RT:46839, PS-41957, CSCvz26156)
+
+  - rollback: In case of lost or corrupted global.data, the rollback number
+    is reconstructed from the rollback files to avoid overwriting existing
+    rollback files when the number is reset. If the file is lost or
+    corrupted, it will now be logged in the confd log.
+
+    (ENG-28208, RT:48507, PS-43620, CSCwa82500, SR:692580453)
+
+  - snmp-agent: The SNMP Agent now support the privacy protocols AES-192 and
+    AES-256.
+
+    (ENG-30012, RT:49709, PS-44837)
+
+  - web-server: When ConfD fails to listen on the configured webui IP
+    address and port, a POSIX error string (e.g. "address already in use")
+    is now logged instead of "unknown reason".
+
+    (ENG-29713, CSCwd02687, BEMS01462163)
+
+  - yanger: Removed redundant "must" expression evaluation caused by
+    instance create, but only for "must" expressions with a not() function
+    where all the referenced nodes are within the current instance.
+
+    (ENG-28518, RT:48887, PS-44003, CSCwb26594)
+
+Corrections:
+
+  - confd: Fixed a bug where ConfD would not start when a certain type of
+    notification replay file was loaded.
+
+    (ENG-29711, RT:49661, PS-44789, CSCwc86821)
+
+  - confd: Prevent ConfD from leaking sensitive information in certain
+    situations.
+
+    (ENG-29312, RT:49432, PS-44552, CSCwc17900)
+
+  - confd: NETCONF notification stream names may now be the same as already
+    existing ConfD process names without issues.
+
+    (ENG-26389, RT:46025, PS-41142, CSCvy19927)
+
+  - confd: Added support for displaying multiple keys in the DP API
+    get_next() callback entries in the output from the `confd
+    --check-callbacks` command.
+
+    (ENG-30301, RT:49735, PS-44863)
+
+  - aaa: Added support for storing more than one xmlns attribute with the
+    NACM rule path of type node-instance-identifier to allow the path
+    expression to use multiple namespace prefixes as required by the YANG
+    RFC 7950 and NACM RFC 8341.
+
+    (ENG-29593, RT:49589, PS-44717, CSCwc72161)
+
+  - c-api: When ConfD parsed a data callback reply of type
+    array(tag_value_t), and one of the tag_value_t items set a specific
+    namespace, that namespace was reused when parsing the next item without
+    a specific namespace. This led to an "application protocol error" and a
+    "Bad tag value" entry in devel.log
+
+    (ENG-30205, RT:49874, PS-45001, CSCwd51803)
+
+  - c-api: ConfD can now handle UNIX groups with many members.
+
+    (ENG-29439, RT:49163, PS-44276, CSCwc34768)
+
+  - candidate: Fixed issue where nested choices were not properly set when
+    resetting candidate database.
+
+    (ENG-30138)
+
+  - cdb: Strict CDB WAL (Write Ahead Log) validation broke backward
+    compatibility during startup due to a redundant operation. The issue was
+    fixed by allowing the load to continue upon detection of the redundant
+    operations.
+
+    (ENG-30337, CSCwd69313, BEMS01535101)
+
+  - cdb: When startup db is enabled, caching during upgrade was causing
+    internal errors. This issue is fixed by correcting cdb db cache updates.
+
+    (ENG-29584, RT:49599, PS-44727, CSCwc71150)
+
+  - cdb-capi: Corrected cdb_index() and cdb_next_index() when querying at
+    prepare phase of a read-write transaction.
+
+    (ENG-30113)
+
+  - cdb-capi: A CDB two-phase subscriber disconnecting in the prepare phase
+    of a transaction caused the transaction to close in the commit phase
+    without waiting for other subscribers, sometimes resulting in a crash
+    during cdb_diff_iterate(). CDB now handles disconnection in prepare
+    phase correctly.
+
+    (ENG-30098, RT:49894, PS-45021)
+
+  - cdb-capi: A trigger of the operational datastore using
+    trigger_oper_subscriptions() would lead to an internal crash when the
+    socket used by the operation was closed. Operational datastore triggers
+    are now handled correctly.
+
+    (ENG-29491, RT:49279, PS-44393, CSCwc48760)
+
+  - cdb-capi: A lockless CDB session established at the prepare phase of a
+    write transaction can cause an irrecoverable error if CDB data is
+    queried over that session after write transaction is closed. The CDB
+    subsystem has been updated to cover such a case.
+
+    (ENG-27639, RT:49447, RT:47772, RT:48650, RT:49585, PS-44567, PS-42895,
+    PS-43763, PS-44712)
+
+  - cdb-subscription: A race condition existed between an unsubscribe of a
+    two-phase subscriber and CDB receiving distribution replies from
+    secondary nodes, causing an internal error. ConfD has been updated to
+    cover such a case.
+
+    (ENG-29600)
+
+  - cli: Buffer sizes for internal IPC within the CLI have been changed to
+    be aligned with the buffering inside the built-in CLI client.
+
+    (ENG-30288)
+
+  - cli: If the user configures the CLI to use a dynamic prompt which looks
+    completely different in a specific mode vs when it is at the top-level
+    the arrow pointer that is produced in a syntax error would be off when
+    using the 'top ...' command. The syntax-error arrow now points
+    correctly.
+
+    (ENG-30024)
+
+  - cli: An internal error in the CLI has been corrected that could happen
+    when using a tailf:cli-diff-dependency extension that points towards
+    something that was not viewable/readable due to NACM rules.
+
+    (ENG-30003, RT:49797, PS-44923, CSCwd22979)
+
+  - cli: The CLI wasn't able to modify the current keymap with
+    keymap-actions using clispec in configure-mode but only in oper-mode.
+    This was fixed to enable it for configure-mode.
+
+    (ENG-29915, RT:49743, PS-44871, CSCwd11735)
+
+  - cli: Corrected the previous optimisation regarding C-style
+    diff-calculation for simple additions (no re-ordering) to an ordered-by
+    user list.
+
+    (ENG-29888)
+
+  - cli: Fixed an "internal error" that appeared when changing a node being
+    monitored by a kicker with the "config-false" exclude filter.
+
+    (ENG-29824, RT:49719, PS-44847, CSCwd01191)
+
+  - cli: The 'confd_cli' application has been improved to use the return
+    value of the system call 'getlogin_r' when looking up current user.
+
+    (ENG-29818, RT:49722, PS-44850, CSCwd00121)
+
+  - cli: Fixed a memory leakage issue in the CLI caused by incorrect
+    internal queue management, visible when a lot of data comes via SSH.
+
+    (ENG-29812)
+
+  - cli: An incorrect diff was produced by cdb_get_modifications_cli() when
+    an ordered-by user list was part of the changeset.
+
+    (ENG-29525, RT:49542, PS-44667, CSCwc57357)
+
+  - cs_trans: Resolved an issue with validation when modifying a leaf that
+    is included in the must statement of another leaf.
+
+    (ENG-30169, RT:49869, PS-44997, CSCwd47023)
+
+  - cs_trans: Improve the use of --check-callbacks by allowing to provide a
+    path directly to a list-node, adding the ability to see the next value's
+    key in get_next() output and fix a newline typo.
+
+    (ENG-29879, RT:49733, PS-44861, CSCwd07147)
+
+  - cs_trans: When applying a list filter in the CLI the internal expression
+    could fail if the list was part of a different namespace. This has been
+    fixed by taking special care of the namespace switch.
+
+    (ENG-29863, RT:49704, RT:49737, PS-44832, PS-44865, CSCwd05802)
+
+  - cs_trans: Creating data in "delayed when" mode (e.g. loading XML file)
+    would fail with an internal error if there was a container under a
+    created instance, with its children deleted as an effect of the "when"
+    expression being false.
+
+    (ENG-29646, RT:49644, PS-44772, CSCwc79270, BEMS01490047)
+
+  - cs_trans: Resolved an issue with leafref validation where deleting a
+    leaf being referenced by a leafref in some cases did not result in an
+    error.
+
+    (ENG-29642, RT:49637, PS-44765, CSCwc78320)
+
+  - cs_trans: During and after the "prepare" phase of a transaction, ConfD
+    will now, as expected, unset the "delayed when" flag.
+
+    (ENG-29511, RT:49510, PS-44634, CSCwc53887)
+
+  - cs_trans: The DP callback function move_after() was never called for a
+    set-hook (i.e. a node annotated with tailf:set-hook). Now, move_after()
+    is called for a set-hook as well as a transaction-hook.
+
+    (ENG-28277, RT:48620, PS-43732, CSCwa93146)
+
+  - documentation: Added supplemental documentation for the
+    maapi_copy_tree() function to clarify a proper subset. See the
+    confd_lib_maapi(3) man page.
+
+    (ENG-26173, RT:45811, PS-40926)
+
+  - ha: When a new secondary node joins an HA group, the secondary node
+    needs to sync its datastore with the primary and deletes its old one. If
+    the secondary has a large data store, the delete action could prevent
+    sending a TICK message to the primary. If the primary node does not
+    receive a TICK message from the secondary, it considers the secondary
+    dead and closes the connection. The delete action has been improved so
+    it will not block secondary from sending TICK messages.
+
+    (ENG-30173, CSCwd47347, BEMS01500229)
+
+  - json-rpc: Starting a transaction with an incorrect action path now gives
+    a more descriptive error. This specifically applies to the case where
+    the given action path is a valid path in the data model, but not to an
+    action. Instead of getting an unspecified internal error it will now
+    return an invalid params error and say that the path does not point to
+    an action.
+
+    (ENG-29417)
+
+  - json-rpc: JSON-RPC validate_commit now detects any transaction conflicts
+    on ordered by user lists without crashing.
+
+    (ENG-28334, RT:47462, RT:49780, PS-42583, PS-44906, CSCwa99070)
+
+  - kickers: Fix potential crash in kicker subscribers when HA node
+    transition occurs.
+
+    (ENG-29872)
+
+  - maapi: Improved error message when attempting to set an attribute to a
+    key leaf.
+
+    (ENG-29706, RT:49674, PS-44802, CSCwc85748)
+
+  - netconf: When the NETCONF Trace Log is disabled, any corresponding
+    external log process is now also terminated.
+
+    (ENG-29914, RT:49766, PS-44892, CSCwd11730)
+
+  - netconf: Fixed a bug where yang-push subscriptions failed if an
+    anchor-time was supplied.
+
+    (ENG-29839)
+
+  - netconf: Filters in a datastore subscription (YANG Push) that contains
+    unknown model elements or namespaces will now result in an error
+    response to an establish-subscription or modify-subscription request.
+
+    (ENG-29325, RT:49022, PS-44135, CSCwc20289, SR:693196654)
+
+  - netconf: RESTCONF GET calls using with-defaults=report-all-trimmed now
+    correctly tag default config-false data as default.
+
+    (ENG-28672)
+
+  - netconf: In some cases, when doing a NETCONF GET request with a subtree
+    filter where you provide a tag name that does not match any YANG nodes
+    and the XML is also not well-formed, you could get an internal error.
+    This was a side effect of the change in ENG-25267. This issue has now
+    been fixed so that you get a malformed-message error instead.
+
+    (ENG-28474, RT:48930, PS-44046, CSCwb22845)
+
+  - netconf: YANG-Push on-change subscriptions did not consider the node
+    attribute 'inactive'. Now, inactive and updated nodes will not trigger a
+    notification for such a subscription.
+
+    (ENG-27489)
+
+  - observability: An unresponsive CDB could block building a debug dump
+    forever. Now, requesting information from CDB while building a debug
+    dump has a timeout equal to 1/10 of the collect-timeout (1 second by
+    default).
+
+    (ENG-30282, CSCwd62301, BEMS01500229)
+
+  - observability: Corrected the total tts memory size displayed via 'confd
+    --status' and 'confd --debug-dump'.
+
+    (ENG-13396, RT:46926, PS-42043)
+
+  - python-api: Prevent an internal error when setting a leaf-list with a
+    faulty relative-path and instead return an invalid path error.
+
+    (ENG-30186)
+
+  - restconf: Fixed an internal error that could occur when using RESTCONF
+    with token validation authentication for a user without a password.
+
+    (ENG-30150)
+
+  - restconf: Querying the restconf root with content or with-origin query
+    parameters now returns the expected error instead of resulting in an
+    internal error.
+
+    (ENG-30039)
+
+  - restconf: Retrieving augmented config-false lists with RESTCONF using
+    filter content=nonconfig used to truncate the response and generate an
+    error log. Now it instead returns the full response without any error.
+
+    (ENG-29887, RT:49748, PS-44876, CSCwd08235)
+
+  - restconf: Sending several RESTCONF requests at a fast pace where
+    RESTCONF is disabled and shortly thereafter enabled again, could result
+    in alternating successful and unsuccessful responses to the requests.
+    The worker processes created for the requests had not been updated with
+    RESTCONF transitioning from being disabled back to enabled. This fix let
+    all workers handling RESTCONF and webui requests be killed and restarted
+    with knowledge of the RESTCONF and/or webui-server being re-enabled, and
+    all requests thereafter are successful.
+
+    (ENG-29320, RT:49397, PS-44517, CSCwc19634)
+
+  - rollback: Stale .prepare files now get cleaned up when ConfD is
+    restarted.
+
+    (ENG-29989, CSCwd21521, BEMS01467138)
+
+  - schema: Fixed an incorrect restriction that required a module to be
+    explicitly imported when using a grouping that contained a default
+    identityref to the original module.
+
+    (ENG-29814)
+
+  - snmp-agent: Retrieving operational values from SNMP without starting the
+    snmp agent caused an internal error. The values are now treated as
+    nonexistent, and nothing is returned.
+
+    (ENG-30187, RT:49885, PS-45012, CSCwd48599)
+
+  - toolchain: Remove faulty YANG schema-mount-point-specific compiler
+    checks from confdc and yanger.
+
+    (ENG-29695, RT:49667, PS-44795, CSCwc85008)
+
+  - toolchain: When the Turbo Parser encounters a leaf that has a default
+    value and tries to modify it but then undo the modification it would not
+    set it to the default value but rather just leave it as unset.
+
+    (ENG-29541, RT:49572, PS-44697, CSCwc62476)
+
+  - toolchain: Fixed an issue where confdc would produce broken fxs files
+    when augmenting with a notification containing a "when" statement.
+
+    (ENG-28142, RT:48449, PS-43562, CSCwa75058)
+
+  - upgrade: If a client used MAAPI to modify operational data during an
+    upgrade and a node had its schema changed, then the changes done over
+    MAAPI were ignored. The upgrade procedure has been updated not to ignore
+    the change done over MAAPI.
+
+    (ENG-29916, RT:49732, PS-44860, CSCwd11827)
+
+  - web-server: Reduced startup time for when the webui docroot contains a
+    very large number of files and directories.
+
+    (ENG-29633, RT:49512, PS-44636, CSCwc76876)
+
+  - xpath: The XPath evaluation failed to convert a predicate to a matching
+    list filter when the model had a restriction that limits more than the
+    given predicate and caused ConfD to reply incorrectly. As a result, the
+    XPath evaluation now skips evaluating facets when generating list
+    filters from predicates.
+
+    (ENG-29991, RT:49778, PS-44904, CSCwd21557)
+
+  - yanger: YANG compilation no longer fails when the "must" statement
+    contains wildcard.
+
+    (ENG-29945, CSCwd08838)
+
+  - yanger: Defining a grouping with nested uses statements and referencing
+    it from another module will no longer cause YANG compilation errors.
+
+    (ENG-29462, RT:49325, PS-44441)
+
+  - yanger: A bits or enumeration statement inside a union is now allowed to
+    be empty due to an unsupported feature as long as the enclosing union
+    still has at least one valid type.
+
+    (ENG-28243, RT:48416, PS-43528, CSCwa87237)
+
+  - yanger: Fixed non-strict-leafref validation behaviour that did not
+    correctly check the type when there were intermediate leafrefs, now we
+    follow the paths and check the underlying type of a leafref.
+
+    (ENG-28149)
+
+  - yanger: Add support for 'confdc --mib2yang' to emit YANG files with
+    UTF-8 character encoding.
+
+    (ENG-28064, RT:48348, PS-43462, CSCwa60102)
+
+
+ConfD-8.0 [November 10, 2022]
+=============================
+
+Removals:
+
+  - cli: Removed deprecated configuration parameter
+    /confdConfig/cli/commitRetryTimeout.
+
+    (ENG-23443)
+
+Non-backwards compatible enhancements:
+
+  - confd: ConfD now requires glibc version 2.24 or higher for all
+    Linux-based targets except for Linux/MIPS where the requirements remain
+    unchanged (glibc/eglibc version 2.16 or higher).
+
+    (ENG-28531)
+
+  - confd: By default, using the confdc option --deviation now emits the
+    deviation file as an fxs file of its own. If the deviation fxs file
+    already exists, the fxs file is only emitted if the yang source file has
+    a newer modification time than the fxs file. It is possible to skip
+    automatic emit of deviation models by using --skip-deviation-fxs. See
+    confdc(1) for further info.
+
+    (ENG-27616, RT:47556, PS-42677, CSCwa10218)
+
+  - confd: The Java API now refers to 'primary' and 'secondary' instead of
+    'master' and 'slave' roles to reflect internal API changes. Any
+    references to methods, variables, or enumerations using the old names
+    will have to be changed to use the new versions.
+
+    (ENG-24649, RT:46447, PS-41562)
+
+  - cdb: Read and write requests towards the operational datastore can now
+    be done in parallel. However, CDB OP subscribers can no longer commit
+    sync to the same path that is modified by the original writeset.
+
+    (ENG-28710)
+
+  - cdb: The confd_cmd command now refers to 'primary' and 'secondary'
+    instead of 'master' and 'slave' roles to reflect internal API changes.
+    The following commands have been added:
+    - primary
+    - secondary
+    - dead-secondary
+    The following commands are deprecated and will be removed in two
+    releases:
+    - master
+    - slave
+    - dead-slave
+    The command output also defaults to the new naming. The old behavior can
+    be obtained by using the new global switch -O (as in Old) but will be
+    removed in a future version.
+
+    (ENG-29412)
+
+  - python-api: The Python API now refers to 'primary' and 'secondary'
+    instead of 'master' and 'slave' roles to reflect internal API changes.
+    The change is backward compatible except for the two keyword arguments
+    to the function _ha.beslave (now an alias for _ha.besecondary) which
+    have been renamed as follows:
+    masterid -> primary_id
+    masterip -> primary_ip
+    The old names are now deprecated and will be removed in a future
+    release.
+
+    (ENG-28601)
+
+  - restconf: The value of the RESTCONF HTTP response header Last-Modifed
+    was previously taken from the creation time of the latest rollback file.
+    Now the time value of Last-Modifed is taken as the time of the last
+    commit. Also, the corresponding Etag is now marked as weak (see RFC
+    9110) by the leading characters 'W/', and attached at the end is the
+    format XML or JSON.
+
+    (ENG-28337)
+
+Non-backwards compatible corrections:
+
+  - confd: The YANG string input validation across interfaces and APIs is
+    now enabled by default. I.e., the default value for
+    /confdConfig/validateUtf8/enabled is now changed to 'true'.
+
+    (ENG-29371)
+
+  - confd: ConfD now needs to be shut down before using the
+    --set-snmp-engine-boots option or the command will have no effect.
+
+    (ENG-29162)
+
+  - cdb-capi: Using cdb_create(), cdb_set_elem() or cdb_set_elem2() on
+    children of non-existent presence container succeed and the presence
+    container was created implicitly. Now, the behaviour has been corrected,
+    so the presence container must be created explicitly before
+    setting/creating its children.
+
+    (ENG-11073)
+
+  - web-server: TLS 1.1 is still available but now disabled by default.
+
+    (ENG-28966)
+
+Enhancements:
+
+  - confd: To reduce the number of disk writes, the persistent transaction
+    IDs (TIDs) are now allocated in groups of 1000 by default. This number
+    can be configured under
+    '/confdConfig/persistentTransactionIds/allocationSize' and the feature
+    can be completely disabled by setting
+    '/confdConfig/persistentTransactionIds/enabled' to 'false'.
+
+    (ENG-28528)
+
+  - confd: Operational data can now be loaded into ConfD in JSON format
+    through MAAPI load config - e.g. using the confd_load tool.
+
+    (ENG-28437)
+
+  - confd: A new configuration option `ssh/parallelLogin` was added which
+    controls how many incoming SSH sessions can be opened and will see
+    "password:" prompt before SSH will start throttling. Default value prior
+    to this change was 1. See the confd.conf(5) man page for details.
+
+    (ENG-28305, RT:48772, RT:49219, RT:48660, PS-43886, PS-44332, PS-43773,
+    CSCwa96330)
+
+  - confd: ConfD now outputs a progress event span when a transaction is
+    holding the transaction lock.
+
+    (ENG-24341)
+
+  - c-api: The C API now refers to 'primary' and 'secondary' instead of
+    'master' and 'slave' roles to reflect internal API changes. The change
+    is backward compatible but customer code still needs to be recompiled.
+    In the confd_ha_status_state enum in confd_ha.h, the following have been
+    added:
+    - CONFD_HA_STATE_SECONDARY
+    - CONFD_HA_STATE_PRIMARY
+    - CONFD_HA_STATE_SECONDARY_RELAY
+    The following old constants are retained but will be removed in a future
+    release:
+    - CONFD_HA_STATE_SLAVE
+    - CONFD_HA_STATE_MASTER
+    - CONFD_HA_STATE_SLAVE_RELAY
+    In confd_ha.h, the following functions have been added:
+    - confd_ha_beprimary
+    - confd_ha_besecondary
+    - confd_ha_secondary_dead
+    The following old functions are still available as macros but will be
+    removed in a future release:
+    - confd_ha_bemaster
+    - confd_ha_beslave
+    - confd_ha_slave_dead
+    In the cdb_txid struct in confd_cdb.h, the following field has been
+    added:
+    - char primary[MAXHOSTLEN];
+    The old field 'master' is retained but is simply a pointer to the
+    primary field and will be removed in a future release.
+    In confd_events.h, the following constants have been added:
+    - CONFD_HA_INFO_NOPRIMARY
+    - CONFD_HA_INFO_SECONDARY_DIED
+    - CONFD_HA_INFO_SECONDARY_ARRIVED
+    - CONFD_HA_INFO_SECONDARY_INITIALIZED
+    - CONFD_HA_INFO_IS_PRIMARY
+    - CONFD_HA_INFO_BESECONDARY_RESULT
+    The following old constants are retained but will be removed in a future
+    release:
+    - CONFD_HA_INFO_NOMASTER
+    - CONFD_HA_INFO_SLAVE_DIED
+    - CONFD_HA_INFO_SLAVE_ARRIVED
+    - CONFD_HA_INFO_SLAVE_INITIALIZED
+    - CONFD_HA_INFO_IS_MASTER
+    - CONFD_HA_INFO_BESLAVE_RESULT
+
+    (ENG-28602)
+
+  - cdb: Transaction log loading during commit has been reworked. This
+    change can help reduce the time it takes to commit transactions with a
+    large amount of changes.
+
+    (ENG-28526)
+
+  - cli: The CLI will now include the full context for each row when
+    producing CSV data. This is done by issuing the command 'show ... |
+    csv'.
+
+    (ENG-29205, RT:49335, PS-44451, CSCwc02887)
+
+  - cli: An option has been added to confd.conf
+    /confdConfig/cli/enableLastLoginBanner to control if the builtin
+    last-login-banner should be displayed in the CLI or not. Default option
+    is that this is enabled. This banner displays the amount of failed login
+    attempts for a certain user in ConfD.
+
+    (ENG-28676, RT:49082, PS-44196)
+
+  - cs_trans: XPath evaluation involving 'inet:ipv6-address' has been
+    optimized.
+
+    (ENG-29425)
+
+  - documentation: Added a description of the new timeout and compress
+    options for the confd command debug-dump option to the confd(1) man
+    page.
+
+    (ENG-28616)
+
+  - erlang-api: The Erlang API now refers to 'primary' and 'secondary'
+    instead of 'master' and 'slave' roles to reflect internal API changes.
+    The change is backward compatible but has deprecated bemaster/2,
+    slave_dead/2 and beslave/4 from the econfd_ha module. These functions
+    will be removed in a future release. Please use beprimary/2,
+    secondary_dead/2 and besecondary/4 instead.
+
+    (ENG-28603)
+
+  - examples: Added a new example - show brief, illustrating how to add an
+    additional CLI parameter to a YANG rendered command and how to modify
+    the output in a clispec action. See examples.confd/cli/show_brief.
+
+    (ENG-28115)
+
+  - ha: Start the tick mechanism on the standby node before HA
+    synchronization in order to avoid the timeout on the remote, upstream
+    node if HA synchronization takes more time.
+
+    (ENG-28669, RT:49069, PS-44183, CSCwb43087, SR:693306272, BEMS01434424)
+
+  - java-api: Optimized the performance of ConfPath creation when
+    initializing from a string path and when appending a suffix path to an
+    existing ConfPath.
+
+    (ENG-28577, RT:48944, RT:48996, PS-44060, PS-44110, CSCwb32541,
+    SR:692069065)
+
+  - json-rpc: A feature was added to allow progress trace of validation and
+    commits in JSON-RPC using comet requests. When invoking a validation
+    using the "validate_commit" method, you can set the "comet_id",
+    "handle", and "details" params. This allows fetching the progress trace
+    for the operation using the "comet" method with the same "comet_id" that
+    was used for the "validate_commit" method. "details" specifies the
+    verbosity level and can be either "normal", "verbose,", "very_verbose",
+    or "debug". After "validate_commit" has been invoked with the params
+    mentioned above, you can also get the progress trace for commits using
+    the same comet_id provided to the "validate_commit" method. See the
+    section "Method validate_commit" in the JSON-RPC chapter of the ConfD
+    User Guide.
+
+    (ENG-28578)
+
+  - json-rpc: A JSON-RPC subscribe method called "subscribe_progress_trace"
+    feature was added to make it possible to subscribe to progress trace
+    events. After starting the subscriber, the "comet" method can be invoked
+    to get the progress trace for any operations performed after the
+    subscriber was started. It is possible to only get progress trace events
+    for a specific context using the optional "filter_context" param. If
+    this param is not provided, "comet" will return the progress trace for
+    all contexts. Specifying verbosity level with the optional "verbosity"
+    param is also possible. Verbosity can be either "normal", "verbose",
+    "very_verbose" or "debug", default is "normal". Documentation has been
+    added for this subscriber in the JSON-RPC chapter of the ConfD User
+    Guide, section "Method subscribe_progress_trace".
+
+    (ENG-28564, RT:49643, PS-44771)
+
+  - netconf: Internal buffer for data received over SSH was hardcoded to a
+    big value, which caused memory usage spike thus sometimes provoking OOM
+    on platforms with limited memory. Now the buffer size is configurable.
+
+    (ENG-27154, RT:47265, PS-42386, CSCvz48927)
+
+  - restconf: Authentication tokens are now cached together with the
+    user/password in the RESTCONF authentication cache. If, at
+    authentication, the user/password presented is found in the
+    authentication cache together with an authentication Token, the Token
+    will be returned. If no user/password is found in the authentication
+    cache (and token authentication is configured), the normal external
+    authentication mechanism will be invoked, expected to produce a Token to
+    be returned.
+
+    (ENG-24487, RT:42628, PS-37744, CSCvv25391)
+
+  - schema: The location of the shared-memory schema file used by C API
+    clients is now configurable in confd.conf through the
+    /confdConfig/sharedMemorySchemaPath parameter. It defaults to
+    <confd-run-dir>/state/schema, which was previously hard-coded.
+
+    (ENG-29322)
+
+  - toolchain: The confdc compiler has been changed to prevent emitting
+    custom versions of system built-in YANG namespaces. The reason is that
+    it is not possible to change system-builtin YANG modules. Therefore it
+    should not be possible to emit code from such custom versions of system
+    built-in YANG modules either since it will pose a risk of causing
+    inconsistencies.
+    As a convenience, it is still possible to emit source code (C, Erlang,
+    Python, Java, MIB) from actual built-in YANG modules. A new flag called
+    '--builtin' has been added to allow this. To see which system built-in
+    YANG modules can be used to emit, please use the new flag
+    '--list-builtins'.
+
+    (ENG-24844, RT:43894, PS-39000, CSCwb01938)
+
+  - yanger: YANG 1.1 submodules belonging to the same module, including each
+    other, no longer cause circular dependency errors.
+
+    (ENG-28809)
+
+Corrections:
+
+  - confd: Adding support for Linux Network Namespaces (NetNs) and binding
+    to a network device such as a VRF for RESTCONF and JSONRPC. Also, fixing
+    the support for NetNs and VRF for the SNMPA, SNMPGW, NETCONF-subagent
+    and HA functionality. Re-introducing documentation that was previously
+    removed.
+
+    (ENG-23401, RT:49776, RT:49172, RT:40975, PS-44902, PS-44285, PS-36073,
+    CSCvt25586)
+
+  - confd: The internal TLS implementation was upgraded to improve security.
+
+    (ENG-29949, RT:49777, PS-44903, CSCwd15423)
+
+  - confd: An issue has been fixed where internal Erlang processes remained
+    after a CLI session over SSH was terminated.
+
+    (ENG-29556)
+
+  - confd: The behavior of the option
+    'confdConfig/ssh/idleConnectionTimeout' was reinstated to what it was
+    before ConfD 7.4.
+
+    (ENG-29510)
+
+  - confd: The behavior of the option 'confdConfig/aaa/sshLoginGraceTime'
+    was reinstated to what it was before ConfD 7.4.
+
+    (ENG-29509)
+
+  - confd: Fixed an internal error that would sometimes occur when
+    formatting the string error message of an error without an IKP.
+
+    (ENG-29221, RT:49389, PS-44509, CSCwc04553)
+
+  - confd: Fixed an issue where the MAAPI save config function could output
+    invalid XML containing a closing tag without a corresponding opening tag
+    when provided with a path to non-config data requesting config data from
+    CDB.
+
+    (ENG-29024, RT:49310, PS-44425, CSCwb83677)
+
+  - confd: The fix for ENG-28128 introduced an error where the installation
+    would fail with incomprehensible error messages if openssl or ssh-keygen
+    is not available on the machine running the ConfD installer. The
+    installation now works as expected if openssl or ssh-keygen is
+    unavailable when installing.
+
+    (ENG-28899)
+
+  - confd: The login banner that displays the amount of failed login
+    attempts for a user in ConfD was not initialized if the first time a
+    user logged in on a fresh installation was a failed attempt. This has
+    been corrected so those failed attempts initialize the counters
+    correctly.
+
+    (ENG-28815, RT:49082, PS-44196, CSCwb58537)
+
+  - confd: Transactions that don't have a suitable value for the 'db' leaf
+    defined in tailf-netconf-monitoring.yang are no longer shown in
+    'netconf-state sessions'. This also fixes an internal error that would
+    occur if such transactions would be active in the system when
+    'netconf-state sessions' is consulted.
+
+    (ENG-28736)
+
+  - confd: Invalid values for 'confdConfig/ssh/algorithms/serverHostKey'
+    will now be rejected with an error when attempting to dynamically
+    configure them on the CLI.
+
+    (ENG-28682, RT:49098, PS-44212, CSCwb45715)
+
+  - confd: An issue that could result in the system freezing during schema
+    validation has been addressed. Syntactic (schema) validation means that
+    the data when viewed as an XML document must adhere to the schema, here
+    represented by YANG modules.
+
+    (ENG-28674, RT:48864, PS-43979)
+
+  - confd: Restored the documented feature to allow deleting SSH code from
+    the ConfD installation if the integrated SSH server is not needed, for
+    example, if OpenSSH is used to terminate SSH for NETCONF and the CLI.
+    See ConfD UG chapter "Installing ConfD on a target system" for details.
+
+    (ENG-28297, RT:48638, PS-43751, CSCwa95009)
+
+  - confd: With the upgrade of the SSH servers in ConfD 7.4 the
+    authentication callback started to be invoked just on password
+    authentication failures. The invocation of the authentication callback
+    for failures with the public key authentication method is reinstated.
+
+    (ENG-28025, RT:47837, PS-42951, CSCwa54741)
+
+  - confd: Previously lax config loading (ignoring unknown namespaces and
+    elements) using the flag MAAPI_CONFIG_XML_LOAD_LAX did not work for JSON
+    files. It is now possible to use MAAPI_CONFIG_XML_LOAD_LAX for lax
+    config loading of JSON files.
+
+    (ENG-27176)
+
+  - confd: Log an error in the daemon log when the SSH host keys of a
+    running system have been removed and a client tries to connect.
+
+    (ENG-23884)
+
+  - aaa: In certain scenarios the path used for NACM checks was incorrectly
+    constructed. The incorrect path could amongst other things cause
+    transactions to terminate while reading data.
+
+    (ENG-28834, RT:49167, PS-44280, CSCwb64760)
+
+  - aaa: Add support for explicit namespace for the node-instance-identifier
+    in the NACM data-node path leaf as required by, for example, the YANG
+    RFC 7950 and suggested by the NACM RFC 8341.
+
+    (ENG-18213, RT:48202, PS-43319)
+
+  - c-api: Changed the namespace argument's type from 'int' to 'u_int32_t'
+    in the C API function confd_find_cs_root to accommodate for the full
+    range of hash values used in the system.
+
+    (ENG-29519)
+
+  - c-api: An issue has been resolved where cdb_get_modifications_cli() with
+    ITER_WANT_CLI_ORDER caused an internal error when
+    '/confdConfig/datastores/running/access' is set to
+    'writable-through-candidate'.
+
+    (ENG-29308, RT:49399, PS-44519)
+
+  - c-api: Fixed typo in a confd_lib error message.
+
+    (ENG-29201)
+
+  - c-api: External data providers could receive get_elem calls on
+    leaf-lists despite the daemon not setting
+    CONFD_DAEMON_FLAG_LEAF_LIST_AS_LEAF. Data providers will now get a
+    get_next call instead.
+
+    (ENG-24757, RT:49435, RT:43748, PS-44555, PS-38865, CSCvv81934)
+
+  - cdb: confd --cdb-backup now gracefully handles out-of-diskspace errors.
+
+    (ENG-29678, RT:49655, PS-44783, CSCwc83761)
+
+  - cdb: Fixed an issue where an internal subscriber crashed at commit phase
+    causing all calls to cdb_start_session() or cdb_start_session2() to
+    always fail.
+
+    (ENG-29530, RT:48894, RT:49409, PS-44010, PS-44529, CSCwc58288)
+
+  - cdb: Removed an internal error that happened when doing an in-service
+    upgrade and using candidate.
+
+    (ENG-29473, RT:49439, PS-44559, CSCwc42006)
+
+  - cdb: Fixed a race condition that caused internal error when doing
+    cdb_trigger_subscriptions() at prepare phase of ongoing write
+    transaction.
+
+    (ENG-29450, RT:49506, PS-44630)
+
+  - cdb: An issue has been resolved where the primary node in an HA setup
+    with synchronous replication was able to commit a transaction towards
+    the operational datastore without first ensuring that a lock has been
+    granted.
+
+    (ENG-29355)
+
+  - cdb: If there are two write sessions to operational datastore, the first
+    is north session using confd_lib_maapi and the second is south session
+    using confd_lib_cdb. If they are pending because of subscriber and that
+    subscriber is terminated when receiving subscription notification of the
+    first session, then the second session was ignored. The CDB subsystem
+    has been updated, so the second session will be applied correctly.
+
+    (ENG-29338)
+
+  - cdb: An issue has been fixed where internal Erlang processes remained
+    and kept consuming memory after subscriber diff iteration.
+
+    (ENG-29307, RT:49374, PS-44492, CSCwc14532, BEMS01452195)
+
+  - cdb: Corrected value of leaf and leaf-list in subscription notification
+    that is generated by cdb_trigger_subscriptions() at prepare phase of
+    read-write transaction.
+
+    (ENG-29288)
+
+  - cdb: Improved validation on cdb back-end operations to fix an issue that
+    corrupted cdb files.
+
+    (ENG-29057, CSCwb89584, BEMS01429421)
+
+  - cdb: The operational data store now attempts to abort ongoing
+    transactions when an HA role change is requested. Previously, a
+    potential situation could arise where a transaction was left unhandled
+    indefinitely with the node being unable to complete the HA role change.
+
+    (ENG-28770)
+
+  - cdb: An issue has been fixed where journal compaction would cause ConfD
+    to terminate if the startup datastore was used.
+
+    (ENG-28556, RT:48953, PS-44067)
+
+  - cdb: Improved validation performance for certain scenarios where many
+    referenced leafs were deleted at once.
+
+    (ENG-28514, RT:48913, PS-44029, CSCwb26986)
+
+  - cdb: The transaction ID of operational datastore was incorrectly
+    omitted, or shown as '0'. The system has been updated to show that
+    transaction ID correctly.
+
+    (ENG-14197, RT:30599, PS-10146, SR:683364494)
+
+  - cdb-capi: The command 'is_default' is added to confd_cmd to determine
+    whether the given path contains the default value.
+    Additionally, the MAAPI and CDB API 'num_instances' function used by the
+    confd_cmd tool now correctly counts the number of values when the given
+    path is a YANG 1.1 leaf-list with default values.
+
+    (ENG-28743)
+
+  - cdb-subscription: When a subscription of the NETCONF stream was made
+    followed by a long running get-config in the same session, another,
+    unrelated session doing an edit-config could be delayed at commit until
+    the get-config return. This was caused by some too conservative internal
+    synchronization. This has now been remedied by removing the internal
+    synchronization point.
+
+    (ENG-28333, RT:48226, PS-43343, CSCwa98905)
+
+  - cli: When several CLI filters are translated into XPath expressions
+    sometimes the resulting composition was an invalid XPath expression. Now
+    the composition is also a valid XPath expression.
+
+    (ENG-29538, RT:49370, PS-44488, CSCwc60837)
+
+  - cli: When interrupt (Ctrl-C) is received from user when running
+    completion an incorrect signal was sent to the worker process, causing
+    it to log error before shutdown, as opposed to shutdown silently. Now
+    the correct signal is used and the worker shuts down without error
+    messages.
+
+    (ENG-29489, RT:49511, PS-44635, CSCwc48132)
+
+  - cli: The CLI will now use the module-name as part of a value for a
+    'identityref' and 'instance-identifier' types when displaying data in
+    JSON format.
+    This is done in accordance with the RFC
+    https://datatracker.ietf.org/doc/html/rfc7951#section-4 description of
+    how to encode YANG data as JSON data.
+
+    (ENG-29475, RT:49357, PS-44475)
+
+  - cli: The XML escaping of the result of the C style CLI dump obtained
+    with "confd --cli-c-dump" was improved.
+
+    (ENG-29445)
+
+  - cli: The 'cli-c-dump' option of 'confd' was corrected to prevent an
+    internal error that could occur when generating the 'info' field of a
+    parameter whose type included the type 'bits'. The error would occur if
+    at least one of the 'bits' is annotated with 'tailf:info'.
+
+    (ENG-29397, RT:49483, PS-44603, CSCwc28518)
+
+  - cli: Fix performance degradation of evaluating CLI commands
+    auto-rendered for data nodes with "when" statements depending on a
+    leaf-list when loading a large configuration file.
+
+    (ENG-29395, RT:49405, PS-44525, CSCwc28154)
+
+  - cli: The audit log for values introduced in the CLI wizard was improved
+    to prevent errors that could occur with certain data types, like leaf
+    lists of type integer and leaf lists annotated with
+    'tailf:cli-flat-list-syntax'.
+
+    (ENG-29278, RT:49412, PS-44532, CSCwc10658)
+
+  - cli: Corrected the `load merge` command to prevent an internal error
+    that could occur while parsing data that resembles a prefix, e.g. an
+    IPV6.
+
+    (ENG-29266, RT:49388, PS-44508, CSCwc10221)
+
+  - cli: The CLI would include namespace prefixes for leaf values when using
+    combinations of identity-ref, different YANG-modules and the display
+    target JSON. This has been fixed by not using prefix for values for JSON
+    output.
+
+    (ENG-29252, RT:49357, PS-44475, CSCwc05376)
+
+  - cli: The CLI command 'load override file.xml' would fail if the user
+    didn't have (NACM) delete access to the whole configuration. Now only
+    the part of the configuration where the user have delete access will be
+    attempted to be deleted, and the rest will be ignored.
+
+    (ENG-29102, RT:48262, RT:49323, PS-43379, PS-44439, CSCwb94526)
+
+  - cli: The CLI uses an updated JSON display target code for 'show ... |
+    display json'. It provides better consistency and is more aligned with
+    other display targets, which helps remove stray brackets in printouts.
+
+    (ENG-29101, RT:49338, PS-44454, CSCwb94518)
+
+  - cli: When the turboparser is parsing a line where a
+    'tailf:cli-flatten-container' structure ends and continues into a
+    non-flat structure, additional tokens that are still applicable are now
+    parsed correctly.
+
+    (ENG-29046, RT:49252, PS-44364)
+
+  - cli: When the CLI combined `display <target>` and `context-match
+    <string>` pipe-targets, the CLI tried to apply faulty logic and could
+    crash. This has been fixed by ignoring the `context-match <string>`
+    pipe-target when the `display <target>` is used. This was how the CLI
+    behaved before this regression.
+
+    (ENG-29027, RT:49309, PS-44424, CSCwb85136)
+
+  - cli: The C-style CLI diff generated by 'show configuration' was improved
+    for situations where an ordered-by user leaf-list is annotated with
+    'tailf:cli-list-syntax' and the parent is annotated with
+    'tail:cli-reset-container'.
+
+    (ENG-29023)
+
+  - cli: The CLI can now once again handle combining display-groups and
+    pipe-display-targets like `show ... some-display-group | display json`
+    or `show ... some-display-group | display xml`.
+
+    (ENG-28998, RT:49228, PS-44341, CSCwb79318)
+
+  - cli: Users would fail to get groups assigned if they belonged to a list
+    of group exceeding the initial size hints for groups. Groups are now
+    handled dynamically and assignment will now also handle interruptions
+    from received signals.
+
+    (ENG-28898, CSCwb73188, BEMS01411418)
+
+  - cli: Improved the range bounds calculation mechanism to prevent an
+    internal error that could occur during command traversal and completion
+    if the 'tailf:cli-range-list-syntax' is used in unsupported scenarios,
+    i.e the list key, or the leaf list, type is not integer based.
+
+    (ENG-28844, RT:49229, PS-44342, CSCwb66497)
+
+  - cli: The CLI encountered an internal error when executing the command
+    'top revert' with an ambiguous argument applicable to multiple commands.
+    The error reporting was corrected.
+
+    (ENG-28832)
+
+  - cli: Corrected the behaviour of the show command of the C-style CLI to
+    prevent that, when the 'confd.conf' CLI setting 'defaultLeafListStyle'
+    is set to 'flat-list', leafs of type string are not displayed trimmed
+    and avoid an internal error for strings of lengths inferior to 4.
+
+    (ENG-28828, RT:49216, PS-44329)
+
+  - cli: The confd.conf option `/confdConfig/cli/cmdAAAForAutowizard`which
+    controls AAA command rule checks in the CLI-autowizard was always turned
+    on. This has been made optional again.
+
+    (ENG-28671, RT:49032, PS-44146, CSCwb43190)
+
+  - cli: When using the CLI to delete values from a leaf-list that are
+    default values the user will no-longer be shown an error about missing
+    values. Rather the CLI will behave similar to how default values are
+    treated on ordinary leafs which are considered as a no-change operation.
+
+    (ENG-28543, RT:48945, PS-44061, CSCwb27721)
+
+  - cli: When transactions are disabled; switching cases in a choice, from
+    the default case to another case would in some use-cases not have any
+    effect on the running configuration.
+
+    (ENG-28412)
+
+  - cli: Containers and list elements are no longer included in transaction
+    diffs with outformat 'cli' if neither themselves nor their children have
+    been modified.
+
+    (ENG-27881, RT:47792, PS-42915, CSCwa35460, SR:691732496)
+
+  - cli: The CLI will not print out presence containers in a diff-set if no
+    content has been changed (thus considered being empty) if the extension
+    tailf:cli-incomplete-command is active on the presence-container. This
+    makes the diff more correct according to what input is allowed towards
+    the CLI.
+
+    (ENG-27878, RT:48052, PS-43167, CSCwa35392)
+
+  - cli: The CLI will no longer see a deletion of a mandatory non-presence
+    container (see definition of mandatory node in the YANG RFC7950) as a
+    no-op. Instead the change will happen and any validation which can fail
+    due to this will do so.
+
+    (ENG-26098, RT:45369, PS-40483, CSCvx89039, SR:690915743)
+
+  - cli: Corrected the C-style diff produced by the 'show configuration'
+    command for ordered-by user leaf lists annotated with
+    'tailf:cli-list-syntax', to present a diff when the elements of the leaf
+    list are re-ordered.
+
+    (ENG-24344)
+
+  - cli: Fixed handling of commands from a sourced file that requires user
+    input. When a command from a sourced file is asking for user input - it
+    will get the interrupt signal (Ctrl-C) as opposed to hanging
+    indefinitely prior to the fix. CLI documentation is updated accordingly.
+
+    (ENG-22403, RT:39264, PS-34339, CSCvr78433)
+
+  - cs_trans: Correction of "must" statement validation when referencing an
+    augmented node.
+
+    (ENG-29505, RT:49306, PS-44421, CSCwc52297)
+
+  - cs_trans: Fixed internal errors that could occur during package reloads.
+
+    (ENG-29335, RT:49422, PS-44542, CSCwc21456)
+
+  - cs_trans: Corrected cs_trans exists() API on leaf-list when the
+    transaction is in "delayed when" mode, or leaf-list belongs to external
+    data provider.
+
+    (ENG-29303, RT:49303, PS-44418, CSCwc14026)
+
+  - cs_trans: The 'load merge' command can now create child nodes when
+    parent node is a presence container.
+
+    (ENG-29277, RT:49286, RT:49423, PS-44400, PS-44543, CSCwc10655)
+
+  - cs_trans: When calling maapi_save_config() with MAAPI_CONFIG_NO_PARENTS,
+    ConfD failed to respect NACM rules in some situations. Now the NACM
+    rules are evaluated correctly.
+
+    (ENG-28910, RT:49276, PS-44390, CSCwb96840)
+
+  - cs_trans: Performing a NETCONF 'get' request with a filter, and deleting
+    a list instance included in that NETCONF 'get' request at the same time,
+    would result in a crash if '/confdConfig/enableAttributes' was set to
+    'true'. It is now possible to do these two actions concurrently without
+    a crash.
+
+    (ENG-28470, RT:48782, PS-43897, CSCwb23290)
+
+  - cs_trans: Dependencies in must expressions that had to traverse a list
+    node did not work correctly. In those cases, removing such a node from a
+    list would not trigger the must to be evaluated. This has been fixed.
+
+    (ENG-28467, RT:48862, PS-43977, CSCwb21972)
+
+  - cs_trans: Addressed an issue that, in some cases, caused set operations
+    to fail when executed on leaves inside a transformed presence container
+    or list entry.
+
+    (ENG-28206)
+
+  - cs_trans: Committing a leaf value modification that triggers a must
+    statement validation that contains a starts-with filter could result in
+    an internal error. With this fix, the commit will now succeed.
+
+    (ENG-27933, RT:48120, PS-43235, CSCwa42820)
+
+  - cs_trans: Fixed missing CDB subscriber notification for default leafs
+    has "when" expression.
+
+    (ENG-25459, RT:44723, PS-39834, CSCvw89945)
+
+  - documentation: Configuration of TLS 1.3 protocol and ciphers are now
+    documented under /confdConfig/restconf/transport/ssl and
+    /confdCofig/webui/transport/ssl.
+
+    (ENG-24394, RT:42993, PS-38107, CSCvz74078)
+
+  - examples: Updated RESTCONF examples, various output updates and also fix
+    of typos and details.
+
+    (ENG-28852)
+
+  - ha: During initial sync or resync of CDB data when a standby node
+    connects to the active node, there was a lack of flow control, which
+    could lead to unnecessarily high memory allocation and CPU usage on the
+    standby node. ConfD now employs proper flow control during syncing of
+    data.
+
+    (ENG-29544, RT:49278, PS-44392, CSCwc63063, SR:693425052)
+
+  - ha: If the initial synchronization fails when a new secondary node
+    connects to the primary, the synchronization is automatically retried.
+    An issue has been fixed where the re-synchronization could fail
+    depending on which datastore caused the initial failure.
+
+    (ENG-28905)
+
+  - java-api: Java API now uses JDK's built-in implementations for some XML
+    parsing factories, so the presence of alternate implementations (like
+    Xalan/Xerces libraries) do not affect the functionality.
+
+    (ENG-29379, RT:49700, PS-44828, BEMS01447259)
+
+  - java-api: Fixed an issue where the Java API, in some cases, would send
+    instance paths to ConfD over MAAPI containing list keys of type
+    enumeration encoded in the Java API's internal format, which ConfD does
+    not recognise. Enumeration keys in instance paths are now always
+    converted to their string representation before being sent to ConfD.
+
+    (ENG-29326)
+
+  - json-rpc: If a jsonrpc client was denied access because of a NACM rule,
+    an internal error was produced in the error log. This is now corrected
+    and a proper jsonrpc error message will be returned and no errors are
+    produced in the error log.
+
+    (ENG-28906, RT:49428, PS-44548, CSCwb74643, BEMS01422869)
+
+  - json-rpc: Fix a transaction hanging if a CDB subscription is removed,
+    such as by stopping the subscriber, while the transaction is being
+    committed.
+
+    (ENG-28840, RT:49044, RT:49179, PS-44158, PS-44292, CSCwb65900)
+
+  - kickers: Fix crash in kicker subscribers when HA node transition occurs.
+
+    (ENG-29565)
+
+  - kickers: When the kicker is triggered, the 'action-name' action is
+    invoked on the 'kick-node' instance. If the action is augmented from
+    another module without any parent node wrapped, ConfD will fail to find
+    the action and return error "action does not exist" in devel.log but
+    keep silent on the CLI. Now ConfD will take extra steps to find the
+    augmented action, as well as print an error to the CLI and devel.log if
+    not successful.
+
+    (ENG-29262, RT:49372, PS-44490, CSCwc08581)
+
+  - netconf: The 'ssh/parallelLogin' confd.conf option will now take effect
+    for NETCONF.
+
+    (ENG-29418, RT:48660, PS-43773)
+
+  - netconf: A regression caused an internal error in Yang-Push when trying
+    to modify an on-change subscription on a non-existent path. Now, this no
+    longer leads to an internal error and instead an "unchanging-selection"
+    error is returned as before the regression.
+
+    (ENG-29324, RT:49022, PS-44135, CSCwc20172, SR:693196654)
+
+  - netconf: Setting a value for a list using a data provider in YANG-Push
+    would sometimes result in an internal error and no push-change-update
+    being sent. This occurred for certain YANG list key types. This has now
+    been fixed so that all key types are handled correctly.
+
+    (ENG-28165, RT:48276, PS-43393, CSCwa76412)
+
+  - netconf: When the default attribute is set to 'true' in the edit-config
+    operation for a leaf-list node, the NETCONF server sets the node to its
+    default value i.e., removes it from the configuration datastore as
+    defined in RFC 6243.
+
+    (ENG-23766)
+
+  - netconf: NETCONF was not retrieving leaf-list default values, which were
+    introduced in YANG 1.1. Default values are now retrieved in accordance
+    with RFC 6243.
+
+    (ENG-23318)
+
+  - observability: Total heap and memory size calculations are corrected in
+    the process status output of ConfD debug dumps.
+
+    (ENG-29588)
+
+  - python-api: Corrected argument parsing in _confd.find_cs_root(), which
+    would previously result in an overflow error if the namespace hash of a
+    module was manually set using tailf:id-value with a value greater than
+    2^31.
+
+    (ENG-29517, RT:49545, PS-44670, CSCwc54777)
+
+  - python-api: A Python Daemon running for a while could under some
+    circumstances quit and report "Fatal Python error: deallocating None".
+    The reason was invalid reference counting of the None object.
+
+    (ENG-28866, RT:48781, PS-43896, CSCwb70039, SR:693121699)
+
+  - restconf: Some audit log RESTCONF messages showed duration with a wrong
+    time unit. They now show it with the correct, micro second (us),
+    timeunit.
+
+    (ENG-29604)
+
+  - restconf: A rare race condition could lead to a leaf-list being deleted
+    during the processing of a GET request on the leaf-list, which in turn
+    led to an internal error. This case is now handled and the GET request
+    will finish correctly and return an empty result.
+
+    (ENG-29386)
+
+  - restconf: The custom error-app-tag will now be returned (if present)
+    when invoking an action callback.
+
+    (ENG-29222, RT:49067, PS-44181, CSCwc05021)
+
+  - restconf: The Yang-Patch reply of a failing commit-queue operation
+    now follows the correct error model. The specific commit-queue error
+    message is now enclosed by the anydata Yang element: error-info.
+
+    (ENG-28938, RT:48469, PS-43582, CSCwb75864)
+
+  - restconf: The origin attribute in RESTCONF was present on nodes even if
+    it was disabled in confd.conf and even when the ?with-origin query
+    parameter wasn't used. Now the origin is only displayed when
+    "/confdConfig/enableOrigin" is set in confd.conf and the ?with-origin
+    query parameter is used. Note that this change means that in RESTCONF
+    responses where nodes previously had the origin attribute, e.g
+    or:origin="or:intended", these will no longer be present when origin is
+    disabled or when ?with-origin is not used.
+
+    (ENG-28883, RT:49266, PS-44380, CSCwb72606, SR:693330171)
+
+  - restconf: An error-app-tag specified in a YANG must-expression in an
+    action input, did not show up when the must-expression was violated. Now
+    when the must-expression is violated the resulting error response
+    contains the specified error-app-tag.
+
+    (ENG-28681, RT:49067, PS-44181, CSCwb45148)
+
+  - restconf: If data for a node is tagged with when expression is present
+    in a request and the "when" condition evaluates to "false", the server
+    will now reply with an error message. This applies for RESTCONF and
+    NETCONF requests.
+
+    (ENG-26931, RT:46334, PS-41454, CSCvy78102, SR:691452220)
+
+  - restconf: snmpv2 mib operational data can now be retrieved via RESTCONF.
+
+    (ENG-25434, RT:44614, PS-39725, CSCvw84034)
+
+  - rollback: Rollback files cleanup in fixed mode removed incorrect files
+    when rollback file number went from 6 to 7 digits.
+
+    (ENG-29650, CSCwc99354, BEMS01467138)
+
+  - schema: A fault made a choice in a list that is both mandatory=true and
+    config=false to be mandatory to be configured, which it should not be.
+    It has now been fixed.
+
+    (ENG-28162, RT:48457, PS-43570, CSCwa76410)
+
+  - snmp-agent: An issue has been resolved where a failed XPath evaluation
+    would cause an additional internal error when xpath tracing was
+    disabled. This could happen either when
+    '/confdConfig/logs/xpathTraceLog/enabled' was set to 'false' or when no
+    trace function was passed to 'maapi_xpath_eval()' or
+    'maapi_xpath_eval_expr()' in confd_lib_maapi.
+
+    (ENG-28355, RT:48563, PS-43675, CSCwb02229)
+
+  - snmp-agent: The SNMP Counter64 type was not encoded according to the
+    RFC. It will now monotonically increase until it reaches a maximum value
+    of 2^64-1 (18446744073709551615 decimal), where it will wrap around to
+    zero.
+
+    (ENG-27901, RT:48048, PS-43163, CSCwa38217)
+
+  - snmp-agent: The SNMP agent now returns a truncated octet string instead
+    of an error if the actual data string length is longer than the max
+    string length.
+
+    (ENG-27889, RT:48038, PS-43159, CSCwa36360)
+
+  - snmp-agent: Corrected the error message when incorrectly setting
+    usmUserStatus to be a 'notWritable' error for the usmUserStatus object.
+
+    (ENG-27777, RT:47737, PS-42860, CSCwa29118)
+
+  - toolchain: Patched an issue causing environment variables to not be
+    fully read into Erlang when the environment was too large, for example
+    EMULATOR_FLAGS.
+
+    (ENG-29782, RT:49616, PS-44744, CSCwc94425)
+
+  - toolchain: If confdc is used to generate a yang from a MIB file and
+    python3 is not installed then no error was given and the result was an
+    incorrect yang file. This has now been corrected so that no yang file is
+    generated and an error message is displayed, as python3 is a
+    prerequisite for a proper installation.
+
+    (ENG-29255, RT:49394, PS-44514, CSCwc05952)
+
+  - toolchain: The turboparser has improved the identification of
+    'tailf:cli-sequence-commands' extension to make sure it remains in that
+    state when processing command lines.
+
+    (ENG-28851, RT:49253, PS-44365, CSCwb67581)
+
+  - toolchain: The turbo parser now checks that a list is empty before
+    deleting it due to a failed parse attempt.
+    NOTE: While the turbo parser no longer performs unwanted deletes, there
+    may be more data which should have been parsed and accepted but is
+    currently skipped until ENG-29046 is implemented.
+
+    (ENG-28850, RT:49252, PS-44364, CSCwb67568)
+
+  - toolchain: The turboparser in the CLI can now handle non-sequence lines
+    that have the tailf:cli-reset-container extension present on containers.
+
+    (ENG-27335, RT:47480, PS-42601, CSCvz77038)
+
+  - toolchain: The turbo-parser in the CLI can now revert incorrectly set
+    prefix-keys to values set earlier when parsing a config file.
+
+    (ENG-27334, RT:47479, PS-42600, CSCvz77021)
+
+  - toolchain: The CLI turbo parser now enforces
+    'tailf:cli-delete-when-empty' extension when parsing list key.
+
+    (ENG-27330, RT:47469, PS-42590, CSCvz75867)
+
+  - toolchain: The CLI turbo parser will not delete existing data when
+    parsing a line where the data nodes might be tested but later turns out
+    to not be applicable for the current line.
+
+    (ENG-27327, RT:47463, PS-42584, CSCvz75653)
+
+  - toolchain: The CLI turbo parser internal backtracking mechanism was
+    improved.
+
+    (ENG-27285, ENG-27326, RT:47367, RT:47449, PS-42488, PS-42570,
+     CSCvz67372, CSCvz75649)
+
+  - toolchain: confd.smp did not not use to dump core on abnormal
+    termination in case su(1) was used to change euid to an unprivileged
+    user or the binary had capabilities(7) set. prctl(PR_SET_DUMPABLE, 1) is
+    now called to enable core dumps for unprivileged users.
+
+    (ENG-26280, RT:45268, PS-40381, CSCwc94004, SR:690864570)
+
+  - xpath: Verification for derived-from() and derived-from-or-self()
+    functions when node-set argument is leaf-list is fixed so that the
+    functions now check for any valid node to verify.
+
+    (ENG-29469, RT:49426, PS-44546, CSCwc40164)
+
+  - xpath: XPath cache is now deleted once it is not needed in order to
+    reduce the memory consumption. The new option
+    /confdConfig/xpathCache/enabled has also been added to make the XPath
+    cache mechanism configurable. It is enabled by default and can be
+    disabled by setting the parameter to 'false'.
+
+    (ENG-29082)
+
+  - xpath: 'must' statement validation of XPath expressions referencing
+    sublists could in certain cases be evaluated as false when the
+    validation should have succeeded.
+
+    (ENG-29018, RT:49306, PS-44421, CSCwb82569)
+
+  - xpath: Deleting a node referred to by another node, using a relative
+    leafref, was not validated correctly. Now ConfD throws an error in
+    validation and the delete is not allowed.
+
+    (ENG-28588, RT:49016, PS-44129, CSCwb33761)
+
+  - xpath: XPath expressions containing mandatory leaves were sometimes
+    incorrectly evaluated to be existing even though they were not. This has
+    now been fixed.
+
+    (ENG-28473, RT:48631, PS-43744, CSCwb22686)
+
+  - xpath: When importing a module and assigning it with a different prefix
+    than the original, a must statement using that prefix was incorrectly
+    validated. Now the validation in that case is correct.
+
+    (ENG-26756, RT:46311, PS-41431, CSCvy56434)
+
+  - yanger: Fix of an internal compiler error, caused by 'refine' of
+    'choice' in 'grouping'.
+
+    (ENG-29030, RT:49320, PS-44436, CSCwb86336)
+
+  - yanger: Corrected the "refine" statement for leaf-lists nodes. Now the
+    set of refined default values replaces the defaults already given.
+
+    (ENG-28822)
+
+  - yanger: Addressed an issue where yanger could, in some cases,
+    erroneously ignore groupings used in augment statements augmenting a
+    grouping defined in a submodule.
+
+    (ENG-28567, RT:48753, PS-43867, CSCwb30027)
+
+  - yanger: Refinements are no longer, in some cases, erroneously applied to
+    schema nodes with the same top-level name as the refinement's target
+    node.
+    For example, given the following grouping and refinement:
+    grouping g {
+    leaf a { type string; }
+    container c { leaf a { type string; } }
+    }
+    uses g {
+    refine a { default "default-string"; }
+    }
+    The refinement statement would previously, in some cases, be applied to
+    both "a" leaves in the grouping.
+
+    (ENG-28431, RT:48997, RT:48869, PS-44111, PS-43985, CSCwb15578)
+
+  - yanger: An 'invalid namespace' error occurred when a submodule imported
+    a third module and the main module did not import that module.
+    Groupings now satisfy all references and do not require importing
+    modules or including submodules to support nested groupings as stated by
+    RFC7950 section 5.5.
+
+    (ENG-28011, RT:48177, RT:49325, PS-43294, PS-44441, CSCwa52537)

@@ -1,0 +1,96 @@
+Using OpenConfig models with ConfD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OpenConfig models do not comply with the YANG standard document, RFC 7950.  A
+notable non-compliance that causes ConfD not to work with OpenConfig models as
+intended by model authors is that the models use POSIX regular expressions,
+whereas YANG assumes XML-Schema regular expressions.  There are several
+differences between those two kinds of regular expressions, OpenConfig models
+use only one of them: XML-Schema expressions are implicitly anchored on both
+ends and characters '^' and '$' have no special meaning; in POSIX expressions
+they denote the initial and terminal anchors, respectively.
+
+The result is that when an OpenConfig model declares a string leaf with a
+pattern like "^[a-z]*$", it means a leaf accepting strings consisting entirely
+of small letters, whereas for ConfD such pattern means strings starting with
+'^', followed by any number of small letters, terminated by '$'.
+
+All OpenConfig models that intend to use POSIX regular expressions declare so
+by the extension statement "regexp-posix", defined by
+"openconfig-extensions.yang".  This example shows how models using this
+declaration can be used with ConfD.
+
+
+Example overview
+~~~~~~~~~~~~~~~~
+
+ConfD compiler uses the open-source tool `yanger` for processing YANG modules.
+It is possible to modify or extend tool's behavior by "plugins"; such plugin,
+`yanger_oc.erl`, is used in this example to modify regular expressions.
+
+The plugin modifies all pattern statements such that they behave as intended by
+OpenConfig authors, but at the same time the schema is kept untouched, i.e. the
+response to the "get-schema" request is identical to the original YANG module.
+
+Note that the plugin does not do any complex regular expression manipulations,
+all it does is to treat the first and the last character there.  So for example
+if the pattern looks like "(^[a-z]*$)", the plugin does not handle it
+correctly, nor it tries to deal with other POSIX/XML-Schema differences;
+OpenConfig models published at the moment of writing this do not require that.
+
+Apart from the plugin the example consists of following:
+
+  * `oc-test.yang` - an example module that declares POSIX regular expression
+    with four leaves using POSIX patterns
+  * `openconfig-extensions.yang` - a YANG module declaring the extension
+    statement, taken from https://github.com/openconfig/public/
+  * `set-cmd-success.xml` and `set-cmd-failure.xml` - two NETCONF edit-config
+    messages configuring the four leaves.
+
+
+Compiling the plugin
+~~~~~~~~~~~~~~~~~~~~
+
+In general, so as to compile a yanger plugin you should use the original
+yanger.  You can clone it from GitHub:
+
+    $ git clone https://github.com/mbj4668/yanger/
+
+ConfD distribution contains everything necessary to compile and run yanger
+plugins and this example uses that, but if you have yanger downloaded, point
+$YANGER_DIR to its directory before compiling, e.g.
+
+    $ YANGER_DIR=/path/to/yanger make all
+
+
+Running the example
+~~~~~~~~~~~~~~~~~~~
+
+Compile the plugin (see above) and the YANG module by `make all`.  The YANG
+module is compiled using a command line like this:
+
+    $ YANGER_PLUGINPATH=$PWD confdc -c -o oc-test.fxs oc-test.yang
+
+The point is that confdc needs to know where to look for yanger plugins; and
+setting the environment variable `YANGER_PLUGINPATH` is the way to indicate
+that.
+
+Once this completes, start ConfD by `make all start`.  If all goes well, you
+can interact with ConfD e.g. like this:
+
+    $ netconf-console --get-schema oc-test | diff oc-test.yang -
+    $ netconf-console set-cmd-success.xml 
+      [ ... <ok/> ...]
+    $ netconf-console set-cmd-failure.xml 
+      [ ... <rpc-error/> ...]
+    $ make cli-c
+    admin connected from 127.0.0.1 using console on box
+    box# config
+    Entering configuration mode terminal
+    box(config)# root full value5
+    box(config)# commit
+    Commit complete.
+    box(config)# root initial ^aa2
+    ------------------------------------^
+    syntax error: "^aa2" is an invalid value.
+    box(config)# 

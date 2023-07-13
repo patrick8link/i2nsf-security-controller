@@ -1,0 +1,91 @@
+Subscribing to CDB stored operational data changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates subscribing for notifications on changes in
+operational data stored in CDB.
+
+Theory prerequisites are described in ConfD user guide, chapter 6.8 -
+"Operational data in CDB", and chapter 5.6 - "CDB Subscriptions".
+
+It defines a plain YANG model with an simple "IP routes" information.
+
+Example does not include explicit data feeder - e.g. daemon to repeatedly
+update/delete operational data in CDB. For an example of such implementation,
+please see another existing example - examples.confd / cdb_oper / ifstatus.
+Next section describes alternate ways to write data into CDB for sake of this
+example demonstration.
+
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+
+On ConfD startup, there is no operational data stored in CDB for routes.yang
+module. Application "cdb-oper-subs" is started, registering a CDB
+subscriber for changes done in the specific "route" list.
+
+When changes are done on registered sub-tree in CDB, subscriber is notified,
+and processes the changes as needed. In our example case, it simply writes
+the information about pending changes to the standard output, e.g.:
+
+    CDB operational subscription point triggered
+    CREATED: /routes:system/ip/route{127.0.0.1}
+    SET: /routes:system/ip/route{127.0.0.1}/destination
+            oldv == None; newv == 127.0.0.1
+
+To see any output printed by subscriber, data needs to be written to CDB,
+following the instructions about locks on CDB described in theory chapter
+referenced above.
+
+We can utilize southbound APIs to fill in the data. For this example, we use
+"confd_cmd" command that comes with ConfD distribution.
+It allows (among other features) to write to CDB using simple bash commands.
+
+Some examples are shown in following section of this README. For details on
+command usage, run e.g. "confd_cmd -h commands" to get list of commands
+and "confd_cmd -h xxx" where "xxx" is specific command to get more info about.
+Beware, usage of "-o -fr" arguments is mandatory, to work on operational data,
+and to enforce CDB_LOCK_REQUEST required to trigger the operational subscribers
+(see theory for details).
+
+Contents of CDB operational data can be simply verified in ConfD CLI using:
+"show system", or by running a NETCONF query via "make query" in shell,
+invoking this example Makefile target.
+
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+ 1. Build the necessary files and start ConfD and the CDB subscriber agent by
+    typing
+
+        $ make all start
+
+    The cdb-oper-subs agent will be running in the foreground.
+    This console will show all the info printed by subscriber when data in
+    CDB operational list "route" is changed.
+
+ 2. In another terminal/console, look at the route status information in ConfD
+    CLI by typing
+
+        $ make cli
+        > show system ip
+
+    This step can be done repeatedly to check the latest state when performing
+    write changes to CDB operational data.
+
+    As an alternative approach to read data, see step 5. further below.
+
+ 3. Write data to CDB for subscriber to process, please note values are
+    artificial and can be modified as necessary
+
+        $ confd_cmd -o -fr -c "create /system/ip/route{127.0.0.1}"
+        $ confd_cmd -o -fr -c "cdb_set_object /system/ip/route{192.168.1.1} \
+                               192.168.1.1 192.168.0.1 255.255.255.0 duplex \
+                               10 eth0"
+
+  4. Check the initial window where "make start" is executed, for information
+     dumped to standard output by the subscriber.
+
+  5. Look at the routes status via a NETCONF <get> rpc by typing
+
+        $ make query

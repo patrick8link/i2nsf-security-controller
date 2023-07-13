@@ -1,0 +1,752 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module econfd_cdb</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module econfd_cdb</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>An Erlang interface equivalent to the CDB C-API (documented   
+in confd_lib_cdb(3)).
+<p>Copyright © 2006 Tail-F Systems AB</p>
+
+<p><b>Version:</b> {$Id$}</p>
+
+<h2><a name="description">Description</a></h2><p>An Erlang interface equivalent to the CDB C-API (documented   
+in confd_lib_cdb(3)).</p>
+  
+   <p>The econfd_cdb library is used to connect to the  ConfD  built  in   
+XML  database,  CDB. The purpose of this API to provide a read and   
+subscription API to CDB.</p>
+  
+   <p>CDB owns and stores the configuration data and  the  user  of  the  API   
+wants  to read that configuration data and also get notified when someone   
+through either NETCONF, the CLI, the Web UI, or MAAPI  modifies   
+the data so that the application can re-read the configuration data and   
+act accordingly.</p>
+  
+   <h3><a name="Paths">Paths</a></h3>
+  
+   <p>In the C lib a path is a string. Assume the following   
+YANG fragment:</p>
+  
+   <pre>         container hosts {
+           list host {
+             key name;
+             leaf name {
+               type string;
+             }
+             leaf domain {
+               type string;
+             }
+             leaf defgw {
+               type inet:ip-address;
+             }
+             container interfaces {
+               list interface {
+                 key name;
+                 leaf name {
+                   type string;
+                 }
+                 leaf ip {
+                   type inet:ip-address;
+                 }
+                 leaf mask {
+                   type inet:ip-address;
+                 }
+                 leaf enabled {
+                   type boolean;
+                 }
+               }
+             }
+           }
+         }</pre>
+   Furthermore assume the database is populated with the following data
+   <pre>             &lt;hosts xmlns="http://acme.com/ns/hst/1.0"&gt;
+                &lt;host&gt;
+                  &lt;name&gt;buzz&lt;/name&gt;
+                  &lt;domain&gt;tail-f.com&lt;/domain&gt;
+                  &lt;defgw&gt;192.168.1.1&lt;/defgw&gt;
+                  &lt;interfaces&gt;
+                    &lt;interface&gt;
+                      &lt;name&gt;eth0&lt;/name&gt;
+                      &lt;ip&gt;192.168.1.61&lt;/ip&gt;
+                      &lt;mask&gt;255.255.255.0&lt;/mask&gt;
+                      &lt;enabled&gt;true&lt;/enabled&gt;
+                    &lt;/interface&gt;
+                    &lt;interface&gt;
+                      &lt;name&gt;eth1&lt;/name&gt;
+                      &lt;ip&gt;10.77.1.44&lt;/ip&gt;
+                      &lt;mask&gt;255.255.0.0&lt;/mask&gt;
+                      &lt;enabled&gt;false&lt;/enabled&gt;
+                    &lt;/interface&gt;
+                  &lt;/interfaces&gt;
+                &lt;/host&gt;
+              &lt;/hosts&gt;</pre>
+  
+   <p>The format path "/hosts/host{buzz}/defgw" refers to the leaf element   
+called defgw of the host whose key (name element) is buzz.</p>
+  
+   <p>The format path "/hosts/host{buzz}/interfaces/interface{eth0}/ip"   
+refers to the leaf element called "ip" in the "eth0" interface   
+of the host called "buzz".</p>
+  
+   In the Erlang CDB and MAAPI interfaces we use ikeypath() lists instead
+   to address individual objects in the XML tree. The IkeyPath is backwards,
+   thus the two above paths are expressed as
+   <pre>   [defgw, {&lt;&lt;"buzz"&gt;&gt;}, host, [NS|hosts]]
+   [ip, {&lt;&lt;"eth0"&gt;&gt;}, interface, interfaces, {&lt;&lt;"buzz"&gt;&gt;}, host, [NS|hosts]]</pre>
+  
+    It is possible loop through all entries in a list as in:
+   <pre>
+   N = econfd_cdb:num_instances(CDB, [host,[NS|hosts]]),
+   lists:map(fun(I) -&gt;
+               econfd_cdb:get_elem(CDB, [defgw,[I],host,[NS|hosts]]), .......
+             end, lists:seq(0, N-1))
+   </pre>
+   Thus in the list with length N [Index] is an implicit key during the
+   life of a CDB read session.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-cdb_sess">cdb_sess()</a></h3>
+<p><tt>cdb_sess() = #cdb_session{}</tt></p>
+<p>  A datastructure which is used as a handle to all the of the access
+  functions</p>
+
+<h3 class="typedecl"><a name="type-dbtype">dbtype()</a></h3>
+<p><tt>dbtype() = 1 | 2 | 3 | 4</tt></p>
+<p>  When we open CDB sessions we must choose which database to read
+  or write from/to. These ints are defined in econfd.hrl</p>
+
+<h3 class="typedecl"><a name="type-err">err()</a></h3>
+<p><tt>err() = {error, {integer(), binary()}} | {error, closed}</tt></p>
+<p>  Errors can be either
+  <ul><li> {error, Ecode::integer(), Reason::binary()} where Ecode is
+  one of the error codes defined in econfd_errors.hrl, and Reason is
+  (possibly empty) textual description </li>
+  <li> {error, closed} if the socket gets closed </li></ul></p>
+
+<h3 class="typedecl"><a name="type-sub_ns">sub_ns()</a></h3>
+<p><tt>sub_ns() = <a href="econfd.html#type-namespace">econfd:namespace()</a> | ''</tt></p>
+<p>  A namespace or use '' as wildcard (any namespace)</p>
+
+<h3 class="typedecl"><a name="type-sub_type">sub_type()</a></h3>
+<p><tt>sub_type() = 1 | 2 | 3</tt></p>
+<p>  Subscription type
+  <ul><li>
+  ?CDB_SUB_RUNNING - commit subscription.
+  </li><li>
+  ?CDB_SUB_RUNNING_TWOPHASE - two phase subscription, i.e. notification
+  will be received for prepare, commit, and possibly abort.
+  </li><li>
+  ?CDB_SUB_OPERATIONAL - subscription for changes to CDB operational data.
+  </li></ul></p>
+
+<h3 class="typedecl"><a name="type-subscription_sync_type">subscription_sync_type()</a></h3>
+<p><tt>subscription_sync_type() = 1 | 2 | 3 | 4</tt></p>
+<p>  Return value from the fun passed to wait/3,
+  indicating what to do with further notifications coming from
+  this transaction. These ints are defined in econfd.hrl</p>
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#cd-2">cd/2</a></td><td>Change the context node of the session.</td></tr>
+<tr><td valign="top"><a href="#close-1">close/1</a></td><td>End the session and close the socket.</td></tr>
+<tr><td valign="top"><a href="#connect-0">connect/0</a></td><td>Equivalent to <a href="#connect-1"><tt>connect({127, 0, 0, 1})</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#connect-1">connect/1</a></td><td>Equivalent to <a href="#connect-2"><tt>connect(Address, 4565)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#connect-2">connect/2</a></td><td>Equivalent to <a href="#connect-3"><tt>connect(Address, Port, &lt;&lt;"econfd self()"&gt;&gt;)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#connect-3">connect/3</a></td><td>Connect to CDB on the host with address Address:Port.</td></tr>
+<tr><td valign="top"><a href="#create-2">create/2</a></td><td>Only for CDB operational data:
+  Create the element denoted by IKP.</td></tr>
+<tr><td valign="top"><a href="#delete-2">delete/2</a></td><td>Only for CDB operational data:
+  Delete the element denoted by IKP.</td></tr>
+<tr><td valign="top"><a href="#diff_iterate-5">diff_iterate/5</a></td><td>Iterate over changes in CDB after a subscription triggers.</td></tr>
+<tr><td valign="top"><a href="#end_session-1">end_session/1</a></td><td>Terminate the session.</td></tr>
+<tr><td valign="top"><a href="#exists-2">exists/2</a></td><td>Checks existense of an object.</td></tr>
+<tr><td valign="top"><a href="#get_case-3">get_case/3</a></td><td>Returns the current case for a choice.</td></tr>
+<tr><td valign="top"><a href="#get_elem-2">get_elem/2</a></td><td>Read an element.</td></tr>
+<tr><td valign="top"><a href="#get_modifications_cli-2">get_modifications_cli/2</a></td><td>Equivalent to <a href="#get_modifications_cli-3"><tt>get_modifications_cli(CDB, Point, 0)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#get_modifications_cli-3">get_modifications_cli/3</a></td><td>Return Return a string with the CLI commands that corresponds
+  to the changes that triggered subscription.</td></tr>
+<tr><td valign="top"><a href="#get_object-2">get_object/2</a></td><td>Returns all the values in a container or list entry.</td></tr>
+<tr><td valign="top"><a href="#get_objects-4">get_objects/4</a></td><td>Returns all the values for NumEntries list entries.</td></tr>
+<tr><td valign="top"><a href="#get_phase-1">get_phase/1</a></td><td>Get CDB start-phase.</td></tr>
+<tr><td valign="top"><a href="#get_txid-1">get_txid/1</a></td><td>Get CDB transaction id.</td></tr>
+<tr><td valign="top"><a href="#get_values-3">get_values/3</a></td><td>Returns the values for the leafs that have the "value" 'not_found'  
+in the Values list.</td></tr>
+<tr><td valign="top"><a href="#index-2">index/2</a></td><td>Returns the position (starting at 0) of the list entry in path.</td></tr>
+<tr><td valign="top"><a href="#new_session-2">new_session/2</a></td><td>Initiate a new session using the socket returned by
+  connect().</td></tr>
+<tr><td valign="top"><a href="#new_session-3">new_session/3</a></td><td>Initiate a new session using the socket returned by connect(),
+  with detailed control via the Flags argument.</td></tr>
+<tr><td valign="top"><a href="#next_index-2">next_index/2</a></td><td>Returns the position (starting at 0) of the list entry after
+  the given path (which can be non-existing, and if multiple keys the
+  last keys can be '*').</td></tr>
+<tr><td valign="top"><a href="#num_instances-2">num_instances/2</a></td><td>Returns the number of entries in a list.</td></tr>
+<tr><td valign="top"><a href="#set_case-4">set_case/4</a></td><td>Only for CDB operational data: Set the case for a choice.</td></tr>
+<tr><td valign="top"><a href="#set_elem-3">set_elem/3</a></td><td>Only for CDB operational data:
+  Write Value into CDB.</td></tr>
+<tr><td valign="top"><a href="#set_elem2-3">set_elem2/3</a></td><td>Only for CDB operational data:
+  Write ValueBin into CDB.</td></tr>
+<tr><td valign="top"><a href="#set_object-3">set_object/3</a></td><td>Only for CDB operational data: Write an entire object,
+  i.e.</td></tr>
+<tr><td valign="top"><a href="#set_values-3">set_values/3</a></td><td>Only for CDB operational data: Write a list of tagged values.</td></tr>
+<tr><td valign="top"><a href="#subscribe-3">subscribe/3</a></td><td>Equivalent to <a href="#subscribe-4"><tt>subscribe(CDB, Prio, '', MatchKeyString)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#subscribe-4">subscribe/4</a></td><td>Set up a CDB configuration subscription.</td></tr>
+<tr><td valign="top"><a href="#subscribe-5">subscribe/5</a></td><td>Equivalent to <a href="#subscribe-6"><tt>subscribe(CDB, Type, 0, Prio, Ns, MatchKeyString)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#subscribe-6">subscribe/6</a></td><td>Generalized subscription.</td></tr>
+<tr><td valign="top"><a href="#subscribe_done-1">subscribe_done/1</a></td><td>After a subscriber is done with all subscriptions and ready to
+       receive updates this subscribe_done/1 must be called.</td></tr>
+<tr><td valign="top"><a href="#subscribe_session-1">subscribe_session/1</a></td><td>Initialize a subscription socket.</td></tr>
+<tr><td valign="top"><a href="#trigger_oper_subscriptions-1">trigger_oper_subscriptions/1</a></td><td>Equivalent to <a href="#trigger_oper_subscriptions-2"><tt>trigger_oper_subscriptions(Socket, all)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#trigger_oper_subscriptions-2">trigger_oper_subscriptions/2</a></td><td>Equivalent to <a href="#trigger_oper_subscriptions-3"><tt>trigger_oper_subscriptions(Socket, SubPoints, 0)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#trigger_oper_subscriptions-3">trigger_oper_subscriptions/3</a></td><td>Trigger CDB operational subscribers as if an update in oper data       
+had been done.</td></tr>
+<tr><td valign="top"><a href="#trigger_subscriptions-1">trigger_subscriptions/1</a></td><td>Equivalent to <a href="#trigger_subscriptions-2"><tt>trigger_subscriptions(Socket, all)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#trigger_subscriptions-2">trigger_subscriptions/2</a></td><td>Trigger CDB subscribers as if an update in the configuration
+       had been done.</td></tr>
+<tr><td valign="top"><a href="#wait-3">wait/3</a></td><td>Wait for subscription events.</td></tr>
+<tr><td valign="top"><a href="#wait_start-1">wait_start/1</a></td><td>Wait for CDB to become available (reach start-phase one).</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="cd-2">cd/2</a></h3>
+<div class="spec">
+<p><tt>cd(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = ok | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Change the context node of the session.</p>
+ 
+  Note that this function can not be used as an existence test.</p>
+
+<h3 class="function"><a name="close-1">close/1</a></h3>
+<div class="spec">
+<p><tt>close(Cdb_session::Socket | CDB) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Result = ok | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>}</tt></li></ul></p>
+</div><p>End the session and close the socket.</p>
+
+<h3 class="function"><a name="connect-0">connect/0</a></h3>
+<div class="spec">
+<p><tt>connect() -&gt; <a href="econfd.html#type-connect_result">econfd:connect_result()</a></tt><br></p>
+</div><p>Equivalent to <a href="#connect-1"><tt>connect({127, 0, 0, 1})</tt></a>.</p>
+
+
+<h3 class="function"><a name="connect-1">connect/1</a></h3>
+<div class="spec">
+<p><tt>connect(Address) -&gt; <a href="econfd.html#type-connect_result">econfd:connect_result()</a></tt>
+<ul class="definitions"><li><tt>Address = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#connect-2"><tt>connect(Address, 4565)</tt></a>.</p>
+
+
+<h3 class="function"><a name="connect-2">connect/2</a></h3>
+<div class="spec">
+<p><tt>connect(Address, Port) -&gt; <a href="econfd.html#type-connect_result">econfd:connect_result()</a></tt>
+<ul class="definitions"><li><tt>Address = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>Port = non_neg_integer()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#connect-3"><tt>connect(Address, Port, &lt;&lt;"econfd self()"&gt;&gt;)</tt></a>.</p>
+
+
+<h3 class="function"><a name="connect-3">connect/3</a></h3>
+<div class="spec">
+<p><tt>connect(Address, Port, ClientName) -&gt; <a href="econfd.html#type-connect_result">econfd:connect_result()</a></tt>
+<ul class="definitions"><li><tt>Address = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>Port = non_neg_integer()</tt></li><li><tt>ClientName = binary()</tt></li></ul></p>
+</div><p><p>Connect to CDB on the host with address Address:Port.</p>
+ 
+  If the port is changed it must also be changed in confd.conf
+   A  call  to  cdb_connect()  is  typically  followed by a call to either
+         new_session() for a reading session or a call to subscribe_session()
+         for a subscription socket or calls to any of the write API functions
+  for a data socket.
+  ClientName is a string which confd will use as an identifier when
+  e.g. reporting status.</p>
+
+<h3 class="function"><a name="create-2">create/2</a></h3>
+<div class="spec">
+<p><tt>create(CDB, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data:
+  Create the element denoted by IKP.</p>
+
+<h3 class="function"><a name="delete-2">delete/2</a></h3>
+<div class="spec">
+<p><tt>delete(CDB, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data:
+  Delete the element denoted by IKP.</p>
+
+<h3 class="function"><a name="diff_iterate-5">diff_iterate/5</a></h3>
+<div class="spec">
+<p><tt>diff_iterate(CDB, SubPoint, Fun, Flags, State) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li><li><tt>Fun = fun((IKeypath, Op, OldValue, Value, State) -&gt; {ok, Ret, State} | {error, term()})</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Op = integer()</tt></li><li><tt>OldValue = <a href="econfd.html#type-value">econfd:value()</a> | undefined</tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | undefined | <a href="econfd.html#type-key">econfd:key()</a> | {}</tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, State} | {error, term()}</tt></li></ul></p>
+</div><p><p>Iterate over changes in CDB after a subscription triggers.</p>
+ 
+  This function can be called from within the fun passed to wait/3. When
+  called it will invoke Fun for each change that matched the Point. If
+  Flags is ?CDB_ITER_WANT_PREV, OldValue will be the previous value (if
+  available). When OldValue or Value is not available (or requested) they will
+  be the atom 'undefined'.
+  When Op == ?MOP_MOVED_AFTER (only for "ordered-by user" list entry),
+  Value == {} means that the entry was moved first in the list, otherwise
+  Value is a econfd:key() tuple that identifies the entry it was moved after.</p>
+
+<h3 class="function"><a name="end_session-1">end_session/1</a></h3>
+<div class="spec">
+<p><tt>end_session(CDB) -&gt; {ok, <a href="econfd.html#type-socket">econfd:socket()</a>}</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li></ul></p>
+</div><p><p>Terminate the session.</p>
+ 
+  This releases the lock on CDB which is active during a read session.
+  Returns a socket that can be re-used in new_session/2
+  We  use  connect()  to  establish a read socket to CDB. When the
+    socket is closed, the read session is ended. We can reuse  the  same
+    socket  for  another  read session, but we must then end the session
+    and create another session using new_session/2.
+  %%
+    While we have a live CDB read session, CDB is  locked  for  writing.
+    Thus  all external entities trying to modify CDB are blocked as long
+    as we have an open CDB read session. It is very  important  that  we
+    remember  to  either  end_session()  or close() once we have
+    read what we wish to read.</p>
+
+<h3 class="function"><a name="exists-2">exists/2</a></h3>
+<div class="spec">
+<p><tt>exists(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, boolean()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Checks existense of an object.</p>
+ 
+  Leafs in the data model may be optional, and presence containers and
+  list entries may or may not exist. This function checks whether a node
+  exists in CDB, returning Int == 1 if it exists, Int == 0 if not.</p>
+
+<h3 class="function"><a name="get_case-3">get_case/3</a></h3>
+<div class="spec">
+<p><tt>get_case(CDB, IKeypath, Choice) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Choice = <a href="econfd.html#type-qtag">econfd:qtag()</a> | [<a href="econfd.html#type-qtag">econfd:qtag()</a>]</tt></li><li><tt>Result = {ok, <a href="econfd.html#type-qtag">econfd:qtag()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Returns the current case for a choice.</p>
+
+<h3 class="function"><a name="get_elem-2">get_elem/2</a></h3>
+<div class="spec">
+<p><tt>get_elem(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, <a href="econfd.html#type-value">econfd:value()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Read an element.</p>
+ 
+  Note, the C interface has separate get
+       functions for different types.</p>
+
+<h3 class="function"><a name="get_modifications_cli-2">get_modifications_cli/2</a></h3>
+<div class="spec">
+<p><tt>get_modifications_cli(CDB, SubPoint) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li><li><tt>Result = {ok, CliString} | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>}</tt></li><li><tt>CliString = binary()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#get_modifications_cli-3"><tt>get_modifications_cli(CDB, Point, 0)</tt></a>.</p>
+
+
+<h3 class="function"><a name="get_modifications_cli-3">get_modifications_cli/3</a></h3>
+<div class="spec">
+<p><tt>get_modifications_cli(CDB, SubPoint, Flags) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, CliString} | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>}</tt></li><li><tt>CliString = binary()</tt></li></ul></p>
+</div><p>Return Return a string with the CLI commands that corresponds
+  to the changes that triggered subscription.</p>
+
+<h3 class="function"><a name="get_object-2">get_object/2</a></h3>
+<div class="spec">
+<p><tt>get_object(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-value">econfd:value()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Returns all the values in a container or list entry.</p>
+
+<h3 class="function"><a name="get_objects-4">get_objects/4</a></h3>
+<div class="spec">
+<p><tt>get_objects(CDB, IKeypath, StartIndex, NumEntries) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>StartIndex = integer()</tt></li><li><tt>NumEntries = integer()</tt></li><li><tt>Result = {ok, [[<a href="econfd.html#type-value">econfd:value()</a>]]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Returns all the values for NumEntries list entries.</p>
+ 
+  Starting at index StartIndex. The return value has one Erlang list for
+  each YANG list entry, i.e. it is a list of NumEntries lists.</p>
+
+<h3 class="function"><a name="get_phase-1">get_phase/1</a></h3>
+<div class="spec">
+<p><tt>get_phase(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, {Phase, Type}} | <a href="#type-err">err()</a></tt></li><li><tt>Phase = 0..2</tt></li><li><tt>Type = false | init | normal | upgrade</tt></li></ul></p>
+</div><p>Get CDB start-phase.</p>
+
+<h3 class="function"><a name="get_txid-1">get_txid/1</a></h3>
+<div class="spec">
+<p><tt>get_txid(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, PrimaryNode, Now} | {ok, Now}</tt></li><li><tt>PrimaryNode = term()</tt></li><li><tt>Now = tuple()</tt></li></ul></p>
+</div><p><p>Get CDB transaction id.</p>
+ 
+  When we are a cdb client, and ConfD restarts, we can use this function
+  to retrieve the last CDB transaction id. If it the same as earlier
+  we don't need re-read the CDB data. This is also useful when we're
+  a CDB client in a HA setup.</p>
+
+<h3 class="function"><a name="get_values-3">get_values/3</a></h3>
+<div class="spec">
+<p><tt>get_values(CDB, IKeypath, Values) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Values = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-tagval">econfd:tagval()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Returns the values for the leafs that have the "value" 'not_found'  
+in the Values list.</p>
+ 
+  This can be used to read an arbitrary set of
+  sub-elements of a container or list entry. The return value is a list
+  of the same length as Values, i.e. the requested leafs are in the same
+  position in the returned list as in the Values argument. The elements
+  in the returned list are always "canonical" though, i.e. of the form
+  <a href="econfd.html#type-tagval"><code>econfd:tagval()</code></a>.</p>
+
+<h3 class="function"><a name="index-2">index/2</a></h3>
+<div class="spec">
+<p><tt>index(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Returns the position (starting at 0) of the list entry in path.</p>
+
+<h3 class="function"><a name="new_session-2">new_session/2</a></h3>
+<div class="spec">
+<p><tt>new_session(Socket, Db) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Db = <a href="#type-dbtype">dbtype()</a></tt></li><li><tt>Result = {ok, <a href="#type-cdb_sess">cdb_sess()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Initiate a new session using the socket returned by
+  connect().</p>
+
+<h3 class="function"><a name="new_session-3">new_session/3</a></h3>
+<div class="spec">
+<p><tt>new_session(Socket, Db, Flags) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Db = <a href="#type-dbtype">dbtype()</a></tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, <a href="#type-cdb_sess">cdb_sess()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Initiate a new session using the socket returned by connect(),
+  with detailed control via the Flags argument.</p>
+
+<h3 class="function"><a name="next_index-2">next_index/2</a></h3>
+<div class="spec">
+<p><tt>next_index(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Returns the position (starting at 0) of the list entry after
+  the given path (which can be non-existing, and if multiple keys the
+  last keys can be '*').</p>
+
+<h3 class="function"><a name="num_instances-2">num_instances/2</a></h3>
+<div class="spec">
+<p><tt>num_instances(CDB, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Returns the number of entries in a list.</p>
+
+<h3 class="function"><a name="set_case-4">set_case/4</a></h3>
+<div class="spec">
+<p><tt>set_case(CDB, IKeypath, Choice, Case) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Choice = <a href="econfd.html#type-qtag">econfd:qtag()</a> | [<a href="econfd.html#type-qtag">econfd:qtag()</a>]</tt></li><li><tt>Case = <a href="econfd.html#type-qtag">econfd:qtag()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data: Set the case for a choice.</p>
+
+<h3 class="function"><a name="set_elem-3">set_elem/3</a></h3>
+<div class="spec">
+<p><tt>set_elem(CDB, Value, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data:
+  Write Value into CDB.</p>
+
+<h3 class="function"><a name="set_elem2-3">set_elem2/3</a></h3>
+<div class="spec">
+<p><tt>set_elem2(CDB, ValueBin, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>ValueBin = binary()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data:
+  Write ValueBin into CDB. ValueBin is the textual value representation.</p>
+
+<h3 class="function"><a name="set_object-3">set_object/3</a></h3>
+<div class="spec">
+<p><tt>set_object(CDB, ValueList, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>ValueList = [<a href="econfd.html#type-value">econfd:value()</a>]</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Only for CDB operational data: Write an entire object,
+  i.e. YANG list entry or container.</p>
+
+<h3 class="function"><a name="set_values-3">set_values/3</a></h3>
+<div class="spec">
+<p><tt>set_values(CDB, ValueList, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>ValueList = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p><p>Only for CDB operational data: Write a list of tagged values.</p>
+ 
+  This function is an alternative to
+  set_object/3, and allows for writing more complex structures
+  (e.g. multiple entries in a list).</p>
+
+<h3 class="function"><a name="subscribe-3">subscribe/3</a></h3>
+<div class="spec">
+<p><tt>subscribe(CDB, Priority, MatchKeyString) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Priority = integer()</tt></li><li><tt>MatchKeyString = string()</tt></li><li><tt>Result = {ok, SubPoint} | <a href="#type-err">err()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#subscribe-4"><tt>subscribe(CDB, Prio, '', MatchKeyString)</tt></a>.</p>
+
+
+<h3 class="function"><a name="subscribe-4">subscribe/4</a></h3>
+<div class="spec">
+<p><tt>subscribe(CDB, Priority, Ns, MatchKeyString) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Priority = integer()</tt></li><li><tt>Ns = <a href="#type-sub_ns">sub_ns()</a></tt></li><li><tt>MatchKeyString = string()</tt></li><li><tt>Result = {ok, SubPoint} | <a href="#type-err">err()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li></ul></p>
+</div><p><p>Set up a CDB configuration subscription.</p>
+ 
+  <p>A CDB subscription means that we are notified when CDB changes.  
+We can have multiple subscription points. Each subscription point  
+is defined through a path corresponding to the paths we use for read  
+operations, however they are in string form and allow formats that  
+aren't possible in a proper ikeypath(). It is possible to indicate  
+namespaces in the path with a prefix notation (see last example) -  
+this is only necessary if there are multiple elements with the same  
+name (in different namespaces) at some level in the path, though.</p>
+ 
+  <p>We can subscribe either to specific leaf elements or entire  
+subtrees. Subscribing to list entries can be done using fully  
+qualified paths, or tagpaths to match multiple entries. A  
+path which isn't a leaf element automatically matches the subtree  
+below that path. When specifying keys to a list entry it is  
+possible to use the wildcard character * which will match any key  
+value.</p>
+ 
+  <p>Some examples:</p>
+ 
+  <ul>
+  <li>
+    /hosts
+   <p>
+    Means that we subscribe to any changes in the subtree - rooted at
+    "/hosts". This includes additions or removals of "host" entries as well
+    as changes to already existing "host" entries.
+   </p>
+  </li>
+  <li>
+    /hosts/host{www}/interfaces/interface{eth0}/ip
+   <p>
+    Means we are notified when host "www" changes its IP address on
+    "eth0".
+   </p>
+  </li>
+  <li>
+    /hosts/host/interfaces/interface/ip
+   <p>
+    Means we are notified when any host changes any of its IP addresses.
+   </p>
+  </li>
+  <li>
+    /hosts/host/interfaces
+   <p>
+    Means we are notified when either an interface
+    is added/removed or when an individual leaf element in an
+    existing interface is changed.
+   </p>
+  </li>
+  <li>
+    /hosts/host/types:data
+   <p>
+    Means we are notified when any host changes the contents of its
+    "data" element, where "data" is an element from a namespace with
+    the prefix "types". The prefix is normally not necessary, see above.
+   </p>
+  </li>
+  </ul>
+ 
+  <p>The priority value is an integer. When CDB  is  changed,  the  
+change  is  performed  inside  a transaction. Either a commit  
+operation from the CLI or  a  candidate-commit  operation  in  
+NETCONF  means  that  the  running database is changed. These  
+changes occur inside a ConfD transaction. CDB will handle the  
+subscriptions  in  lock-step  priority  order. First all  
+subscribers at the lowest priority are handled,  once  they  all  
+have synchronized via the return value from the fun passed to  
+wait/3, the next set - at the next priority  level -  
+is handled by CDB.</p>
+ 
+  <p>Operational and configuration subscriptions can be done on the same  
+socket, but in that case the notifications may be arbitrarily  
+interleaved, including operational notifications arriving between  
+different configuration notifications for the same transaction. If  
+this is a problem, use separate sessions for operational and  
+configuration subscriptions.</p>
+ 
+  <p>The namespace argument specifies the toplevel namespace, i.e.  
+the namespace for the first element in the path. The namespace is  
+optional, 0 can be used as "don't care" value.</p>
+ 
+  subscribe()  returns  a  subscription point which is an integer.
+  This integer value is used later in wait/3 to identify this
+  particular subscription.
+ </p>
+
+<h3 class="function"><a name="subscribe-5">subscribe/5</a></h3>
+<div class="spec">
+<p><tt>subscribe(CDB, Type, Priority, Ns, MatchKeyString) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Type = <a href="#type-sub_type">sub_type()</a></tt></li><li><tt>Priority = integer()</tt></li><li><tt>Ns = <a href="#type-sub_ns">sub_ns()</a></tt></li><li><tt>MatchKeyString = string()</tt></li><li><tt>Result = {ok, SubPoint} | <a href="#type-err">err()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#subscribe-6"><tt>subscribe(CDB, Type, 0, Prio, Ns, MatchKeyString)</tt></a>.</p>
+
+
+<h3 class="function"><a name="subscribe-6">subscribe/6</a></h3>
+<div class="spec">
+<p><tt>subscribe(CDB, Type, Flags, Priority, Ns, MatchKeyString) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>Type = <a href="#type-sub_type">sub_type()</a></tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Priority = integer()</tt></li><li><tt>Ns = <a href="#type-sub_ns">sub_ns()</a></tt></li><li><tt>MatchKeyString = string()</tt></li><li><tt>Result = {ok, SubPoint} | <a href="#type-err">err()</a></tt></li><li><tt>SubPoint = pos_integer()</tt></li></ul></p>
+</div><p><p>Generalized subscription.</p>
+ 
+  Where Type is one of
+  <ul><li>
+  ?CDB_SUB_RUNNING - traditional commit subscription, same as subscribe/4.
+  </li><li>
+  ?CDB_SUB_RUNNING_TWOPHASE - two phase subscription, i.e. notification
+  will be received for prepare, commit, and possibly abort.
+  </li><li>
+  ?CDB_SUB_OPERATIONAL - subscription for changes to CDB operational data.
+  </li></ul>
+  Flags is either 0 or:
+  <ul><li>
+  ?CDB_SUB_WANT_ABORT_ON_ABORT - normally if a subscriber is the one
+    to abort a transaction it will not receive an abort
+    notification. This flags means that this subscriber wants an
+    abort notification even if it originated the abort.
+  </li></ul></p>
+
+<h3 class="function"><a name="subscribe_done-1">subscribe_done/1</a></h3>
+<div class="spec">
+<p><tt>subscribe_done(CDB) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li></ul></p>
+</div><p>After a subscriber is done with all subscriptions and ready to
+       receive updates this subscribe_done/1 must be called. Until it
+       is no notifications will be delivered.</p>
+
+<h3 class="function"><a name="subscribe_session-1">subscribe_session/1</a></h3>
+<div class="spec">
+<p><tt>subscribe_session(Socket) -&gt; {ok, <a href="#type-cdb_sess">cdb_sess()</a>}</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p><p>Initialize a subscription socket.</p>
+ 
+  This is a socket that is used to receive notifications about
+                   updates to the database. A subscription socket
+  is used in the subscribe() function.</p>
+
+<h3 class="function"><a name="trigger_oper_subscriptions-1">trigger_oper_subscriptions/1</a></h3>
+<div class="spec">
+<p><tt>trigger_oper_subscriptions(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#trigger_oper_subscriptions-2"><tt>trigger_oper_subscriptions(Socket, all)</tt></a>.</p>
+
+
+<h3 class="function"><a name="trigger_oper_subscriptions-2">trigger_oper_subscriptions/2</a></h3>
+<div class="spec">
+<p><tt>trigger_oper_subscriptions(Socket, SubPoints) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>SubPoints = [pos_integer()] | all</tt></li></ul></p>
+</div><p>Equivalent to <a href="#trigger_oper_subscriptions-3"><tt>trigger_oper_subscriptions(Socket, SubPoints, 0)</tt></a>.</p>
+
+
+<h3 class="function"><a name="trigger_oper_subscriptions-3">trigger_oper_subscriptions/3</a></h3>
+<div class="spec">
+<p><tt>trigger_oper_subscriptions(Socket, SubPoints, Flags) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>SubPoints = [pos_integer()] | all</tt></li><li><tt>Flags = non_neg_integer()</tt></li></ul></p>
+</div><p><p>Trigger CDB operational subscribers as if an update in oper data       
+had been done.</p>
+ 
+  Flags can be given as ?CDB_LOCK_WAIT to have the
+       call wait until the subscription lock becomes available, otherwise
+       it should be 0.</p>
+
+<h3 class="function"><a name="trigger_subscriptions-1">trigger_subscriptions/1</a></h3>
+<div class="spec">
+<p><tt>trigger_subscriptions(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#trigger_subscriptions-2"><tt>trigger_subscriptions(Socket, all)</tt></a>.</p>
+
+
+<h3 class="function"><a name="trigger_subscriptions-2">trigger_subscriptions/2</a></h3>
+<div class="spec">
+<p><tt>trigger_subscriptions(Socket, SubPoints) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>SubPoints = [pos_integer()] | all</tt></li></ul></p>
+</div><p>Trigger CDB subscribers as if an update in the configuration
+       had been done.</p>
+
+<h3 class="function"><a name="wait-3">wait/3</a></h3>
+<div class="spec">
+<p><tt>wait(CDB, TimeOut, Fun) -&gt; Result</tt>
+<ul class="definitions"><li><tt>CDB = <a href="#type-cdb_sess">cdb_sess()</a></tt></li><li><tt>TimeOut = integer() | infinity</tt></li><li><tt>Fun = fun((SubPoints) -&gt; close | <a href="#type-subscription_sync_type">subscription_sync_type()</a>) | fun((Type, Flags, SubPoints) -&gt; close | <a href="#type-subscription_sync_type">subscription_sync_type()</a> | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>})</tt></li><li><tt>SubPoints = [pos_integer()]</tt></li><li><tt>Type = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = ok | {error, badretval} | {error, <a href="econfd.html#type-transport_error">econfd:transport_error()</a>} | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>}</tt></li></ul></p>
+</div><p><p>Wait for subscription events.</p>
+ 
+  <p>The fun will be given a list of the subscription points that  
+triggered, and in the arity-3 case also Type and Flags for the  
+notification. There can be several points if we have issued several  
+subscriptions at the same priority.</p>
+ 
+  Type is one of:
+  <ul><li>
+     ?CDB_SUB_PREPARE - notification for the prepare phase
+  </li><li>
+     ?CDB_SUB_COMMIT  - notification for the commit phase
+  </li><li>
+     ?CDB_SUB_ABORT   - notification for abort when prepare failed
+  </li><li>
+     ?CDB_SUB_OPER    - notification for changes to CDB operational data
+  </li></ul>
+ 
+  Flags is the 'bor' of zero or more of:
+  <ul><li>
+     ?CDB_SUB_FLAG_IS_LAST - the last notification of its type for this session
+  </li><li>
+     ?CDB_SUB_FLAG_TRIGGER - the notification was artificially triggered
+  </li><li>
+     ?CDB_SUB_FLAG_REVERT - the notification is due to revert of a confirmed
+                            commit
+  </li><li>
+     ?CDB_SUB_FLAG_HA_SYNC -  the cause of the subscription
+                              notification is initial synchronization
+                              of a HA secondary from CDB on the primary.
+  </li><li>
+     ?CDB_SUB_FLAG_HA_IS_SECONDARY - the system is currently in HA
+     SECONDARY mode.
+  </li></ul>
+ 
+  The fun can return the atom 'close' if we wish to close the socket and
+  return from wait/3. Otherwise there are three different types of
+  synchronization replies the application can use as return values from
+  either the arity-1 or the arity-3 fun:
+  <ul><li>
+     ?CDB_DONE_PRIORITY
+     This means that the application has acted on the subscription
+     notification and CDB can continue to deliver further  notifications.
+  </li><li>
+     ?CDB_DONE_SOCKET
+     This  means that we are done. But regardless of priority, CDB
+     shall not send any further notifications to us on our  socket
+     that are related to the currently executing transaction.
+  </li><li>
+     ?CDB_DONE_TRANSACTION
+     This means that CDB should not send any further notifications
+     to any subscribers - including ourselves  -  related  to  the
+     currently executing transaction.
+  </li><li>
+     ?CDB_DONE_OPERATIONAL
+     This should be used when a subscription notification for
+     operational data has been read. It is the only type that should
+     be used in this case, since the operational data does not have
+     transactions and the notifications do not have priorities.
+  </li></ul><p>
+  Finally the arity-3 fun can, when Type == ?CDB_SUB_PREPARE,
+  return an error either as <tt>{error, binary()}</tt> or as
+  <tt>{error, #confd_error{}}</tt>  
+({error, tuple()} is only for internal ConfD/NCS use). This will  
+cause the commit of the current transaction to be aborted.</p>
+ 
+  <p>CDB is locked for writing while config subscriptions are delivered.</p>
+ 
+  When wait/3 returns <tt>{error, timeout}</tt> the connection (and its
+  subscriptions) is still active and the application needs to call
+  wait/3 again. But if wait/3 returns <tt>ok</tt> or
+  <tt>{error, Reason}</tt> the connection to ConfD is closed and all
+  subscription points associated with it are cleared.</p>
+
+<h3 class="function"><a name="wait_start-1">wait_start/1</a></h3>
+<div class="spec">
+<p><tt>wait_start(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Wait for CDB to become available (reach start-phase one).</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

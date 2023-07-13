@@ -1,0 +1,25 @@
+module ietf-interfaces-ann {
+  namespace "http://tail-f.com/if-ann";
+  prefix ifann;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import ietf-interfaces {
+    prefix if;
+  }
+
+  tailf:annotate "/if:interfaces/if:interface/if:enabled" {
+    tailf:code-name interface_enabled;
+    tailf:callpoint example-cp {
+      tailf:operational;
+    }
+  }
+
+  tailf:annotate "/if:interfaces/if:interface/if:oper-status" {
+    tailf:callpoint example-cp {
+      tailf:config false;
+    }
+  }
+}

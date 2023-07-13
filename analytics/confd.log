@@ -1,0 +1,89 @@
+<INFO> 7-Jul-2023::04:45:54.614 ubuntu confd[118021]: - Writing daemon log to /home/ubuntu/i2nsf-security-controller/analytics/confd.log
+<INFO> 7-Jul-2023::04:45:54.430 ubuntu confd[118021]: - Enabling daemon log
+<INFO> 7-Jul-2023::04:45:54.437 ubuntu confd[118021]: - Starting ConfD vsn: 8.0.4
+<DEBUG> 7-Jul-2023::04:45:54.466 ubuntu confd[118021]: - Loading file confd.fxs
+<DEBUG> 7-Jul-2023::04:45:54.484 ubuntu confd[118021]: - Loading file ietf-yang-types.fxs
+<DEBUG> 7-Jul-2023::04:45:54.485 ubuntu confd[118021]: - Loading file ietf-inet-types.fxs
+<DEBUG> 7-Jul-2023::04:45:54.486 ubuntu confd[118021]: - Loading file ietf-datastores.fxs
+<DEBUG> 7-Jul-2023::04:45:54.499 ubuntu confd[118021]: - Loading file ietf-yang-library.fxs
+<DEBUG> 7-Jul-2023::04:45:54.501 ubuntu confd[118021]: - Loading file ietf-yang-patch.fxs
+<DEBUG> 7-Jul-2023::04:45:54.502 ubuntu confd[118021]: - Loading file tailf-yang-patch.fxs
+<DEBUG> 7-Jul-2023::04:45:54.503 ubuntu confd[118021]: - Loading file tailf-rollback.fxs
+<DEBUG> 7-Jul-2023::04:45:54.509 ubuntu confd[118021]: - Loading file ietf-netconf.fxs
+<DEBUG> 7-Jul-2023::04:45:54.511 ubuntu confd[118021]: - Loading file ietf-netconf-with-defaults.fxs
+<DEBUG> 7-Jul-2023::04:45:54.512 ubuntu confd[118021]: - Loading file netconf_netmod.fxs
+<DEBUG> 7-Jul-2023::04:45:54.512 ubuntu confd[118021]: - Loading file ietf-restconf.fxs
+<DEBUG> 7-Jul-2023::04:45:54.513 ubuntu confd[118021]: - Loading file confd_cfg.fxs
+<DEBUG> 7-Jul-2023::04:45:54.539 ubuntu confd[118021]: - Loading file config.fxs
+<DEBUG> 7-Jul-2023::04:45:54.540 ubuntu confd[118021]: - Loading file netconf_notification.fxs
+<DEBUG> 7-Jul-2023::04:45:54.540 ubuntu confd[118021]: - Loading file netconf_actions.fxs
+<DEBUG> 7-Jul-2023::04:45:54.541 ubuntu confd[118021]: - Loading file yang.fxs
+<DEBUG> 7-Jul-2023::04:45:54.541 ubuntu confd[118021]: - Loading file tailf_netconf.fxs
+<DEBUG> 7-Jul-2023::04:45:54.542 ubuntu confd[118021]: - Loading file cli-builtin.fxs
+<DEBUG> 7-Jul-2023::04:45:54.543 ubuntu confd[118021]: - Loading file confd.conf
+<INFO> 7-Jul-2023::04:45:54.544 ubuntu confd[118021]: - Consulting daemon configuration file confd.conf
+<INFO> 7-Jul-2023::04:45:54.600 ubuntu confd[118021]: - Writing audit log to /home/ubuntu/i2nsf-security-controller/analytics/audit.log
+<INFO> 7-Jul-2023::04:45:54.600 ubuntu confd[118021]: - Enabling audit log
+<INFO> 7-Jul-2023::04:45:54.603 ubuntu confd[118021]: - Writing NETCONF log to /home/ubuntu/i2nsf-security-controller/analytics/netconf.log
+<INFO> 7-Jul-2023::04:45:54.603 ubuntu confd[118021]: - Enabling NETCONF log
+<INFO> 7-Jul-2023::04:45:54.606 ubuntu confd[118021]: - Enabling SNMP log
+<INFO> 7-Jul-2023::04:45:54.609 ubuntu confd[118021]: - Writing developer log to /home/ubuntu/i2nsf-security-controller/analytics/devel.log
+<INFO> 7-Jul-2023::04:45:54.609 ubuntu confd[118021]: - Enabling developer log
+<INFO> 7-Jul-2023::04:45:54.611 ubuntu confd[118021]: - Enabling JSONRPC log
+<INFO> 7-Jul-2023::04:45:54.614 ubuntu confd[118021]: - Enabling WebUI log log
+<INFO> 7-Jul-2023::04:45:54.623 ubuntu confd[118021]: - Enabling error log
+<INFO> 7-Jul-2023::04:45:54.623 ubuntu confd[118021]: - Writing error log to ./confderr.log
+<INFO> 7-Jul-2023::04:45:54.631 ubuntu confd[118021]: - Daemon logging started
+<DEBUG> 7-Jul-2023::04:45:54.649 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-subscribed-notifications.fxs
+<DEBUG> 7-Jul-2023::04:45:54.652 ubuntu confd[118021]: - Loading file ./ietf-ethertypes.fxs
+<DEBUG> 7-Jul-2023::04:45:54.652 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-origin.fxs
+<DEBUG> 7-Jul-2023::04:45:54.653 ubuntu confd[118021]: - Loading file ./ietf-interfaces.fxs
+<DEBUG> 7-Jul-2023::04:45:54.655 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-netconf-monitoring.fxs
+<DEBUG> 7-Jul-2023::04:45:54.656 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-common-monitoring2.fxs
+<DEBUG> 7-Jul-2023::04:45:54.657 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-common-monitoring.fxs
+<DEBUG> 7-Jul-2023::04:45:54.658 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-netconf-acm.fxs
+<DEBUG> 7-Jul-2023::04:45:54.659 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-common-query.fxs
+<DEBUG> 7-Jul-2023::04:45:54.659 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-transactions.fxs
+<DEBUG> 7-Jul-2023::04:45:54.660 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-common.fxs
+<DEBUG> 7-Jul-2023::04:45:54.661 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-progress.fxs
+<DEBUG> 7-Jul-2023::04:45:54.662 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/iana-crypt-hash.fxs
+<DEBUG> 7-Jul-2023::04:45:54.663 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/lib/confd/lib/core/confd/priv/ietf-ip.fxs
+<DEBUG> 7-Jul-2023::04:45:54.663 ubuntu confd[118021]: - Loading file ./ietf-packet-fields.fxs
+<DEBUG> 7-Jul-2023::04:45:54.664 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-confd-monitoring.fxs
+<DEBUG> 7-Jul-2023::04:45:54.667 ubuntu confd[118021]: - Loading file ./ietf-i2nsf-nsf-facing-interface.fxs
+<DEBUG> 7-Jul-2023::04:45:54.676 ubuntu confd[118021]: - Loading file ./ietf-i2nsf-monitoring-interface.fxs
+<DEBUG> 7-Jul-2023::04:45:54.680 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-yang-schema-mount.fxs
+<DEBUG> 7-Jul-2023::04:45:54.680 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-yang-push.fxs
+<DEBUG> 7-Jul-2023::04:45:54.683 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-yang-metadata.fxs
+<DEBUG> 7-Jul-2023::04:45:54.684 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-x509-cert-to-name.fxs
+<DEBUG> 7-Jul-2023::04:45:54.684 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/lib/confd/lib/core/confd/priv/ietf-network-instance.fxs
+<DEBUG> 7-Jul-2023::04:45:54.685 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-netconf-notifications.fxs
+<DEBUG> 7-Jul-2023::04:45:54.686 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-netconf-nmda.fxs
+<DEBUG> 7-Jul-2023::04:45:54.689 ubuntu confd[118021]: - Loading file ./ietf-i2nsf-analytics-interface.fxs
+<DEBUG> 7-Jul-2023::04:45:54.690 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-netconf-partial-lock.fxs
+<DEBUG> 7-Jul-2023::04:45:54.691 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-xsd-types.fxs
+<DEBUG> 7-Jul-2023::04:45:54.692 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-monitoring.fxs
+<DEBUG> 7-Jul-2023::04:45:54.693 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-last-login.fxs
+<DEBUG> 7-Jul-2023::04:45:54.694 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-confd-monitoring2.fxs
+<DEBUG> 7-Jul-2023::04:45:54.702 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-acm.fxs
+<DEBUG> 7-Jul-2023::04:45:54.703 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-with-transaction-id.fxs
+<DEBUG> 7-Jul-2023::04:45:54.704 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-with-rollback-id.fxs
+<DEBUG> 7-Jul-2023::04:45:54.705 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-rollback.fxs
+<DEBUG> 7-Jul-2023::04:45:54.706 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-query.fxs
+<DEBUG> 7-Jul-2023::04:45:54.707 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-inactive.fxs
+<DEBUG> 7-Jul-2023::04:45:54.708 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-forward.fxs
+<DEBUG> 7-Jul-2023::04:45:54.709 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-netconf-extensions.fxs
+<DEBUG> 7-Jul-2023::04:45:54.710 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-kicker.fxs
+<DEBUG> 7-Jul-2023::04:45:54.711 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-yang-push-deviation.fxs
+<DEBUG> 7-Jul-2023::04:45:54.712 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/ietf-subscribed-notifications-deviation.fxs
+<DEBUG> 7-Jul-2023::04:45:54.713 ubuntu confd[118021]: - Loading file ./dhcpd.fxs
+<DEBUG> 7-Jul-2023::04:45:54.714 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-confd-progress.fxs
+<DEBUG> 7-Jul-2023::04:45:54.715 ubuntu confd[118021]: - Loading file /home/ubuntu/confd/etc/confd/tailf-aaa.fxs
+<DEBUG> 7-Jul-2023::04:45:54.771 ubuntu confd[118021]: - Loading file ./commands-c.ccl
+<DEBUG> 7-Jul-2023::04:45:54.778 ubuntu confd[118021]: - Loading file ./commands-j.ccl
+<INFO> 7-Jul-2023::04:45:54.876 ubuntu confd[118021]: - Reading state file failed: ./local.data: file not found ((re)creating)
+<INFO> 7-Jul-2023::04:45:54.918 ubuntu confd[118021]: - Starting to listen for Internal IPC on 127.0.0.1:4565
+<INFO> 7-Jul-2023::04:45:55.213 ubuntu confd[118021]: - CDB load: processing file: ./confd-cdb/aaa_init.xml
+<INFO> 7-Jul-2023::04:45:55.491 ubuntu confd[118021]: - Starting to listen for NETCONF SSH on 10.0.0.44:2022
+<INFO> 7-Jul-2023::04:45:55.615 ubuntu confd[118021]: - Starting to listen for CLI SSH on 0.0.0.0:2024
+<INFO> 7-Jul-2023::04:45:55.717 ubuntu confd[118021]: - ConfD started vsn: 8.0.4

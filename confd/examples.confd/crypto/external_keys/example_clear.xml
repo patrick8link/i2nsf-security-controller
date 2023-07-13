@@ -1,0 +1,14 @@
+<ex:strings xmlns:ex="http://tail-f.com/ns/example">
+  <ex:string>
+    <ex:id>1</ex:id>
+    <ex:secret>$0$hello there</ex:secret>
+  </ex:string>
+  <ex:string>
+    <ex:id>2</ex:id>
+    <ex:secret>$0$now is the time</ex:secret>
+  </ex:string>
+  <ex:string>
+    <ex:id>3</ex:id>
+    <ex:secret>$0$sigge</ex:secret>
+  </ex:string>
+</ex:strings>

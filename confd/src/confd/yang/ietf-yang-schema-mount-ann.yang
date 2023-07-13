@@ -1,0 +1,27 @@
+module ietf-yang-schema-mount-ann {
+  namespace "urn:dummy";
+  prefix dummy;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import ietf-yang-schema-mount {
+    prefix yangmnt;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "Annotation module for ietf-yang-schema-mounts.
+
+     Copyright 2019 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification.";
+
+  tailf:annotate "/yangmnt:schema-mounts" {
+    tailf:callpoint "yangmnt" {
+      tailf:internal;
+    }
+  }
+}

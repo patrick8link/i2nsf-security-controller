@@ -1,0 +1,47 @@
+module new {
+  namespace "http://tail-f.com/ns/example/new";
+  prefix new;
+
+  import simple {
+     prefix simple;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for In-service Upgrade example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2010-03-10 {
+    description "Initial revision.";
+  }
+
+  typedef small-int {
+    type int32 {
+      range "-100000 .. 100000";
+    }
+  }
+
+  augment "/simple:simple" {
+    leaf int {
+      type small-int;
+      default 32;
+    }
+  }
+
+  leaf must-have {
+    type int32;
+    mandatory true;
+  }
+}

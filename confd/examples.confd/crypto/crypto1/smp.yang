@@ -1,0 +1,51 @@
+module smp {
+  namespace "http://tail-f.com/ns/example/smp";
+  prefix smp;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Built in ConfD crypto types example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-06-16 {
+    description "Initial revision.";
+  }
+
+  container strs {
+    list str {
+      key nr;
+      max-elements 64;
+      leaf nr {
+        type int32;
+      }
+      leaf des3-string {
+        type tailf:des3-cbc-encrypted-string;
+        mandatory true;
+      }
+      leaf aes-string {
+        type tailf:aes-cfb-128-encrypted-string;
+        mandatory true;
+      }
+    }
+  }
+}

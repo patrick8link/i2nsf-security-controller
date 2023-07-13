@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>confd.dp API documentation</title>
+<meta name="description" content="Callback module for connecting data providers to ConfD/NCS." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>confd.dp</code></h1>
+</header>
+<section id="section-intro">
+<p>Callback module for connecting data providers to ConfD/NCS.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="confd.dp.return_worker_socket"><code class="name flex">
+<span>def <span class="ident">return_worker_socket</span></span>(<span>state, key)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return worker socket associated with a worker thread from Daemon/state.</p>
+<p>Return worker socket to pool.</p></div>
+</dd>
+<dt id="confd.dp.take_worker_socket"><code class="name flex">
+<span>def <span class="ident">take_worker_socket</span></span>(<span>state, name, key)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Take worker socket associated with a worker thread from Daemon/state.</p>
+<p>Take worker socket from pool, must be returned with
+dp.return_worker_socket after use.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="confd.dp.Action"><code class="flex name class">
+<span>class <span class="ident">Action</span></span>
+<span>(</span><span>daemon, actionpoint, log=None, init_args=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action callback.</p>
+<p>This class makes it easy to create and register action callbacks by
+sub-classing it and implementing cb_action in the derived class.</p>
+<p>Initialize this object.</p>
+<p>The 'daemon' argument should be a Daemon instance. 'actionpoint'
+is the name of the tailf:actionpoint to manage. 'log' can be any
+log object, and if not set the Daemon logger will be used.
+'init_args' may be any object that will be passed into init()
+when this object is constructed. Lastly, the low-level function
+dp.register_action_cbs() will be called.</p>
+<p>When using this class together with ncs.application.Application
+there is no need to manually initialize this object as it is
+done by the Application.register_action() method.</p>
+<p>Arguments:</p>
+<ul>
+<li>daemon &ndash; Daemon instance (dp.Daemon)</li>
+<li>actionpoint &ndash; actionpoint name (str)</li>
+<li>log &ndash; logging object (optional)</li>
+<li>init_args &ndash; additional arguments (optional)</li>
+</ul></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="confd.dp.Action.action"><code class="name flex">
+<span>def <span class="ident">action</span></span>(<span>fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator for the cb_action callback.</p>
+<p>Only use this decorator for actions of tailf:action type.</p>
+<p>Using this decorator alters the signature of the cb_action callback
+and passes in maagic.Node objects for input and output action data.</p>
+<p>Example of a decorated cb_action:</p>
+<pre><code>@Action.action
+def cb_action(self, uinfo, name, kp, input, output, trans):
+    pass
+</code></pre>
+<p>Callback arguments:</p>
+<ul>
+<li>uinfo &ndash; a UserInfo object</li>
+<li>name &ndash; the tailf:action name (string)</li>
+<li>kp &ndash; the keypath of the action (HKeypathRef)</li>
+<li>input &ndash; input node (maagic.Node)</li>
+<li>output &ndash; output node (maagic.Node)</li>
+<li>trans &ndash; read only transaction, same as action transaction if
+executed with an action context (maapi.Transaction)</li>
+</ul></div>
+</dd>
+<dt id="confd.dp.Action.rpc"><code class="name flex">
+<span>def <span class="ident">rpc</span></span>(<span>fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator for the cb_action callback.</p>
+<p>Only use this decorator for rpc:s.</p>
+<p>Using this decorator alters the signature of the cb_action callback
+and passes in maagic.Node objects for input and output action data.</p>
+<p>Example of a decorated cb_action:</p>
+<pre><code>@Action.rpc
+def cb_action(self, uinfo, name, input, output):
+    pass
+</code></pre>
+<p>Callback arguments:</p>
+<ul>
+<li>uinfo &ndash; a UserInfo object</li>
+<li>name &ndash; the rpc name (string)</li>
+<li>input &ndash; input node (maagic.Node)</li>
+<li>output &ndash; output node (maagic.Node)</li>
+</ul></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.Action.cb_init"><code class="name flex">
+<span>def <span class="ident">cb_init</span></span>(<span>self, uinfo)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The cb_init callback must always be implemented.</p>
+<p>This default implementation will associate a new worker socket
+with this callback.</p></div>
+</dd>
+<dt id="confd.dp.Action.init"><code class="name flex">
+<span>def <span class="ident">init</span></span>(<span>self, init_args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Custom initialization.</p>
+<p>When registering an action using ncs.application.Application this
+method will be called with the 'init_args' passed into the
+register_action() function.</p></div>
+</dd>
+<dt id="confd.dp.Action.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Custom actionpoint start triggered when Python VM starts up.</p></div>
+</dd>
+<dt id="confd.dp.Action.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Custom actionpoint stop triggered when Python VM shuts down.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.dp.Daemon"><code class="flex name class">
+<span>class <span class="ident">Daemon</span></span>
+<span>(</span><span>name, log=None, ip='127.0.0.1', port=4565, path=None, state_mgr=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Manage a data provider connection towards ConfD/NCS.</p>
+<p>Initialize a Daemon object.</p>
+<p>The 'name' argument should be unique. It will show up in the
+CLI and in error messages. All other arguments are optional.
+Argument 'log' can be any log object, and if not set the standard
+logging mechanism will be used. Set 'ip' and 'port' to
+where your Confd/NCS server is. 'path' is a filename to a unix
+domain socket to be used in place of 'ip' and 'port'. If 'path'
+is provided, 'ip' and 'port' arguments are ignored.</p>
+<p>Daemon supports automatic restarting in case of error if a
+state manager is provided using the state_mgr parameter.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="threading.Thread" href="https://docs.python.org/3/library/typing.html#typing.threading.Thread">threading.Thread</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="confd.dp.Daemon.INIT_RETRY_INTERVAL_S"><code class="name">var <span class="ident">INIT_RETRY_INTERVAL_S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="confd.dp.Daemon.State"><code class="name">var <span class="ident">State</span></code></dt>
+<dd>
+<div class="desc"><p>State access to dp.Daemon state, primarily used in callbacks.</p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="confd.dp.Daemon.wsock"><code class="name">var <span class="ident">wsock</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.Daemon.ctx"><code class="name flex">
+<span>def <span class="ident">ctx</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the daemon context.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.finish"><code class="name flex">
+<span>def <span class="ident">finish</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stop the daemon thread.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.ip"><code class="name flex">
+<span>def <span class="ident">ip</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the ip address.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.load_schemas"><code class="name flex">
+<span>def <span class="ident">load_schemas</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load schema information into the process memory.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.path"><code class="name flex">
+<span>def <span class="ident">path</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the unix domain socket path.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.port"><code class="name flex">
+<span>def <span class="ident">port</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the port.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.register_trans_cb"><code class="name flex">
+<span>def <span class="ident">register_trans_cb</span></span>(<span>self, trans_cb_cls=confd.dp.TransactionCallback)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Register a transaction callback class.</p>
+<p>It's not necessary to call this method. Only do that if a custom
+transaction callback will be used.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.register_trans_validate_cb"><code class="name flex">
+<span>def <span class="ident">register_trans_validate_cb</span></span>(<span>self, trans_validate_cb_cls=confd.dp.TransValidateCallback)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Register a transaction validation callback class.</p>
+<p>It's not necessary to call this method. Only do that if a custom
+transaction callback will be used.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Daemon thread processing loop.</p>
+<p>Don't call this method explicitly. It handles reading of control
+and worker sockets and notifying ConfD/NCS that it should continue
+processing by calling the low-level function dp.fd_ready().
+If the connection towards ConfD/NCS is broken or if finish() is
+explicitly called, this function (and the thread) will end.</p></div>
+</dd>
+<dt id="confd.dp.Daemon.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start daemon work thread.</p>
+<p>After registering any callbacks (action, services and such), call
+this function to start processing. The low-level function
+dp.register_done() will be called before the thread is started.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.dp.StateManager"><code class="flex name class">
+<span>class <span class="ident">StateManager</span></span>
+<span>(</span><span>log)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for state managers used with Daemon</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.StateManager.setup"><code class="name flex">
+<span>def <span class="ident">setup</span></span>(<span>self, state, previous_state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Not Implemented.</p></div>
+</dd>
+<dt id="confd.dp.StateManager.teardown"><code class="name flex">
+<span>def <span class="ident">teardown</span></span>(<span>self, state, finished)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Not Implemented.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.dp.TransValidateCallback"><code class="flex name class">
+<span>class <span class="ident">TransValidateCallback</span></span>
+<span>(</span><span>state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Default transaction validation callback implementation class.</p>
+<p>When registering validation points in ConfD/NCS a transaction
+validation callback handler must be provided. This class is a
+generic implementation of such a handler. It implements the
+required callbacks 'cb_init' and 'cb_stop'.</p>
+<p>Initialize a TransValidateCallback object.</p>
+<p>The argument 'state' is the dict representation of a daemon.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.TransValidateCallback.cb_init"><code class="name flex">
+<span>def <span class="ident">cb_init</span></span>(<span>self, tctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The cb_init callback must always be implemented.</p>
+<p>It is required to prepare for future validation
+callbacks. This default implementation allocates a worker
+thread and socket pair and associates it with the transaction.</p></div>
+</dd>
+<dt id="confd.dp.TransValidateCallback.cb_stop"><code class="name flex">
+<span>def <span class="ident">cb_stop</span></span>(<span>self, tctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The cb_stop callback must always be implemented.</p>
+<p>Clean up resources previously allocated in the cb_init
+callback. This default implementation returnes the worker
+thread and socket pair to the pool of workers.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.dp.TransactionCallback"><code class="flex name class">
+<span>class <span class="ident">TransactionCallback</span></span>
+<span>(</span><span>state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Default transaction callback implementation class.</p>
+<p>When connecting data providers to ConfD/NCS a transaction callback
+handler must be provided. This class is a generic implementation of
+such a handler. It implements the only required callback 'cb_init'.</p>
+<p>Initialize a TransactionCallback object.</p>
+<p>The argument 'wsock' is the connected worker socket and 'log'
+is a log object.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.TransactionCallback.cb_finish"><code class="name flex">
+<span>def <span class="ident">cb_finish</span></span>(<span>self, tctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The cb_finish callback of TransactionCallback.</p>
+<p>This implementation returns worker socket associated with a
+worker thread from Daemon/state.</p></div>
+</dd>
+<dt id="confd.dp.TransactionCallback.cb_init"><code class="name flex">
+<span>def <span class="ident">cb_init</span></span>(<span>self, tctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The cb_init callback must always be implemented.</p>
+<p>It is required to prepare for future read/write operations towards
+the data source. This default implementation associates a worker
+socket with a transaction.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="confd.dp.ValidationError"><code class="flex name class">
+<span>class <span class="ident">ValidationError</span></span>
+<span>(</span><span>message)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Exception raised to indicate a failed validation</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="builtins.Exception" href="https://docs.python.org/3/library/typing.html#typing.builtins.Exception">builtins.Exception</a></li>
+<li><a title="builtins.BaseException" href="https://docs.python.org/3/library/typing.html#typing.builtins.BaseException">builtins.BaseException</a></li>
+</ul>
+</dd>
+<dt id="confd.dp.ValidationPoint"><code class="flex name class">
+<span>class <span class="ident">ValidationPoint</span></span>
+<span>(</span><span>daemon, validationpoint, log=None, init_args=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validation Point callback.</p>
+<p>This class makes it easy to create and register validation point
+callbacks by subclassing it and implementing cb_validate with the
+@validate or @validate_with_trans decorator.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="confd.dp.ValidationPoint.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator for the cb_validate callback.</p>
+<p>Using this decorator alters the signature of the cb_validate
+callback and passes in the validationpoint as the last
+argument.</p>
+<p>In addition it logs unhandled exceptions, handles
+ValidationError exception setting the transaction error and
+returns _tm.CONFD_ERR.</p>
+<p>Example of a decorated cb_validate:</p>
+<pre><code>@ValidationPoint.validate
+def cb_validate(self, tctx, keypath, value, validationpoint):
+    pass
+</code></pre>
+<p>Callback arguments:</p>
+<ul>
+<li>tctx - transaction context (TransCtxRef)</li>
+<li>kp &ndash; path to the node being validated (HKeypathRef)</li>
+<li>value &ndash; new value of keypath (Value)</li>
+<li>validationpoint - name of the validation point (str)</li>
+</ul></div>
+</dd>
+<dt id="confd.dp.ValidationPoint.validate_with_trans"><code class="name flex">
+<span>def <span class="ident">validate_with_trans</span></span>(<span>fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator for the cb_validate callback.</p>
+<p>Using this decorator alters the signature of the cb_validate
+callback and passes in root node attached to the transaction
+being validated and the validationpoint as the last argument.</p>
+<p>In addition it logs unhandled exceptions, handles
+ValidationError exception setting the transaction error and
+returns _tm.CONFD_ERR.</p>
+<p>Example of a decorated cb_validate:</p>
+<pre><code>@ValidationPoint.validate_with_trans
+def cb_validate(self, tctx, root, kp, value, validationpoint):
+    pass
+</code></pre>
+<p>Callback arguments:</p>
+<ul>
+<li>tctx - transaction context (TransCtxRef)</li>
+<li>root &ndash; root node (maagic.Root)</li>
+<li>kp &ndash; path to the node being validated (HKeypathRef)</li>
+<li>value &ndash; new value of keypath (Value)</li>
+<li>validationpoint - name of the validation point (str)</li>
+</ul></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="confd.dp.ValidationPoint.init"><code class="name flex">
+<span>def <span class="ident">init</span></span>(<span>self, init_args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Custom initialization.</p>
+<p>When registering a validation point using
+ncs.application.Application this method will be called with
+the 'init_args' passed into the register_validation()
+function.</p></div>
+</dd>
+<dt id="confd.dp.ValidationPoint.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start ValidationPoint</p></div>
+</dd>
+<dt id="confd.dp.ValidationPoint.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stop ValidationPoint</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="confd" href="index.html">confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="confd.dp.return_worker_socket" href="#confd.dp.return_worker_socket">return_worker_socket</a></code></li>
+<li><code><a title="confd.dp.take_worker_socket" href="#confd.dp.take_worker_socket">take_worker_socket</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="confd.dp.Action" href="#confd.dp.Action">Action</a></code></h4>
+<ul class="two-column">
+<li><code><a title="confd.dp.Action.action" href="#confd.dp.Action.action">action</a></code></li>
+<li><code><a title="confd.dp.Action.cb_init" href="#confd.dp.Action.cb_init">cb_init</a></code></li>
+<li><code><a title="confd.dp.Action.init" href="#confd.dp.Action.init">init</a></code></li>
+<li><code><a title="confd.dp.Action.rpc" href="#confd.dp.Action.rpc">rpc</a></code></li>
+<li><code><a title="confd.dp.Action.start" href="#confd.dp.Action.start">start</a></code></li>
+<li><code><a title="confd.dp.Action.stop" href="#confd.dp.Action.stop">stop</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.dp.Daemon" href="#confd.dp.Daemon">Daemon</a></code></h4>
+<ul class="">
+<li><code><a title="confd.dp.Daemon.INIT_RETRY_INTERVAL_S" href="#confd.dp.Daemon.INIT_RETRY_INTERVAL_S">INIT_RETRY_INTERVAL_S</a></code></li>
+<li><code><a title="confd.dp.Daemon.State" href="#confd.dp.Daemon.State">State</a></code></li>
+<li><code><a title="confd.dp.Daemon.ctx" href="#confd.dp.Daemon.ctx">ctx</a></code></li>
+<li><code><a title="confd.dp.Daemon.finish" href="#confd.dp.Daemon.finish">finish</a></code></li>
+<li><code><a title="confd.dp.Daemon.ip" href="#confd.dp.Daemon.ip">ip</a></code></li>
+<li><code><a title="confd.dp.Daemon.load_schemas" href="#confd.dp.Daemon.load_schemas">load_schemas</a></code></li>
+<li><code><a title="confd.dp.Daemon.path" href="#confd.dp.Daemon.path">path</a></code></li>
+<li><code><a title="confd.dp.Daemon.port" href="#confd.dp.Daemon.port">port</a></code></li>
+<li><code><a title="confd.dp.Daemon.register_trans_cb" href="#confd.dp.Daemon.register_trans_cb">register_trans_cb</a></code></li>
+<li><code><a title="confd.dp.Daemon.register_trans_validate_cb" href="#confd.dp.Daemon.register_trans_validate_cb">register_trans_validate_cb</a></code></li>
+<li><code><a title="confd.dp.Daemon.run" href="#confd.dp.Daemon.run">run</a></code></li>
+<li><code><a title="confd.dp.Daemon.start" href="#confd.dp.Daemon.start">start</a></code></li>
+<li><code><a title="confd.dp.Daemon.wsock" href="#confd.dp.Daemon.wsock">wsock</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.dp.StateManager" href="#confd.dp.StateManager">StateManager</a></code></h4>
+<ul class="">
+<li><code><a title="confd.dp.StateManager.setup" href="#confd.dp.StateManager.setup">setup</a></code></li>
+<li><code><a title="confd.dp.StateManager.teardown" href="#confd.dp.StateManager.teardown">teardown</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.dp.TransValidateCallback" href="#confd.dp.TransValidateCallback">TransValidateCallback</a></code></h4>
+<ul class="">
+<li><code><a title="confd.dp.TransValidateCallback.cb_init" href="#confd.dp.TransValidateCallback.cb_init">cb_init</a></code></li>
+<li><code><a title="confd.dp.TransValidateCallback.cb_stop" href="#confd.dp.TransValidateCallback.cb_stop">cb_stop</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.dp.TransactionCallback" href="#confd.dp.TransactionCallback">TransactionCallback</a></code></h4>
+<ul class="">
+<li><code><a title="confd.dp.TransactionCallback.cb_finish" href="#confd.dp.TransactionCallback.cb_finish">cb_finish</a></code></li>
+<li><code><a title="confd.dp.TransactionCallback.cb_init" href="#confd.dp.TransactionCallback.cb_init">cb_init</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="confd.dp.ValidationError" href="#confd.dp.ValidationError">ValidationError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="confd.dp.ValidationPoint" href="#confd.dp.ValidationPoint">ValidationPoint</a></code></h4>
+<ul class="">
+<li><code><a title="confd.dp.ValidationPoint.init" href="#confd.dp.ValidationPoint.init">init</a></code></li>
+<li><code><a title="confd.dp.ValidationPoint.start" href="#confd.dp.ValidationPoint.start">start</a></code></li>
+<li><code><a title="confd.dp.ValidationPoint.stop" href="#confd.dp.ValidationPoint.stop">stop</a></code></li>
+<li><code><a title="confd.dp.ValidationPoint.validate" href="#confd.dp.ValidationPoint.validate">validate</a></code></li>
+<li><code><a title="confd.dp.ValidationPoint.validate_with_trans" href="#confd.dp.ValidationPoint.validate_with_trans">validate_with_trans</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

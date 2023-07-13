@@ -1,0 +1,43 @@
+Building the Python API
+==================================
+
+This directory tree contains the source code needed to build the
+Python API.
+
+
+Requirements
+============
+
+The build requires gcc and GNU make and the development libraries
+for Python 3.7 or greater.
+
+It's also necessary to have access to a built libconfd library.
+
+
+Building
+========
+
+- Python >= 3.7 ConfD product
+
+  make confd-py3
+
+  Generates _confd/_confd_py3.abi3.so
+
+
+- Python >= 3.7 NCS product
+
+  make ncs-py3
+
+  Generates _ncs/_ncs_py3.abi3.so
+
+To build both ConfD and NCS versions just type make.
+
+Test-Suite
+==========
+
+The source is delivered with an extensive test-suite and are located
+in the test/lux directory.
+
+Lux is needed (https://github.com/hawk/lux) to run the tests.
+
+To run all tests do "make -C test/lux test"

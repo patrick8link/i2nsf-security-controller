@@ -1,0 +1,210 @@
+module datamodel {
+  namespace "http://tail-f.com/ns/example/datamodel";
+  prefix datamodel;
+
+  import ietf-yang-types { prefix yang; }
+  import tailf-common { prefix tailf; }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for XPath example
+       (C) 2019 Tail-f Systems
+
+       Permission to use this code as a starting point hereby granted
+       This is ConfD Sample Code.
+
+       See the README file for more information";
+
+  revision 2019-01-23 {
+    description "Initial revision.";
+  }
+
+  typedef status {
+    type enumeration {
+      enum UP;
+      enum DOWN;
+    }
+  }
+
+  grouping grouping_name_id {
+    leaf name {
+      type string;
+    }
+    leaf id {
+      // every id must be >= 10 (can achieve same with range,
+      // but we use must for XPath)
+      must "current() >= 10";
+      type uint32;
+    }
+  }
+
+  list device {
+    key name;
+    // check device name not set to specific value (use of not)
+    must "not(current()/name = \"badval\")";
+    // check device name does not contain sub-string
+    must "not(contains(current()/name, \"wrong\"))";
+    uses grouping_name_id;
+    // check if value starts with specific string
+    leaf "tailf-descr" {
+      must "starts-with(current(), \"Tailf\")" {
+        // error message to be reported if must statement fails
+        error-message "Must start with 'Tailf'!";
+      }
+      type string;
+    }
+    leaf info {
+      type string;
+    }
+  }
+
+  list device-info {
+    // make available only if some device is configured
+    when "../device";
+    // this is equivalent with (count is not needed and should be avoided in
+    // cases where we need existence check only):
+    // when "count(../device) != 0";
+    key name;
+    // NOTE: the must stament is active only after you start configuring
+    // device-info, if this is not enough you need to have must on
+    // `list device` as well
+
+    // number of instances must be same as device instances with info leaf
+    must "count(../device-info) = count(../device/info)";
+    leaf name {
+      type leafref {
+        path "../../device/info"; // reference to key values in sibling list
+      }
+    }
+    leaf info {
+      type string;
+    }
+  }
+
+  list rack {
+    key id;
+    uses grouping_name_id;
+    leaf weight {
+      // check weight is different from other leaf (key) of this instances
+      must "not(current() = current()/../id)";
+      // only height or weight can exist , parent::node() is quivalent to ..
+      when "not(parent::node()/height)";
+      type uint32;
+    }
+
+    container extra-config {
+        when "../id > 100000";
+        leaf color {
+            type enumeration {
+                enum black;
+                enum yellow;
+              }
+        }
+        leaf shade {
+            // this when is evaluated only if when in `extra-config` is true
+            when "../color = \"yellow\"";
+            type enumeration {
+                enum light;
+                enum dark;
+            }
+        }
+    }
+
+    leaf weight-unit {
+      // check weight-unit can be configured only if weight is configured
+      // (compare with when in height-unit - probably more appropriate than
+      // must statement)
+      must "../weight";
+      type enumeration {
+        enum kg;
+        enum lb;
+      }
+    }
+    leaf height {
+      // check height is different from any weight (in all instances)
+      must "not(../../rack[weight = current()])";
+      when "not(../weight)"; // only height or weight can exist
+      type uint32;
+    }
+    leaf height-unit {
+      // can be configured only if height exists
+      // (compare with must in weight-unit)
+      when "../height";
+      type enumeration {
+        enum cm;
+        enum in;
+      }
+    }
+    leaf rack-type {
+      type enumeration {
+        enum SMALL;
+        enum BIG;
+      }
+    }
+    leaf extra-info {
+      // display in CLI or WebUI only if rack-type is BIG (must be in ")
+      tailf:display-when "../rack-type = \"BIG\"";
+      type string;
+    }
+    // there can be at max. 2 devices (A type or B type) with admin-status UP,
+    // double slash goes down recursiveley (dependig on number of elements,
+    // this may be time consuming)
+    must "count(../rack//*[admin-status = 'UP']) <= 2" {
+      tailf:dependency ".";
+      error-message "There must be at maximum 2 devices with admin-status UP!";
+    }
+    grouping device-model {
+      leaf name {
+        type string;
+      }
+      leaf admin-status {
+        type status;
+      }
+    }
+    list device {
+      key name;
+      uses device-model;
+    }
+    container backup {
+      list device {
+        key name;
+        uses device-model;
+      }
+    }
+  }
+
+  list interfaces {
+    key name;
+    leaf name {
+      type string;
+    }
+    leaf vrf {
+      type string;
+    }
+  }
+
+  list service {
+    key name;
+    leaf name {
+      type string;
+    }
+    leaf interface {
+      type leafref {
+        path "../../interfaces/name";
+      }
+    }
+    leaf vrf {
+      type leafref {
+        // allow only vrf assigned to the interface.
+        // Note: in predicate there can be only [<key> = ... ]
+        // and only current() function is allowed
+        path "deref(../interface)/../vrf";
+        // equivalent to previous statement - see how deref simplifies XPath
+        // path "../../interfaces[name = current()/../interface]/vrf";
+      }
+    }
+  }
+}

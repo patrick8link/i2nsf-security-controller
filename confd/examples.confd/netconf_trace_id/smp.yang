@@ -1,0 +1,20 @@
+module smp {
+  namespace "urn:smp";
+  prefix smp;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  container servers {
+    list server {
+      key name;
+      leaf name {
+        type string;
+      }
+      leaf value {
+        type string;
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+Known issues in ConfD-8.0
+=========================
+
+- confd_str2val() (see confd_lib_lib(3)) and the corresponding functionality
+  in the Java API does not enforce the 'pattern' restriction for string
+  types.

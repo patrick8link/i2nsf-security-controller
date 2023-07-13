@@ -1,0 +1,98 @@
+module mtest {
+  namespace "http://tail-f.com/ns/example/mtest";
+  prefix mtest;
+
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Validation example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-12-06 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-05-20 {
+    description "Initial revision.";
+  }
+
+  container mtest {
+    leaf a-number {
+      type int64;
+      default 42;
+      tailf:validate vp1 {
+        tailf:dependency '../b-number';
+       /*  we need to be called if b-number changes.
+           since the validation point is under a-number, we will be
+           called if a-number changes also.  */
+
+      }
+    }
+    leaf b-number {
+      type int64;
+      default 7;
+    }
+    leaf c-number {
+      type int64;
+      default 10;
+      /*  this validation code will be called for every change  */
+      tailf:validate vp2 {
+      }
+    }
+    leaf d-number {
+      type int64;
+      default 20;
+    }
+  }
+  container container {
+    list x {
+      key name;
+      tailf:validate vp3 {
+        tailf:dependency '.';
+      }
+      leaf name {
+        type string;
+      }
+      leaf i {
+        type int32;
+        default 5;
+      }
+    }
+  }
+  container foo {
+    tailf:validate vp3 {
+        tailf:dependency '/container/x';
+    }
+  }
+  container dummy {
+    tailf:validate vp4 {
+        tailf:dependency '/vrf';
+    }
+  }
+  list vrf {
+    key id;
+    leaf id {
+      type int32;
+    }
+    leaf name {
+      type string;
+      mandatory true;
+    }
+  }
+}

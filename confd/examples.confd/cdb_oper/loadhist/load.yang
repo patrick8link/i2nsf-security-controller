@@ -1,0 +1,73 @@
+module load {
+  namespace "http://tail-f.com/ns/example/load";
+  prefix load;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Using CDB operational data store for history example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-30 {
+    description "Initial revision.";
+  }
+
+  container load {
+    config false;
+    tailf:cdb-oper {
+        tailf:persistent true;
+    }
+    list sample {
+      key time;
+      leaf time {
+        type yang:date-and-time;
+      }
+      leaf cpu-percent {
+        type cpu-percent;
+        mandatory true;
+      }
+      list average {
+        key minutes;
+        leaf minutes {
+          type int32;
+        }
+        leaf load {
+          type load-average;
+          mandatory true;
+        }
+      }
+    }
+  }
+  typedef cpu-percent {
+    type decimal64 {
+      fraction-digits 1;
+    }
+  }
+  typedef load-average {
+    type decimal64 {
+      fraction-digits 2;
+    }
+  }
+}

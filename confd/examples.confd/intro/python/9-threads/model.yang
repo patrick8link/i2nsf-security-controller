@@ -1,0 +1,76 @@
+module model {
+  namespace "http://tail-f.com/ns/example/model";
+  prefix model;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Using threads for a data provider example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-27 {
+    description "YANG header information updated";
+  }
+
+  revision 2011-03-01 {
+    description "Initial revision.";
+  }
+
+  container dm {
+    list proc {
+      config false;
+      tailf:callpoint proc;
+      key pid;
+      leaf pid {
+        type uint32;
+      }
+      leaf cpu {
+        type uint32;
+        mandatory true;
+      }
+    }
+    tailf:action sleep {
+      tailf:actionpoint sleep;
+      input {
+        leaf time {
+          type uint32;
+          mandatory true;
+        }
+      }
+      output {
+        leaf slept {
+          type uint32;
+          mandatory true;
+        }
+      }
+    }
+    tailf:action totals {
+      tailf:actionpoint totals;
+      output {
+        leaf num-procs {
+          type uint32;
+          mandatory true;
+        }
+        leaf total-cpu {
+          type uint32;
+          mandatory true;
+        }
+      }
+    }
+  }
+}

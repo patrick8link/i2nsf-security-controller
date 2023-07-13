@@ -1,0 +1,1928 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;25.&nbsp;The RESTCONF API</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch24.html" title="Chapter&nbsp;24.&nbsp;The web server"><link rel="next" href="ch26.html" title="Chapter&nbsp;26.&nbsp;The Management Agent API"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;25.&nbsp;The RESTCONF API</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch24.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch26.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.restconf"></a>Chapter&nbsp;25.&nbsp;The RESTCONF API</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch25.html#d5e12711">25.1. Introduction</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.getting_started">25.2. Getting started</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e12846">25.3. Root resource discovery</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e12870">25.4. Capabilities</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.query_params">25.5. Query Parameters</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.edit_collision">25.6. Edit Collision Prevention</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.using_rollbacks">25.7. Using Rollbacks</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.streams">25.8. Streams</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.schema.resource">25.9. Schema resource</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13348">25.10. YANG Patch Media Type</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13387">25.11. NMDA</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13405">25.12. Extensions</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.extensions.collections">25.13. Collections</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13428">25.14. The RESTCONF Query API</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.partial_response">25.15. Partial Responses</a></span></dt><dt><span class="sect1"><a href="ch25.html#ug.restconf.hidden_nodes">25.16. Hidden Nodes</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13590">25.17. Configuration Meta-Data</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13605">25.18. The Authentication Cache</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13620">25.19. Client IP via Proxy</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13632">25.20. External token authentication/validation</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13663">25.21. Custom Response HTTP Headers</a></span></dt><dt><span class="sect1"><a href="ch25.html#d5e13702">25.22. Generating Swagger for RESTCONF</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12711"></a>25.1.&nbsp;Introduction</h2></div></div></div><p>
+      RESTCONF is an HTTP based protocol as defined in <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt" target="_top"> RFC
+      8040</a>.
+      RESTCONF standardizes a mechanism to allow Web applications to
+      access the configuration data, state data, data-model-specific Remote
+      Procedure Call (RPC) operations, and event notifications within a
+      networking device.
+    </p><p>
+      RESTCONF uses HTTP methods to provide Create, Read, Update,
+      Delete (CRUD) operations on a conceptual datastore containing
+      YANG-defined data, which is compatible with a server that
+      implements NETCONF datastores as defined in
+      <a class="link" href="http://www.ietf.org/rfc/rfc6241.txt" target="_top">RFC 6241</a>
+    </p><p>
+      Configuration data and state data are exposed as resources that can
+      be retrieved with the GET method.  Resources representing
+      configuration data can be modified with the DELETE, PATCH, POST, and
+      PUT methods.  Data is encoded with either XML
+      (<a class="link" href="http://www.w3.org/TR/2008/REC-xml-20081126" target="_top">W3C.REC-xml-20081126</a>)
+      or
+      JSON (<a class="link" href="http://www.ietf.org/rfc/rfc6241.txt" target="_top">RFC 7159</a>)
+    </p><p>
+      This chapter describes the <span class="phrase">ConfD</span> implementation and
+      extension to or deviation from
+      <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt" target="_top">RFC 8040</a>
+      respectively.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.getting_started"></a>25.2.&nbsp;Getting started</h2></div></div></div><p>
+      In order to enable RESTCONF in <span class="phrase">ConfD</span>,
+      RESTCONF must be enabled in the
+      <code class="filename">confd.conf</code>
+      
+      configuration file. The web server configuration for RESTCONF
+      is shared with the WebUI's config, but you may define a separate RESTCONF
+      transport section.
+      The WebUI does not have to be enabled for RESTCONF to work.
+    </p><p>
+      Here is a minimal example of what is needed in the
+      <code class="filename">confd.conf</code>
+      .
+    </p><p>
+      </p><div class="example"><a name="d5e12731"></a><p class="title"><b>Example&nbsp;25.1.&nbsp;<span class="phrase">ConfD</span> configuration for RESTCONF</b></p><div class="example-contents"><pre class="screen">
+&lt;restconf&gt;
+  &lt;enabled&gt;true&lt;/enabled&gt;
+&lt;/restconf&gt;
+
+&lt;webui&gt;
+  &lt;transport&gt;
+    &lt;tcp&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;ip&gt;0.0.0.0&lt;/ip&gt;
+      &lt;port&gt;8008&lt;/port&gt;
+    &lt;/tcp&gt;
+  &lt;/transport&gt;
+&lt;/webui&gt;</pre></div></div><p><br class="example-break">
+    </p><p>
+      If you want to run RESTCONF with a different transport configuration
+      than what the WebUI is using, you can specify a separate RESTCONF
+      transport section.
+    </p><p>
+      </p><div class="example"><a name="d5e12737"></a><p class="title"><b>Example&nbsp;25.2.&nbsp;ConfD separate transport configuration for RESTCONF</b></p><div class="example-contents"><pre class="screen">
+&lt;restconf&gt;
+  &lt;enabled&gt;true&lt;/enabled&gt;
+  &lt;transport&gt;
+    &lt;tcp&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;ip&gt;0.0.0.0&lt;/ip&gt;
+      &lt;port&gt;8009&lt;/port&gt;
+    &lt;/tcp&gt;
+  &lt;/transport&gt;
+&lt;/restconf&gt;
+
+&lt;webui&gt;
+  &lt;enabled&gt;false&lt;/enabled&gt;
+  &lt;transport&gt;
+    &lt;tcp&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;ip&gt;0.0.0.0&lt;/ip&gt;
+      &lt;port&gt;8008&lt;/port&gt;
+    &lt;/tcp&gt;
+  &lt;/transport&gt;
+&lt;/webui&gt;</pre></div></div><p><br class="example-break">
+    </p><p>
+      It is now possible to do a RESTCONF requests towards
+      <span class="phrase">ConfD</span>.
+      Any HTTP client can be used, in the following examples
+      <span class="emphasis"><em>curl</em></span> will be used.
+      The example below will show how a typical RESTCONF request
+      could look like.
+    </p><p>
+      </p><div class="example"><a name="d5e12744"></a><p class="title"><b>Example&nbsp;25.3.&nbsp;A RESTCONF request using 'curl'</b></p><div class="example-contents"><pre class="screen">
+# Note that the command is wrapped in several lines in order to fit.
+#
+# The switch '-i' will include any HTTP reply headers in the output
+# and the '-s' will suppress some superflous output.
+#
+# The '-u' switch specify the User:Password for login authentication.
+#
+# The '-H' switch will add a HTTP header to the request; in this case
+# an 'Accept' header is added, requesting the preferred reply format.
+#
+# Finally, the complete URL to the wanted resource is specified,
+# in this case the top of the configuration tree.
+#
+curl -is -u admin:admin \
+-H "Accept: application/yang-data+xml" \
+http://localhost:8008/restconf/data</pre></div></div><p><br class="example-break">
+    </p><p>
+      In the rest of the document, in order to simplify the presentation, the
+      example above will be expressed as:
+    </p><p>
+      </p><div class="example"><a name="d5e12749"></a><p class="title"><b>Example&nbsp;25.4.&nbsp;A RESTCONF request, simplified</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data
+Accept: application/yang-data+xml
+
+# Any reply with relevant headers will be displayed here!
+HTTP/1.1 200 OK</pre></div></div><p><br class="example-break">
+    </p><p>
+      Note the HTTP return code (200 OK) in the example, which will be
+      displayed together with any relevant HTTP headers returned and
+      a possible body of content.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e12753"></a>25.2.1.&nbsp;Top-level GET request</h3></div></div></div><p>
+        Send a RESTCONF query to get a representation of the top-level
+        resource, which is accessible through the path:
+        <span class="emphasis"><em>/restconf</em></span>.
+      </p><p>
+        </p><div class="example"><a name="d5e12758"></a><p class="title"><b>Example&nbsp;25.5.&nbsp;A top-level RESTCONF request</b></p><div class="example-contents"><pre class="screen">
+GET /restconf
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;restconf xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"&gt;
+  &lt;data/&gt;
+  &lt;operations/&gt;
+  &lt;yang-library-version&gt;2019-01-04&lt;/yang-library-version&gt;
+&lt;/restconf&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        As can be seen from the result, the server exposes three additional
+        resources:
+      </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="emphasis"><em>data</em></span> : this mandatory resource represents
+            the combined configuration and state data resources that can be
+            accessed by a client.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>operations</em></span> : this optional resource is a
+            container that provides access to the data-model-specific
+            RPC operations supported by the server.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>yang-library-version</em></span> : this mandatory
+            leaf identifies the revision date of the "ietf-yang-library"
+            YANG module that is implemented by this server. This resource
+            exposes which YANG modules are in use by <span class="phrase">ConfD</span>
+            system.
+          </p></li></ul></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e12773"></a>25.2.2.&nbsp;Get resources under the <span class="emphasis"><em>data</em></span> resource</h3></div></div></div><p>
+        To fetch configuration, operational data, or both, from the server,
+        a request to the <span class="emphasis"><em>data</em></span> resource is made. In order
+        to restrict the amount of returned data, the following example will
+        prune the amount of output to only consist of the top most nodes.
+        This is achieved by using
+        the <span class="emphasis"><em>depth</em></span> query argument as shown in the example below:
+      </p><p>
+        </p><div class="example"><a name="d5e12780"></a><p class="title"><b>Example&nbsp;25.6.&nbsp;Get the top most resources under the <span class="emphasis"><em>data</em></span></b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data?depth=1
+Accept: application/yang-data+xml
+
+&lt;data xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"&gt;
+  &lt;yang-library xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"/&gt;
+  &lt;modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"/&gt;
+  &lt;dhcp xmlns="http://yang-central.org/ns/example/dhcp"/&gt;
+  &lt;nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm"/&gt;
+  &lt;netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"/&gt;
+  &lt;restconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring"/&gt;
+  &lt;aaa xmlns="http://tail-f.com/ns/aaa/1.1"/&gt;
+  &lt;confd-state xmls="http://tail-f.com/yang/confd-monitoring"/&gt;
+  &lt;last-logins xmlns="http://tail-f.com/yang/last-login"/&gt;
+&lt;/data&gt;</pre></div></div><p><br class="example-break">
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e12784"></a>25.2.3.&nbsp;Manipulating config data with RESTCONF</h3></div></div></div><p>
+        Let's assume we are interested in the <span class="emphasis"><em>dhcp/subnet</em></span>
+        resource in our configuration. In the following examples, assume
+        it is defined by a corresponding Yang module that we have named
+        <span class="emphasis"><em>dhcp.yang</em></span>, looking like this:
+      </p><p>
+        </p><div class="example"><a name="ug.restconf.example.yang.dhcp"></a><p class="title"><b>Example&nbsp;25.7.&nbsp;The <span class="emphasis"><em>dhcp.yang</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+&gt; yanger -f tree examples.confd/restconf/basic/dhcp.yang
+module: dhcp
+  +--rw dhcp
+  +--rw max-lease-time?       uint32
+  +--rw default-lease-time?   uint32
+  +--rw subnet* [net]
+  |  +--rw net               inet:ip-prefix
+  |  +--rw range!
+  |  |  +--rw dynamic-bootp?   empty
+  |  |  +--rw low              inet:ip-address
+  |  |  +--rw high             inet:ip-address
+  |  +--rw dhcp-options
+  |  |  +--rw router*        inet:host
+  |  |  +--rw domain-name?   inet:domain-name
+  |  +--rw max-lease-time?   uint32</pre></div></div><p><br class="example-break">
+      </p><p>
+        We can issue a HTTP GET request to
+        retrieve the value content of the resource. In this case we find
+        that there is no such data, which is indicated by the HTTP return
+        code <span class="emphasis"><em>204 No Content</em></span>.
+      </p><p>
+        Note also how we have prefixed the <span class="emphasis"><em>dhcp:dhcp</em></span> resource.
+        This is how RESTCONF handle namespaces, where the prefix
+        is the YANG module name and the namespace is as defined by the
+        <span class="emphasis"><em>namespace</em></span> statement in the YANG module.
+      </p><p>
+        </p><div class="example"><a name="d5e12800"></a><p class="title"><b>Example&nbsp;25.8.&nbsp;Get the <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/dhcp:dhcp/subnet
+
+HTTP/1.1 204 No Content</pre></div></div><p><br class="example-break">
+      </p><p>
+        We can now create the <span class="emphasis"><em>dhcp/subnet</em></span> resource by
+        sending a HTTP POST request + the data that we want to store.
+        Note the <span class="emphasis"><em>Content-Type</em></span> HTTP header, which indicates
+        the format of the provided body. Two formats is supported:
+        <span class="emphasis"><em>XML</em></span> or <span class="emphasis"><em>JSON</em></span>. In this example
+        we are using XML, which is indicated by the Content-Type value:
+        <span class="emphasis"><em>application/yang-data+xml</em></span>.
+      </p><p>
+        </p><div class="example"><a name="d5e12811"></a><p class="title"><b>Example&nbsp;25.9.&nbsp;Create a new <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+POST /restconf/data/dhcp:dhcp
+Content-Type: application/yang-data+xml
+
+&lt;subnet xmlns="http://yang-central.org/ns/example/dhcp"
+          xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;net&gt;10.254.239.0/27&lt;/net&gt;
+  &lt;range&gt;
+    &lt;dynamic-bootp/&gt;
+    &lt;low&gt;10.254.239.10&lt;/low&gt;
+    &lt;high&gt;10.254.239.20&lt;/high&gt;
+  &lt;/range&gt;
+  &lt;dhcp-options&gt;
+    &lt;router&gt;rtr-239-0-1.example.org&lt;/router&gt;
+    &lt;router&gt;rtr-239-0-2.example.org&lt;/router&gt;
+  &lt;/dhcp-options&gt;
+  &lt;max-lease-time&gt;1200&lt;/max-lease-time&gt;
+&lt;/subnet&gt;
+
+# If the resource is created, the server might respond as follows:
+
+HTTP/1.1 201 Created
+Location: http://localhost:8008/restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27
+  </pre></div></div><p><br class="example-break">
+      </p><p>
+        Note the HTTP return code (201 Created) indicating that the resource
+        was successfully created. We also got a <span class="emphasis"><em>Location</em></span>
+        header, which always is returned in a reply to a successful creation of
+        a resource, stating the resulting URI leading to the created resource.
+      </p><p>
+        If we now want to modify a part of our <span class="emphasis"><em>dhcp/subnet</em></span>
+        config, we can use the HTTP PATCH method, as shown below.
+        Note that the URI used in the request need to be URL-encoded,
+        such that the key value: <span class="emphasis"><em>10.254.239.0/27</em></span>
+        is URL-encoded as: <span class="emphasis"><em>10.254.239.0%2F27</em></span>.
+      </p><p>
+        Also, note the difference of the PATCH URI compared to the earlier
+        <span class="emphasis"><em>POST</em></span> request. With the latter, since the resource
+        does not yet exist, we POST to the parent resource
+        (<span class="emphasis"><em>dhcp:dhcp</em></span>),
+        while with the PATCH request we address the (existing) resource
+        (<span class="emphasis"><em>10.254.239.0%2F27</em></span>).
+      </p><p>
+        </p><div class="example"><a name="d5e12826"></a><p class="title"><b>Example&nbsp;25.10.&nbsp;Modify a part of the <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+PATCH /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27
+
+&lt;subnet&gt;
+  &lt;max-lease-time&gt;3333&lt;/max-lease-time&gt;
+&lt;/subnet&gt;
+
+# If our modification is successful, the server might respond as follows:
+
+HTTP/1.1 204 No Content</pre></div></div><p><br class="example-break">
+      </p><p>
+        We can also replace the subnet with some new configuration.
+        To do this we make use of the <span class="emphasis"><em>PUT</em></span> HTTP method
+        as shown below.
+        Since the operation was successful and no body was returned,
+        we will get a <span class="emphasis"><em>204 No Content</em></span> return code.
+      </p><p>
+        </p><div class="example"><a name="d5e12834"></a><p class="title"><b>Example&nbsp;25.11.&nbsp;Replace a <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+PUT /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27
+Content-Type: application/yang-data+xml
+
+&lt;subnet xmlns="http://yang-central.org/ns/example/dhcp"
+          xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;net&gt;10.254.239.0/27&lt;/net&gt;
+
+  &lt;!-- ...config left out here... --&gt;
+
+&lt;/subnet&gt;
+
+# At success, the server will respond as follows:
+
+HTTP/1.1 204 No Content</pre></div></div><p><br class="example-break">
+      </p><p>
+        To delete the subnet we make use of the
+        <span class="emphasis"><em>DELETE</em></span> HTTP method as shown below.
+        Since the operation was successful and no body was returned,
+        we will get a <span class="emphasis"><em>204 No Content</em></span> return code.
+      </p><p>
+        </p><div class="example"><a name="d5e12842"></a><p class="title"><b>Example&nbsp;25.12.&nbsp;Delete a <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+DELETE /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27
+
+HTTP/1.1 204 No Content</pre></div></div><p><br class="example-break">
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12846"></a>25.3.&nbsp;Root resource discovery</h2></div></div></div><p>
+      RESTCONF makes it possible to specify where the RESTCONF API is located,
+      as described in the RESTCONF <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt#section-3.1" target="_top">RFC
+      8040</a>.
+    </p><p>
+      As per default, the RESTCONF API root is <span class="emphasis"><em>/restconf</em></span>.
+      Typically there is no need to change the default value although it is
+      possible to change this by configuring the RESTCONF API root in the
+      <code class="filename">confd.conf</code>
+      
+      file as:
+    </p><p>
+      </p><div class="example"><a name="d5e12854"></a><p class="title"><b>Example&nbsp;25.13.&nbsp;<span class="phrase">ConfD</span> configuration for RESTCONF</b></p><div class="example-contents"><pre class="screen">
+&lt;restconf&gt;
+  &lt;enabled&gt;true&lt;/enabled&gt;
+  &lt;rootResource&gt;my_own_restconf_root&lt;/rootResource&gt;
+&lt;/restconf&gt;</pre></div></div><p><br class="example-break">
+    </p><p>
+      The RESTCONF API root will now be
+      <span class="emphasis"><em>/my_own_restconf_root</em></span>.
+    </p><p>
+      A client may discover the root resource by getting the
+      <span class="emphasis"><em>/.well-known/host-meta</em></span> resource
+      as shown in the example below:
+    </p><p>
+      </p><div class="example"><a name="d5e12863"></a><p class="title"><b>Example&nbsp;25.14.&nbsp;Example returning <span class="emphasis"><em>/restconf</em></span></b></p><div class="example-contents"><pre class="screen">
+   The client might send the following:
+
+      GET /.well-known/host-meta
+      Accept: application/xrd+xml
+
+   The server might respond as follows:
+
+      HTTP/1.1 200 OK
+
+      &lt;XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'&gt;
+          &lt;Link rel='restconf' href='/restconf'/&gt;
+      &lt;/XRD&gt;</pre></div></div><p><br class="example-break">
+    </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+        In this document, all examples will assume the RESTCONF API root to be
+        <span class="emphasis"><em>/restconf</em></span>.
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12870"></a>25.4.&nbsp;Capabilities</h2></div></div></div><p>
+      A RESTCONF capability is a set of functionality that supplements the
+      base RESTCONF specification. The capability is identified by a
+      uniform resource identifier
+      <a class="link" href="http://www.ietf.org/rfc/rfc3986.txt" target="_top">(URI)</a>.
+      The RESTCONF server includes a <span class="emphasis"><em>capability</em></span>
+      URI leaf-list entry identifying each supported protocol
+      feature. This include the <span class="emphasis"><em>basic-mode</em></span>
+      default-handling mode, optional query parameters and may also include
+      other, <span class="phrase">ConfD</span> specific, capability URIs.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.restconf.capabilities"></a>25.4.1.&nbsp;How to view the capabilities of the RESTCONF server</h3></div></div></div><p>
+        To view currently enabled capabilities, use the
+        ietf-restconf-monitoring YANG model, which is available as:
+        <span class="emphasis"><em>/restconf/data/ietf-restconf-monitoring:restconf-state
+        </em></span>.
+      </p><p>
+        </p><div class="example"><a name="ug.restconf.example.capabilities"></a><p class="title"><b>Example&nbsp;25.15.&nbsp;<span class="phrase">ConfD</span> RESTCONF capabilities</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/ietf-restconf-monitoring:restconf-state
+Host: example.com
+Accept: application/yang-data+xml
+
+&lt;restconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring"
+  xmlns:rcmon="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring"&gt;
+&lt;capabilities&gt;
+  &lt;capability&gt;
+    urn:ietf:params:restconf:capability:defaults:1.0?basic-mode=explicit
+  &lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:depth:1.0&lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:fields:1.0&lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:with-defaults:1.0&lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:filter:1.0&lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:replay:1.0&lt;/capability&gt;
+  &lt;capability&gt;http://tail-f.com/ns/restconf/collection/1.0&lt;/capability&gt;
+  &lt;capability&gt;http://tail-f.com/ns/restconf/query-api/1.0&lt;/capability&gt;
+  &lt;capability&gt;http://tail-f.com/ns/restconf/partial-response/1.0&lt;/capability&gt;
+  &lt;capability&gt;http://tail-f.com/ns/restconf/unhide/1.0&lt;/capability&gt;
+  &lt;capability&gt;urn:ietf:params:restconf:capability:with-origin:1.0&lt;/capability&gt;
+&lt;/capabilities&gt;
+&lt;/restconf-state&gt;</pre></div></div><p><br class="example-break">
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e12886"></a>25.4.2.&nbsp;The <span class="emphasis"><em>defaults</em></span> capability</h3></div></div></div><p>
+        This Capability identifies the <span class="emphasis"><em>basic-mode</em></span>
+        default-handling mode that is used by the server for processing
+        default leafs in requests for data resources.
+      </p><p>
+        </p><div class="example"><a name="d5e12892"></a><p class="title"><b>Example&nbsp;25.16.&nbsp;The default capability URI</b></p><div class="example-contents"><pre class="screen">
+          urn:ietf:params:restconf:capability:defaults:1.0</pre></div></div><p><br class="example-break">
+      </p><p>
+        The capability URL will contain a query parameter named
+        <span class="emphasis"><em>basic-mode</em></span> which value tells us what
+        the default behaviour of the RESTCONF server is when it
+        returns a leaf. The possible values are shown in the table below:
+      </p><div class="table"><a name="d5e12897"></a><p class="title"><b>Table&nbsp;25.1.&nbsp;<span class="emphasis"><em>basic-mode</em></span> values</b></p><div class="table-contents"><table summary="basic-mode values" border="0"><colgroup><col align="left" class="c1" width="25%"><col width="75%" align="left" class="c2"></colgroup><thead><tr><th align="left">Value</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">report-all</td><td align="left">Values set to the YANG default value are reported.</td></tr><tr><td align="left">trim</td><td align="left">Values set to the YANG default value are not
+              reported.</td></tr><tr><td align="left">explicit</td><td align="left">Values that has been set by a client to the YANG default
+              value will be reported.</td></tr></tbody></table></div></div><br class="table-break"><p>
+        The values presented in the table above can also be used by the Client
+        together with the <span class="emphasis"><em>with-defaults</em></span> query parameter
+        in order to override the default RESTCONF server behaviour. Added to
+        these values, the Client can also use the
+        <span class="emphasis"><em>report-all-tagged</em></span> value.
+      </p><div class="table"><a name="d5e12920"></a><p class="title"><b>Table&nbsp;25.2.&nbsp;Additional <span class="emphasis"><em>with-defaults</em></span> value</b></p><div class="table-contents"><table summary="Additional with-defaults value" border="0"><colgroup><col align="left" class="c1" width="25%"><col width="75%" align="left" class="c2"></colgroup><thead><tr><th align="left">Value</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">report-all-tagged</td><td align="left">Works as the <span class="emphasis"><em>report-all</em></span> but a default
+              value will include a XML/JSON attribute to indicate that the
+              value is in fact a default value.</td></tr></tbody></table></div></div><br class="table-break"><p>
+        Refering back to the example:
+        <a class="xref" href="ch25.html#ug.restconf.example.capabilities" title="Example&nbsp;25.15.&nbsp;ConfD RESTCONF capabilities">Example&nbsp;25.15, &#8220;<span class="phrase">ConfD</span> RESTCONF capabilities&#8221;</a>,
+        where the RESTCONF server returned the default capability:
+      </p><pre class="screen">
+urn:ietf:params:restconf:capability:defaults:1.0?basic-mode=explicit</pre><p>
+        It tells us that values that has been set by a client to the
+        YANG default value will be reported but default values that
+        has not been set by the Client will not be returned. Again, note
+        that this is the default RESTCONF server behaviour which can be
+        overridden by the Client by using the <span class="emphasis"><em>with-defaults</em></span>
+        query argument.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e12940"></a>25.4.3.&nbsp;Query parameter capabilities</h3></div></div></div><p>
+        A set of optional RESTCONF Capability URIs are defined to identify
+        the specific query parameters that are supported by the server.
+        Note that capabilities that begin with:
+        <span class="emphasis"><em>urn:ietf:params:restconf</em></span> are defined by the RFC,
+        while capabilities that begin with:
+        <span class="emphasis"><em>http://tail-f.com/ns/restconf</em></span> are specific for
+        ConfD
+        They are defined as:
+      </p><div class="table"><a name="d5e12945"></a><p class="title"><b>Table&nbsp;25.3.&nbsp;Query parameter capabilities</b></p><div class="table-contents"><table summary="Query parameter capabilities" border="0"><colgroup><col align="left" class="c1" width="25%"><col width="75%" align="left" class="c2"></colgroup><thead><tr><th align="left">Name</th><th align="left">URI</th></tr></thead><tbody><tr><td align="left">depth</td><td align="left">urn:ietf:params:restconf:capability:depth:1.0</td></tr><tr><td align="left">fields</td><td align="left">urn:ietf:params:restconf:capability:fields:1.0</td></tr><tr><td align="left">filter</td><td align="left">urn:ietf:params:restconf:capability:filter:1.0</td></tr><tr><td align="left">replay</td><td align="left">urn:ietf:params:restconf:capability:replay:1.0</td></tr><tr><td align="left">with.defaults</td><td align="left">urn:ietf:params:restconf:capability:with.defaults:1.0</td></tr><tr><td align="left">with-origin</td><td align="left">urn:ietf:params:restconf:capability:with-origin:1.0</td></tr></tbody></table></div></div><br class="table-break"><p>
+        For a description of the query parameter functionality see
+        the chapter
+        <a class="xref" href="ch25.html#ug.restconf.query_params" title="25.5.&nbsp;Query Parameters">Section&nbsp;25.5, &#8220;Query Parameters&#8221;</a> .
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.query_params"></a>25.5.&nbsp;Query Parameters</h2></div></div></div><p>
+      Each RESTCONF operation allows zero or more query parameters to be
+      present in the request URI. Query parameters can be given in any order,
+      but can appear at most once. The defined query parameters and in what
+      type of HTTP request they can be used are shown in the table below:
+    </p><div class="table"><a name="d5e12978"></a><p class="title"><b>Table&nbsp;25.4.&nbsp;Query parameters</b></p><div class="table-contents"><table summary="Query parameters" border="0"><colgroup><col align="left" class="c1" width="20%"><col align="left" class="c2" width="20%"><col width="60%" align="left" class="c3"></colgroup><thead><tr><th align="left">Name</th><th align="left">Method</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">content</td><td align="left">GET,HEAD</td><td align="left">Select config and/or non-config data resources.</td></tr><tr><td align="left">depth</td><td align="left">GET,HEAD</td><td align="left">Request limited subtree depth in the reply content.</td></tr><tr><td align="left">fields</td><td align="left">GET,HEAD</td><td align="left">Request a subset of the target resource contents.</td></tr><tr><td align="left">filter</td><td align="left">GET,HEAD</td><td align="left">Boolean notification filter for event stream resources.</td></tr><tr><td align="left">insert</td><td align="left">POST,PUT</td><td align="left">Insertion mode for <span class="emphasis"><em>ordered-by user</em></span>
+            data resources</td></tr><tr><td align="left">point</td><td align="left">POST,PUT</td><td align="left">Insertion point for <span class="emphasis"><em>ordered-by user</em></span>
+            data resources</td></tr><tr><td align="left">start-time</td><td align="left">GET,HEAD</td><td align="left">Replay buffer start time for event stream resources.</td></tr><tr><td align="left">stop-time</td><td align="left">GET,HEAD</td><td align="left">Replay buffer stop time for event stream resources.</td></tr><tr><td align="left">with-defaults</td><td align="left">GET,HEAD</td><td align="left">Control the retrieval of default values.</td></tr><tr><td align="left">with-origin</td><td align="left">GET</td><td align="left">Include origin metadata annotations.</td></tr></tbody></table></div></div><br class="table-break"><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13032"></a>25.5.1.&nbsp;The <span class="emphasis"><em>content</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>content</em></span> query parameter controls
+        if <span class="emphasis"><em>configuration</em></span>,
+        <span class="emphasis"><em>non-configuration</em></span> or both types of data
+        should be returned.
+      </p><p>
+        The allowed values are:
+      </p><div class="table"><a name="d5e13040"></a><p class="title"><b>Table&nbsp;25.5.&nbsp;The <span class="emphasis"><em>content</em></span> query parameter values</b></p><div class="table-contents"><table summary="The content query parameter values" border="0"><colgroup><col align="left" class="c1" width="25%"><col width="75%" align="left" class="c3"></colgroup><thead><tr><th align="left">Value</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">config</td><td align="left">Return only configuration descendant data nodes.</td></tr><tr><td align="left">nonconfig</td><td align="left">Return only non-configuration descendant data nodes.</td></tr><tr><td align="left">all</td><td align="left">Return all descendant data nodes.</td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13060"></a>25.5.2.&nbsp;The <span class="emphasis"><em>depth</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>depth</em></span> query parameter is used to limit
+        the depth of subtrees returned by the server. Data nodes with a
+        value greater than the <span class="emphasis"><em>depth</em></span> parameter are
+        not returned in a response for a GET request.
+      </p><p>
+        The value of the <span class="emphasis"><em>depth</em></span> parameter is either
+        an integer between 1 and 65535 or the string "unbounded".
+        The default value is: "unbounded".
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13068"></a>25.5.3.&nbsp;The <span class="emphasis"><em>fields</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>fields</em></span> query parameter is used to
+        optionally identify data nodes within the target resource
+        to be retrieved in a GET method. The client can use this
+        parameter to retrieve a subset of all nodes in a resource.
+      </p><p>
+        For a full definition of the <span class="emphasis"><em>fields</em></span>
+        value can be constructed, refer to the
+        <a class="link" href="https://tools.ietf.org/html/rfc8040#section-4.8.3" target="_top">
+          RFC 8040, chapter: 4.8.3</a>.
+      </p><p>
+        </p><div class="example"><a name="d5e13077"></a><p class="title"><b>Example&nbsp;25.17.&nbsp;Example of how to use the <span class="emphasis"><em>fields</em></span> query parameter</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/dhcp:dhcp?fields=subnet/range(low;high)
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;dhcp xmlns="http://yang-central.org/ns/example/dhcp" \
+      xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;subnet&gt;
+    &lt;range&gt;
+      &lt;low&gt;10.254.239.10&lt;/low&gt;
+      &lt;high&gt;10.254.239.20&lt;/high&gt;
+    &lt;/range&gt;
+  &lt;/subnet&gt;
+  &lt;subnet&gt;
+    &lt;range&gt;
+      &lt;low&gt;10.254.244.10&lt;/low&gt;
+      &lt;high&gt;10.254.244.20&lt;/high&gt;
+    &lt;/range&gt;
+  &lt;/subnet&gt;
+&lt;/dhcp&gt;</pre></div></div><p><br class="example-break">
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13081"></a>25.5.4.&nbsp;The <span class="emphasis"><em>filter</em></span>, <span class="emphasis"><em>start-time</em></span>
+      and <span class="emphasis"><em>stop-time</em></span> Query Parameters</h3></div></div></div><p>
+        These query parameters are only allowed on an event stream
+        resource and is further described in the chapter:
+        <a class="xref" href="ch25.html#ug.restconf.streams" title="25.8.&nbsp;Streams">Section&nbsp;25.8, &#8220;Streams&#8221;</a> .
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13088"></a>25.5.5.&nbsp;The <span class="emphasis"><em>insert</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>insert</em></span> query parameters is used to specify
+        how a resource should be inserted within an
+        <span class="emphasis"><em>ordered-by user</em></span> list.
+        The allowed values are as shown in the table below.
+      </p><div class="table"><a name="d5e13094"></a><p class="title"><b>Table&nbsp;25.6.&nbsp;The <span class="emphasis"><em>content</em></span> query parameter values</b></p><div class="table-contents"><table summary="The content query parameter values" border="0"><colgroup><col align="left" class="c1" width="25%"><col width="75%" align="left" class="c3"></colgroup><thead><tr><th align="left">Value</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">first</td><td align="left">Insert the new data as the new first entry.</td></tr><tr><td align="left">last</td><td align="left">
+                Insert the new data as the new last entry.
+                This is the <span class="emphasis"><em>default value</em></span>.
+              </td></tr><tr><td align="left">before</td><td align="left">
+                Insert the new data before the insertion point, as
+                specified by the value of the <span class="emphasis"><em>point</em></span>
+                parameter.
+              </td></tr><tr><td align="left">after</td><td align="left">
+                Insert the new data after the insertion point, as
+                specified by the value of the <span class="emphasis"><em>point</em></span>
+                parameter.
+              </td></tr></tbody></table></div></div><br class="table-break"><p>
+        This parameter is only valid if the target data represents a
+        YANG list or leaf-list that is <span class="emphasis"><em>ordered-by user</em></span>.
+        In the example below we will insert a new <span class="emphasis"><em>router</em></span>
+        value, first, in the <span class="emphasis"><em>ordered-by user</em></span> leaf-list of
+        <span class="emphasis"><em>dhcp-options/router</em></span> values. Remember that the
+        default behaviour is for new entries to be inserted last in an
+        <span class="emphasis"><em>ordered-by user</em></span> leaf-list.
+      </p><p>
+        </p><div class="example"><a name="d5e13127"></a><p class="title"><b>Example&nbsp;25.18.&nbsp;Insert <span class="emphasis"><em>first</em></span> into a <span class="emphasis"><em>ordered-by user</em></span> leaf-list</b></p><div class="example-contents"><pre class="screen">
+# Note: we have to split the POST line in order to fit the page
+POST /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options?\
+     insert=first
+Content-Type: application/yang-data+xml
+
+&lt;router&gt;one.acme.org&lt;/router&gt;
+
+# If the resource is created, the server might respond as follows:
+
+HTTP/1.1 201 Created
+Location /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options/\
+         router=one.acme.org</pre></div></div><p><br class="example-break">
+      </p><p>
+        To verify that the router value really ended up first:
+      </p><pre class="screen">
+GET /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;dhcp-options xmlns="http://yang-central.org/ns/example/dhcp"
+              xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;router&gt;one.acme.org&lt;/router&gt;
+  &lt;router&gt;rtr-239-0-1.example.org&lt;/router&gt;
+  &lt;router&gt;rtr-239-0-2.example.org&lt;/router&gt;
+&lt;/dhcp-options&gt;</pre></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13134"></a>25.5.6.&nbsp;The <span class="emphasis"><em>point</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>point</em></span> query parameters is used to specify
+        the insertion point
+        for a data resource that is being created or moved within an
+        <span class="emphasis"><em>ordered-by user</em></span> list or leaf-list.
+        In the example below we will insert the new <span class="emphasis"><em>router</em></span>
+        value: <span class="emphasis"><em>two.acme.org</em></span>, after the first value:
+        <span class="emphasis"><em>one.acme.org</em></span> in the
+        <span class="emphasis"><em>ordered-by user</em></span> leaf-list of
+        <span class="emphasis"><em>dhcp-options/router</em></span> values.
+      </p><p>
+        </p><div class="example"><a name="d5e13146"></a><p class="title"><b>Example&nbsp;25.19.&nbsp;Insert <span class="emphasis"><em>first</em></span> into a <span class="emphasis"><em>ordered-by user</em></span> leaf-list</b></p><div class="example-contents"><pre class="screen">
+# Note: we have to split the POST line in order to fit the page
+POST /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options?\
+     insert=after&amp;\
+     point=/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options/router=one.acme.org
+Content-Type: application/yang-data+xml
+
+&lt;router&gt;two.acme.org&lt;/router&gt;
+
+# If the resource is created, the server might respond as follows:
+
+HTTP/1.1 201 Created
+Location /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options/\
+         router=one.acme.org</pre></div></div><p><br class="example-break">
+      </p><p>
+        To verify that the router value really ended up after our
+        insertion point:
+      </p><pre class="screen">
+GET /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/dhcp-options
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;dhcp-options xmlns="http://yang-central.org/ns/example/dhcp"
+              xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;router&gt;one.acme.org&lt;/router&gt;
+  &lt;router&gt;two.acme.org&lt;/router&gt;
+  &lt;router&gt;rtr-239-0-1.example.org&lt;/router&gt;
+  &lt;router&gt;rtr-239-0-2.example.org&lt;/router&gt;
+&lt;/dhcp-options&gt;</pre></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13153"></a>25.5.7.&nbsp;The <span class="emphasis"><em>with-origin</em></span> Query Parameter</h3></div></div></div><p>
+        The <span class="emphasis"><em>with-origin</em></span> capability is advertised
+        if the origin feature is enabled which can be done in
+        <code class="filename">confd.conf</code>
+         (see
+        <a class="xref" href="rn03re17.html" title="confd.conf"><span class="refentrytitle">confd.conf</span>(5)</a>
+        ). If it is enabled and the
+        <span class="emphasis"><em>with-origin</em></span> query parameter is present,
+        then the server includes the origin metadata annotation in the
+        response. The parameter is only valid when querying
+        operational state datastore which is available as:
+        <span class="emphasis"><em>restconf/ds/ietf-datastores:operational</em></span>.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13162"></a>25.5.8.&nbsp;Additional query parameters</h3></div></div></div><p>
+        There are additional ConfD query parameters available for
+        the RESTCONF API. These additional query parameters are
+        described below.
+      </p><div class="table"><a name="d5e13165"></a><p class="title"><b>Table&nbsp;25.7.&nbsp;Additional Query Parameters</b></p><div class="table-contents"><table summary="Additional Query Parameters" border="0"><colgroup><col align="left" class="c1" width="20%"><col align="left" class="c2" width="20%"><col width="60%" align="left" class="c3"></colgroup><thead><tr><th align="left">Name</th><th align="left">Methods</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">limit</td><td align="left">GET</td><td align="left">
+                Used by the client to specify a limited set of list
+                entries to retrieve.
+                The value of the <span class="emphasis"><em>limit</em></span> parameter is
+                either an integer greater than
+                or equal to 1, or the string <span class="emphasis"><em>unbounded</em></span>.
+                The string <span class="emphasis"><em>unbounded</em></span> is
+                the default value.
+                See <a class="xref" href="ch25.html#ug.restconf.partial_response" title="25.15.&nbsp;Partial Responses">Section&nbsp;25.15, &#8220;Partial Responses&#8221;</a> for an example.
+              </td></tr><tr><td align="left">offset</td><td align="left">GET</td><td align="left">
+                Used by the client to specify the number of list elements to
+                skip before returning the requested set of list entries.
+                The value of the "offset" parameter is an integer greater than
+                or equal to 0. The default value is 0.
+                See <a class="xref" href="ch25.html#ug.restconf.partial_response" title="25.15.&nbsp;Partial Responses">Section&nbsp;25.15, &#8220;Partial Responses&#8221;</a> for an example.
+              </td></tr><tr><td align="left">rollback-comment</td><td align="left">POST, PUT, PATCH, DELETE</td><td align="left">
+                Used to specify a comment to be attached to the Rollback File
+                that will be created as a result of the POST operation.
+                This assume that Rollback File handling is enabled.
+              </td></tr><tr><td align="left">rollback-label</td><td align="left">POST, PUT, PATCH, DELETE</td><td align="left">
+                Used to specify a label to be attached to the Rollback File
+                that will be created as a result of the POST operation.
+                This assume that Rollback File handling is enabled.
+              </td></tr><tr><td align="left">rollback-id</td><td align="left">POST, PUT, PATCH, DELETE</td><td align="left">
+                Return the rollback id in the response if a rollback
+                file was created during this operation. This requires
+                rollbacks to be enabled in the ConfD to take
+                effect.
+              </td></tr></tbody></table></div></div><br class="table-break"></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.edit_collision"></a>25.6.&nbsp;Edit Collision Prevention</h2></div></div></div><p>
+      Two edit collision detection and prevention mechanisms are provided
+      in RESTCONF for the datastore resource: a timestamp and an
+      entity-tag.  Any change to configuration data resources will update the
+      timestamp and entity-tag of the datastore resource. This makes it
+      possible for a client to apply precondition HTTP headers to a
+      request.
+    </p><p>
+      The ConfD RESTCONF API honor the following HTTP response headers:
+      <span class="emphasis"><em>Etag</em></span> and
+      <span class="emphasis"><em>Last-Modified</em></span>, and the
+      following request headers: <span class="emphasis"><em>If-Match</em></span>,
+      <span class="emphasis"><em>If-None-Match</em></span>, <span class="emphasis"><em>If-Modified-Since</em></span>
+      and <span class="emphasis"><em>If-Unmodified-Since</em></span>.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13212"></a>25.6.1.&nbsp;Response headers</h3></div></div></div><p>
+        </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              <code class="code">Etag</code>: This header will contain an
+              <span class="emphasis"><em>entity-tag</em></span> which is an opaque string
+              representing the latest transaction identifier in the
+              ConfD database. This header is only available for the
+              <span class="emphasis"><em>running</em></span> datastore and hence, only
+              relates to configuration data (non-operational).
+            </p></li><li class="listitem"><p>
+              <code class="code">Last-Modified</code>: This header contains the
+              timestamp for the last modification made to the
+              ConfD database. This timestamp can be used by a
+              RESTCONF client in subsequent requests, within the
+              <span class="emphasis"><em>If-Modified-Since</em></span> and
+              <span class="emphasis"><em>If-Unmodified-Since</em></span> header fields.
+              This header is only available for the
+              <span class="emphasis"><em>running</em></span> datastore and hence, only
+              relates to configuration data (non-operational).
+            </p></li></ul></div><p>
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13227"></a>25.6.2.&nbsp;Request headers</h3></div></div></div><p>
+        </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              <code class="code">If-None-Match</code>: This header evaluates to true
+              if the supplied value does not match the latest
+              <span class="emphasis"><em>Etag</em></span> entity-tag value.
+              If evaluated to false an error
+              response with status 304 (Not Modified) will be sent with
+              no body. This header carry only meaning if the entity-tag of the
+              <span class="emphasis"><em>Etag</em></span> response header has previously been
+              acquired.
+            </p><p>
+              The usage of this could for example be a HEAD
+              operation to get information if the data has changed since
+              last retrieval.
+            </p></li><li class="listitem"><p>
+              <code class="code">If-Modified-Since</code>: This request-header field
+              is used with a HTTP method to make it conditional, i.e
+              if the requested resource has not been modified since the
+              time specified in this field, the request will not be
+              processed by the RESTCONF server; instead,
+              a 304 (Not Modified) response
+              will be returned without any message-body.
+            </p><p>
+              Usage of this is for instance for a GET
+              operation to retrieve the information if (and only if) the
+              data has changed since last retrieval.
+              Thus, this header should use the value of a
+              <span class="emphasis"><em>Last-Modified</em></span> response header that
+              has previously been acquired.
+            </p></li><li class="listitem"><p>
+              <code class="code">If-Match</code>: This header evaluates to true
+              if the supplied value matches the latest
+              <span class="emphasis"><em>Etag</em></span> value. If evaluated to false an error
+              response with status 412 (Precondition Failed) will be sent with
+              no body.
+              This header carry only meaning if the entity-tag of the
+              <span class="emphasis"><em>Etag</em></span> response header has previously been
+              acquired.
+            </p><p>
+              The usage of this can be in case of a PUT, where
+              <span class="emphasis"><em>If-Match</em></span> can be used to prevent the lost
+              update problem. It can check if the modification of a resource
+              that the user wants to upload will not override another change
+              that has been done since the original resource was fetched.
+            </p></li><li class="listitem"><p>
+              <code class="code">If-Unmodified-Since</code>: This header evaluates to true
+              if the supplied value has not been last modified after the given
+              date. If the resource has been modified after the given date,
+              the response will be a 412 (Precondition Failed) error
+              with no body.
+              This header carry only meaning if the
+              <code class="code">Last-Modified</code> response header has previously been
+              acquired.
+            </p><p>
+              The usage of this can be the case of a POST, where editions
+              are rejected if the stored resource has been modified since
+              the original value was retrieved.
+            </p></li></ul></div><p>
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.using_rollbacks"></a>25.7.&nbsp;Using Rollbacks</h2></div></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13256"></a>25.7.1.&nbsp;Rolling back configuration changes</h3></div></div></div><p>
+        If rollbacks have been enabled in the configuration using the
+        <span class="emphasis"><em>rollback-id</em></span> query parameter, the fixed id
+        of the rollback file creating during an operation is returned
+        in the results. The below examples shows creation of a new
+        resource and removal of that resource using the rollback
+        created in the first step.
+
+        </p><div class="example"><a name="d5e13260"></a><p class="title"><b>Example&nbsp;25.20.&nbsp;Create a new <span class="emphasis"><em>dhcp/subnet</em></span> resource</b></p><div class="example-contents"><pre class="screen">
+POST /restconf/data/dhcp:dhcp?rollback-id=true
+Content-Type: application/yang-data+xml
+
+&lt;subnet xmlns="http://yang-central.org/ns/example/dhcp"&gt;
+  &lt;net&gt;10.254.239.0/27&lt;/net&gt;
+&lt;/subnet&gt;
+
+HTTP/1.1 201 Created
+Location: http://localhost:8008/restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27
+
+&lt;result xmlns="http://tail-f.com/ns/tailf-restconf"&gt;
+&lt;rollback&gt;
+  &lt;id&gt;10002&lt;/id&gt;
+&lt;/rollback&gt;
+&lt;/result&gt;
+</pre></div></div><p><br class="example-break">
+
+        Then using the fixed id returned above as input to the
+        <span class="emphasis"><em>apply-rollback-file</em></span> action:
+
+        </p><div class="example"><a name="d5e13265"></a><p class="title"><b>Example&nbsp;25.21.&nbsp;</b></p><div class="example-contents"><pre class="screen">
+POST /restconf/data/tailf-rollback:rollback-files/apply-rollback-file
+Content-Type: application/yang-data+xml
+
+&lt;input xmlns="http://tail-f.com/ns/rollback"&gt;
+  &lt;fixed-number&gt;10002&lt;/fixed-number&gt;
+&lt;/input&gt;
+
+HTTP/1.1 204 No Content
+</pre></div></div><p><br class="example-break">
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.streams"></a>25.8.&nbsp;Streams</h2></div></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13269"></a>25.8.1.&nbsp;Introduction</h3></div></div></div><p>
+        The RESTCONF protocol supports YANG-defined event notifications.  The
+        solution preserves aspects of NETCONF event notifications [RFC5277]
+        while utilizing the Server-Sent Events,
+        <a class="link" href="http://www.w3.org/TR/2015/REC-eventsource-20150203" target="_top">
+        W3C.REC-eventsource-20150203</a>,
+        transport strategy.
+      </p><p>
+        RESTCONF event notification streams are described in Sections 6
+        and 9.2 of
+        <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt" target="_top">RFC 8040</a>,
+        where also notification examples can be found.
+      </p><p>
+        RESTCONF event notification is a way for RESTCONF clients to retrieve
+        notifications for different event streams. Event streams configured in
+        ConfD can be subscribed to using different channels such as the
+        <span class="emphasis"><em>RESTCONF</em></span> or the <span class="emphasis"><em>NETCONF</em></span> channel.
+      </p><p>
+        More information on how to define a new notification event using Yang is
+        described in
+        <a class="link" href="http://www.ietf.org/rfc/rfc6020.txt" target="_top">RFC 6020</a>.
+      </p><p>
+        How to add and configure notifications support in ConfD is described in
+        the <code class="filename">confd.conf(5)</code> man page.
+      </p><p>
+        The design of RESTCONF event notification is inspired by how NETCONF
+        event notification is designed. More information on NETCONF event
+        notification can be found in
+        <a class="link" href="http://www.ietf.org/rfc/rfc5277.txt" target="_top">RFC 5277</a>.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13284"></a>25.8.2.&nbsp;Configuration</h3></div></div></div><p>
+        For this example we will define a notification stream, named
+        <span class="emphasis"><em>interface</em></span> in the
+        <code class="filename">confd.conf</code>
+         configuration file
+        as shown below.
+      </p><p>
+        We also enable the builtin replay store which means that
+        ConfD automatically stores all notifications on disk, ready
+        to be replayed should a RESTCONF event notification subscriber
+        ask for logged notifications. The replay store uses a set of
+        wrapping log files on disk (of a certain number and size) to
+        store the notifications.
+      </p><p>
+        </p><div class="example"><a name="d5e13291"></a><p class="title"><b>Example&nbsp;25.22.&nbsp;Configure an example notification</b></p><div class="example-contents"><pre class="screen">
+&lt;notifications&gt;
+  &lt;eventStreams&gt;
+    &lt;stream&gt;
+      &lt;name&gt;interface&lt;/name&gt;
+      &lt;description&gt;Example notifications&lt;/description&gt;
+      &lt;replaySupport&gt;true&lt;/replaySupport&gt;
+      &lt;builtinReplayStore&gt;
+        &lt;dir&gt;./&lt;/dir&gt;
+        &lt;maxSize&gt;S1M&lt;/maxSize&gt;
+        &lt;maxFiles&gt;5&lt;/maxFiles&gt;
+      &lt;/builtinReplayStore&gt;
+    &lt;/stream&gt;
+  &lt;/eventStreams&gt;
+&lt;/notifications&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        To view the currently enabled event streams, use the
+        ietf-restconf-monitoring YANG model. The streams are available under the
+        <span class="emphasis"><em>/restconf/data/ietf-restconf-monitoring:restconf-state/streams
+        </em></span> container.
+      </p><p>
+        </p><div class="example"><a name="d5e13297"></a><p class="title"><b>Example&nbsp;25.23.&nbsp;View the example RESTCONF stream</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/ietf-restconf-monitoring:restconf-state/streams
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+
+&lt;streams xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring"
+         xmlns:rcmon="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring"&gt;
+
+  ...other streams info removed here for brewity reason...
+
+  &lt;stream&gt;
+    &lt;name&gt;interface&lt;/name&gt;
+    &lt;description&gt;Example notifications&lt;/description&gt;
+    &lt;replay-support&gt;true&lt;/replay-support&gt;
+    &lt;replay-log-creation-time&gt;
+      2020-05-04T13:45:31.033817+00:00
+    &lt;/replay-log-creation-time&gt;
+    &lt;access&gt;
+      &lt;encoding&gt;xml&lt;/encoding&gt;
+      &lt;location&gt;https://localhost:8888/restconf/streams/interface/xml&lt;/location&gt;
+    &lt;/access&gt;
+    &lt;access&gt;
+      &lt;encoding&gt;json&lt;/encoding&gt;
+      &lt;location&gt;https://localhost:8888/restconf/streams/interface/json&lt;/location&gt;
+    &lt;/access&gt;
+  &lt;/stream&gt;
+&lt;/streams&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        Note the URL value we get in the <span class="emphasis"><em>location</em></span> element
+        in the example above. This URL should be used when subscribing to
+        the notification events as is shown in the next example.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13302"></a>25.8.3.&nbsp;Subscribe to notification events</h3></div></div></div><p>
+        RESTCONF clients can determine the URL for the subscription resource
+        (to receive notifications) by sending an HTTP GET request for the
+        <span class="emphasis"><em>location</em></span> leaf with the <span class="emphasis"><em>stream</em></span>
+        list entry. The value returned by
+        the server can be used for the actual notification subscription.
+      </p><p>
+        The client will send an HTTP GET request for the (location) URL
+        returned by the server with the <span class="emphasis"><em>Accept</em></span>
+        type <span class="emphasis"><em>text/event-stream</em></span> as shown in the example
+        below. Note that this request works like a <span class="emphasis"><em>long polling</em></span>
+        request which means that the request will not return. Instead, server
+        side notifications will be sent to the client where each line of
+        the notification will be prepended with <span class="emphasis"><em>data: </em></span>.
+      </p><p>
+        </p><div class="example"><a name="d5e13313"></a><p class="title"><b>Example&nbsp;25.24.&nbsp;View the example RESTCONF stream</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/streams/interface/xml
+Accept: text/event-stream
+
+   ...NOTE: we will be waiting here until a notification is generated...
+
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+
+data: &lt;notification xmlns='urn:ietf:params:xml:ns:netconf:notification:1.0'&gt;
+data:     &lt;eventTime&gt;2020-05-04T13:48:02.291816+00:00&lt;/eventTime&gt;
+data:     &lt;link-up xmlns='http://tail-f.com/ns/test/notif'&gt;
+data:       &lt;if-index&gt;2&lt;/if-index&gt;
+data:       &lt;link-property&gt;
+data:         &lt;newly-added/&gt;
+data:         &lt;flags&gt;42&lt;/flags&gt;
+data:         &lt;extensions&gt;
+data:           &lt;name&gt;1&lt;/name&gt;
+data:           &lt;value&gt;3&lt;/value&gt;
+data:         &lt;/extensions&gt;
+data:         &lt;extensions&gt;
+data:           &lt;name&gt;2&lt;/name&gt;
+data:           &lt;value&gt;4668&lt;/value&gt;
+data:         &lt;/extensions&gt;
+data:       &lt;/link-property&gt;
+data:     &lt;/link-up&gt;
+data: &lt;/notification&gt;
+
+   ...NOTE: we will still be waiting here for more notifications to come...
+</pre></div></div><p><br class="example-break">
+      </p><p>
+        Since we have enabled the replay store, we can ask the server
+        to replay any notifications generated since the specific date
+        we specify. After those notifications have been delivered we
+        will continue waiting for new notifications to be generated.
+      </p><p>
+        </p><div class="example"><a name="d5e13318"></a><p class="title"><b>Example&nbsp;25.25.&nbsp;View the example RESTCONF stream</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/streams/interface/xml?start-time=2007-07-28T15%3A23%3A36Z
+Accept: text/event-stream
+
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+
+data: ...any existing notification since given date will be delivered here...
+
+   ...NOTE: when all notifications are delivered, we will be waiting here for more...
+</pre></div></div><p><br class="example-break">
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13321"></a>25.8.4.&nbsp;Errors</h3></div></div></div><p>
+      Errors occurring during streaming of events will be reported as
+      Server-Sent Events (SSE) comments as described in <a class="link" href="http://www.w3.org/TR/2015/REC-eventsource-20150203" target="_top">
+      W3C.REC-eventsource-20150203</a> as shown in the example below.
+    </p><p>
+      </p><div class="example"><a name="d5e13326"></a><p class="title"><b>Example&nbsp;25.26.&nbsp;<span class="phrase">ConfD</span> RESTCONF errors during streaming</b></p><div class="example-contents"><pre class="screen">
+: error: notification stream NETCONF temporarily unavailable</pre></div></div><p><br class="example-break">
+    </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.schema.resource"></a>25.9.&nbsp;Schema resource</h2></div></div></div><p>
+      RFC 8040 Section 3.7 describes retrieval of YANG modules used by the
+      server via the RPC operation <code class="code">get-schema</code>. The YANG source is
+      made available by <span class="phrase">ConfD</span> in two ways: compiled into
+      the fxs file or put in the loadPath.
+      See <a class="xref" href="ch19.html#ug.netconf_agent.monitoring" title="19.10.&nbsp;Monitoring of the NETCONF Server">Section&nbsp;19.10, &#8220;Monitoring of the NETCONF Server&#8221;</a>.
+    </p><p>
+      The example below show how to list the available Yang modules.
+      Since we are interested by the <span class="emphasis"><em>dhcp</em></span> module
+      we only show that part of the output:
+    </p><p>
+      </p><div class="example"><a name="d5e13339"></a><p class="title"><b>Example&nbsp;25.27.&nbsp;List the available Yang modules</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/ietf-yang-library:modules-state
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"
+               xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library"&gt;
+  &lt;module-set-id&gt;f4709e88d3250bd84f2378185c2833c2&lt;/module-set-id&gt;
+  &lt;module&gt;
+    &lt;name&gt;dhcp&lt;/name&gt;
+    &lt;revision&gt;2019-02-14&lt;/revision&gt;
+    &lt;schema&gt;http://localhost:8008/restconf/tailf/modules/dhcp/2019-02-14&lt;/schema&gt;
+    &lt;namespace&gt;http://yang-central.org/ns/example/dhcp&lt;/namespace&gt;
+    &lt;conformance-type&gt;implement&lt;/conformance-type&gt;
+  &lt;/module&gt;
+
+  ...rest of the output removed here...
+
+&lt;/modules-state&gt;</pre></div></div><p><br class="example-break">
+    </p><p>
+      We can now retrieve the <span class="emphasis"><em>dhcp</em></span> Yang module
+      via the URL we got in the <span class="emphasis"><em>schema</em></span> leaf
+      of the reply. Note that the actual URL may point anywhere.
+      The URL is configured by the <span class="emphasis"><em>schemaServerUrl</em></span>
+      setting in the
+      <code class="filename">confd.conf</code>
+      
+      file.
+    </p><pre class="screen">
+GET /restconf/tailf/modules/dhcp/2019-02-14
+
+HTTP/1.1 200 OK
+module dhcp {
+  namespace "http://yang-central.org/ns/example/dhcp";
+  prefix dhcp;
+
+  import ietf-yang-types {
+
+  ...the rest of the Yang module removed here...
+
+</pre></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13348"></a>25.10.&nbsp;YANG Patch Media Type</h2></div></div></div><p>
+      The <span class="phrase">ConfD</span> RESTCONF API also support the YANG Patch
+      Media Type, as defined in
+      <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt" target="_top">RFC 8072</a>.
+    </p><p>
+      A <span class="emphasis"><em>YANG Patch</em></span> is an ordered list of edits that are
+      applied to the target datastore by the RESTCONF server. A YANG Patch
+      request is sent as a HTTP PATCH request containing a body describing
+      the edit operations to be performed. The format of the body is defined
+      in the
+      <a class="link" href="http://www.ietf.org/rfc/rfc8040.txt" target="_top">RFC 8072</a>.
+    </p><p>
+      Refering to the
+      <a class="link" href="ch25.html#ug.restconf.example.yang.dhcp" title="Example&nbsp;25.7.&nbsp;The dhcp.yang resource">dhcp Yang model</a>
+      in our
+      <a class="link" href="ch25.html#ug.restconf.getting_started" title="25.2.&nbsp;Getting started">Getting Started</a>
+      chapter; we will show how to use YANG Patch to achieve the same result
+      but with fewer amount of requests.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13359"></a>25.10.1.&nbsp;Create two new resources with YANG Patch</h3></div></div></div><p>
+        In order to create the resources, we send a HTTP PATCH request
+        where the <span class="emphasis"><em>Content-Type</em></span> indicates that the
+        body in the request consists of a Yang-Patch message.
+        Our Yang-Patch request will initiate two edit operations where each
+        operation will <span class="emphasis"><em>create</em></span> a new subnet. In contrast,
+        compare this with using "plain" RESTCONF where we would have
+        needed two POST requests to achieve the same result.
+      </p><p>
+        </p><div class="example"><a name="d5e13365"></a><p class="title"><b>Example&nbsp;25.28.&nbsp;Create a two new <span class="emphasis"><em>dhcp/subnet</em></span> resources</b></p><div class="example-contents"><pre class="screen">
+PATCH /restconf/data/dhcp:dhcp
+Accept: application/yang-data+xml
+Content-Type: application/yang-patch+xml
+
+&lt;yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch"&gt;
+  &lt;patch-id&gt;add-subnets&lt;/patch-id&gt;
+  &lt;edit&gt;
+    &lt;edit-id&gt;add-subnet-239&lt;/edit-id&gt;
+    &lt;operation&gt;create&lt;/operation&gt;
+    &lt;target&gt;/subnet=10.254.239.0%2F27&lt;/target&gt;
+    &lt;value&gt;
+      &lt;subnet xmlns="http://yang-central.org/ns/example/dhcp" \
+              xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+        &lt;net&gt;10.254.239.0/27&lt;/net&gt;
+          ...content removed here for brevity...
+        &lt;max-lease-time&gt;1200&lt;/max-lease-time&gt;
+      &lt;/subnet&gt;
+    &lt;/value&gt;
+  &lt;/edit&gt;
+  &lt;edit&gt;
+    &lt;edit-id&gt;add-subnet-244&lt;/edit-id&gt;
+    &lt;operation&gt;create&lt;/operation&gt;
+    &lt;target&gt;/subnet=10.254.244.0%2F27&lt;/target&gt;
+    &lt;value&gt;
+      &lt;subnet xmlns="http://yang-central.org/ns/example/dhcp" \
+              xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+        &lt;net&gt;10.254.244.0/27&lt;/net&gt;
+          ...content removed here for brevity...
+        &lt;max-lease-time&gt;1200&lt;/max-lease-time&gt;
+      &lt;/subnet&gt;
+    &lt;/value&gt;
+  &lt;/edit&gt;
+&lt;/yang-patch&gt;
+
+# If the YANG Patch request was successful,
+# the server might respond as follows:
+
+HTTP/1.1 200 OK
+&lt;yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch"&gt;
+  &lt;patch-id&gt;add-subnets&lt;/patch-id&gt;
+  &lt;ok/&gt;
+&lt;/yang-patch-status&gt;</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13369"></a>25.10.2.&nbsp;Modify and Delete in the same Yang-Patch request</h3></div></div></div><p>
+        Let us modify the 'max-lease-time' of one 'subnet' and delete
+        the 'max-lease-time' value of the second 'subnet'. Note that
+        the delete will cause the default value of 'max-lease-time'
+        to take effect, which we will verify using a RESTCONF GET request.
+      </p><p>
+        </p><div class="example"><a name="d5e13373"></a><p class="title"><b>Example&nbsp;25.29.&nbsp;Modify and Delete in the same Yang-Patch request</b></p><div class="example-contents"><pre class="screen">
+PATCH /restconf/data/dhcp:dhcp
+Accept: application/yang-data+xml
+Content-Type: application/yang-patch+xml
+
+&lt;yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch"&gt;
+  &lt;patch-id&gt;modify-and-delete&lt;/patch-id&gt;
+  &lt;edit&gt;
+    &lt;edit-id&gt;modify-max-lease-time-239&lt;/edit-id&gt;
+    &lt;operation&gt;merge&lt;/operation&gt;
+    &lt;target&gt;/dhcp:subnet=10.254.239.0%2F27&lt;/target&gt;
+    &lt;value&gt;
+      &lt;subnet xmlns="http://yang-central.org/ns/example/dhcp" \
+              xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+        &lt;net&gt;10.254.239.0/27&lt;/net&gt;
+        &lt;max-lease-time&gt;1234&lt;/max-lease-time&gt;
+      &lt;/subnet&gt;
+    &lt;/value&gt;
+  &lt;/edit&gt;
+  &lt;edit&gt;
+    &lt;edit-id&gt;delete-max-lease-time-244&lt;/edit-id&gt;
+    &lt;operation&gt;delete&lt;/operation&gt;
+    &lt;target&gt;/dhcp:subnet=10.254.244.0%2F27/max-lease-time&lt;/target&gt;
+  &lt;/edit&gt;
+&lt;/yang-patch&gt;
+
+# If the YANG Patch request was successful,
+# the server might respond as follows:
+
+HTTP/1.1 200 OK
+&lt;yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch"&gt;
+  &lt;patch-id&gt;modify-and-delete&lt;/patch-id&gt;
+  &lt;ok/&gt;
+&lt;/yang-patch-status&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        To verify that our modify and delete operations took place
+        we make use of two RESTCONF GET request as shown below.
+      </p><p>
+        </p><div class="example"><a name="d5e13378"></a><p class="title"><b>Example&nbsp;25.30.&nbsp;Verify the modified max-release-time value</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/dhcp:dhcp/subnet=10.254.239.0%2F27/max-lease-time
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;max-lease-time xmlns="http://yang-central.org/ns/example/dhcp"
+                xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+                1234
+&lt;/max-lease-time&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        </p><div class="example"><a name="d5e13382"></a><p class="title"><b>Example&nbsp;25.31.&nbsp;Verify the default values after delete of the
+          max-release-time value</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/dhcp:dhcp/subnet=10.254.244.0%2F27/max-lease-time?\
+      with-defaults=report-all-tagged
+Accept: application/yang-data+xml
+
+HTTP/1.1 200 OK
+&lt;max-lease-time wd:default="true"
+                xmlns:wd="urn:ietf:params:restconf:capability:defaults:1.0"
+                xmlns="http://yang-central.org/ns/example/dhcp"
+                xmlns:dhcp="http://yang-central.org/ns/example/dhcp"&gt;
+                7200
+&lt;/max-lease-time&gt;</pre></div></div><p><br class="example-break">
+      </p><p>
+        Note how we in the last GET request make use of the
+        <span class="emphasis"><em>with-defaults</em></span> query parameter to request
+        that a default value should be returned and also be tagged as such.
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13387"></a>25.11.&nbsp;NMDA</h2></div></div></div><p>
+      Network Management Datastore Architecture (NMDA), as defined in
+      <a class="link" href="http://www.ietf.org/rfc/rfc8527.txt" target="_top">RFC 8527</a>,
+      extends the RESTCONF protocol.
+      This enable RESTCONF clients to discover which datastores are
+      supported by the RESTCONF server, determine which modules are
+      supported in each datastore, and interact with all the datastores
+      supported by the NMDA.
+    </p><p>
+      A RESTCONF client can test if a server supports the NMDA by using
+      either the HEAD or GET methods on <span class="emphasis"><em>/restconf/ds/ietf-
+      datastores:operational</em></span>, as shown below:
+    </p><p>
+      </p><div class="example"><a name="d5e13394"></a><p class="title"><b>Example&nbsp;25.32.&nbsp;Check if the RESTCONF server support NMDA</b></p><div class="example-contents"><pre class="screen">
+HEAD /restconf/ds/ietf-datastores:operational
+
+HTTP/1.1 200 OK</pre></div></div><p><br class="example-break">
+    </p><p>
+      A RESTCONF client can discover which datastores and YANG modules the
+      server supports by reading the YANG library information from the
+      operational state datastore. Note in the example below that, since
+      the result consists of three top-nodes, it can't be represented
+      in XML; hence we request the returned content to be in JSON format.
+      See also: <a class="xref" href="ch25.html#ug.restconf.extensions.collections" title="25.13.&nbsp;Collections">Section&nbsp;25.13, &#8220;Collections&#8221;</a>.
+    </p><p>
+      </p><div class="example"><a name="d5e13400"></a><p class="title"><b>Example&nbsp;25.33.&nbsp;Check what datastores the RESTCONF server support</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/ds/ietf-datastores:operational/datastore
+Accept: application/yang-data+json
+
+HTTP/1.1 200 OK
+{
+  "ietf-yang-library:datastore": [
+    {
+      "name": "ietf-datastores:running",
+      "schema": "common"
+    },
+    {
+      "name": "ietf-datastores:intended",
+      "schema": "common"
+    },
+    {
+      "name": "ietf-datastores:operational",
+      "schema": "common"
+    }
+  ]
+}</pre></div></div><p><br class="example-break">
+    </p><p>
+      For more information about NMDA see:
+      <a class="xref" href="ch06.html" title="Chapter&nbsp;6.&nbsp;Datastores">Chapter&nbsp;6, <i>Datastores</i></a>.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13405"></a>25.12.&nbsp;Extensions</h2></div></div></div><p>
+      To avoid any potential future conflict with the RESTCONF standard,
+      any extensions made to the <span class="phrase">ConfD</span> implementation
+      of RESTCONF is located under
+      the URL path: <span class="emphasis"><em>/restconf/tailf</em></span>, or is controlled
+      by means of a vendor specific media type.
+    </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+        There is no index of extensions under
+        <span class="emphasis"><em>/restconf/tailf</em></span>. To list extensions, access
+        <span class="emphasis"><em>/restconf/data/ietf-yang-library:modules-state</em></span> and
+        follow published
+        links for schemas.
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.extensions.collections"></a>25.13.&nbsp;Collections</h2></div></div></div><p>
+      The RESTCONF specification states that a result containing
+      multiple instances (e.g a number of list entries) is not
+      allowed if XML encoding is used. The reason for this is that
+      an XML document can only have one root node.
+    </p><p>
+      This functionality is supported if the
+      <span class="emphasis"><em>http://tail-f.com/ns/restconf/collection/1.0</em></span>
+      capability is presented. See also:
+      <a class="xref" href="ch25.html#ug.restconf.capabilities" title="25.4.1.&nbsp;How to view the capabilities of the RESTCONF server">Section&nbsp;25.4.1, &#8220;How to view the capabilities of the RESTCONF server&#8221;</a>.
+    </p><p>
+      To remedy this, a HTTP GET request can make use of
+      the <span class="emphasis"><em>Accept:</em></span>
+      media type: <span class="emphasis"><em>application/vnd.yang.collection+xml</em></span> as
+      shown in the following example.
+      The result will then be wrapped within a <span class="emphasis"><em>collection</em></span>
+      element.
+    </p><p>
+      </p><div class="example"><a name="d5e13425"></a><p class="title"><b>Example&nbsp;25.34.&nbsp;Use of collections</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/ds/ietf-datastores:operational/\
+    ietf-yang-library:yang-library/datastore
+Accept: application/vnd.yang.collection+xml
+
+&lt;collection xmlns="http://tail-f.com/ns/restconf/collection/1.0"&gt;
+  &lt;datastore xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"
+            xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library"&gt;
+    &lt;name xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores"&gt;
+       ds:running
+    &lt;/name&gt;
+    &lt;schema&gt;common&lt;/schema&gt;
+  &lt;/datastore&gt;
+  &lt;datastore xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"
+             xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library"&gt;
+    &lt;name xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores"&gt;
+      ds:intended
+    &lt;/name&gt;
+    &lt;schema&gt;common&lt;/schema&gt;
+  &lt;/datastore&gt;
+  &lt;datastore xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library
+             xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library"&gt;
+    &lt;name xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores"&gt;
+      ds:operational
+    &lt;/name&gt;
+    &lt;schema&gt;common&lt;/schema&gt;
+  &lt;/datastore&gt;
+&lt;/collection&gt;</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13428"></a>25.14.&nbsp;The RESTCONF Query API</h2></div></div></div><p>
+      The ConfD RESTCONF Query API consists of a number of
+      operation to start a query which may live over several
+      RESTCONF request, where data can be fetch in suitable
+      chunks. The data to be returned is produced by applying
+      an XPath expression where the data also may be sorted.
+    </p><p>
+      The RESTCONF client can check if the ConfD RESTCONF server
+      support this functionality by looking for the
+      <span class="emphasis"><em>http://tail-f.com/ns/restconf/query-api/1.0</em></span>
+      capability. See also: <a class="xref" href="ch25.html#ug.restconf.capabilities" title="25.4.1.&nbsp;How to view the capabilities of the RESTCONF server">Section&nbsp;25.4.1, &#8220;How to view the capabilities of the RESTCONF server&#8221;</a>.
+    </p><p>
+      The <code class="filename">tailf-rest-query.yang</code> and the
+      <code class="filename">tailf-common-query.yang</code> YANG models
+      describe the structure of the RESTCONF Query API messages.
+      By using the Schema Resource functionality, as described in
+      <a class="xref" href="ch25.html#ug.restconf.schema.resource" title="25.9.&nbsp;Schema resource">Section&nbsp;25.9, &#8220;Schema resource&#8221;</a> , you can
+      get hold of them.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13438"></a>25.14.1.&nbsp;Request and Replies</h3></div></div></div><p>
+        The API consists of the following Requests:
+      </p><p>
+        </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              <span class="emphasis"><em>start-query</em></span> : Start a query and
+              return a query handle.
+            </p></li><li class="listitem"><p>
+              <span class="emphasis"><em>fetch-query-result</em></span> : Use a query handle to
+              repeatedly fetch chunks of the result.
+            </p></li><li class="listitem"><p>
+              <span class="emphasis"><em>immediate-query</em></span> : Start a query and return
+              the entire result immediately.
+            </p></li><li class="listitem"><p>
+              <span class="emphasis"><em>reset-query</em></span> : (Re)set where the next fetched
+              result will begin from.
+            </p></li><li class="listitem"><p>
+              <span class="emphasis"><em>stop-query</em></span> : Stop (and close) the query.
+            </p></li></ul></div><p>
+      </p><p>
+        The API consists of the following Replies:
+      </p><p>
+        </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              <span class="emphasis"><em>start-query-result</em></span> : Reply to the start-query
+              request.
+            </p></li><li class="listitem"><p>
+              <span class="emphasis"><em>query-result</em></span> : Reply to the
+              fetch-query-result and immediate-query requests.
+            </p></li></ul></div><p>
+      </p><p>
+        In the following examples, we'll use this data model:
+      </p><p>
+        </p><div class="example"><a name="d5e13469"></a><p class="title"><b>Example&nbsp;25.35.&nbsp;<span class="emphasis"><em>example.yang</em></span> : model for the
+          Query API example</b></p><div class="example-contents"><pre class="screen">
+container x {
+  list host {
+    key number;
+    leaf number {
+      type int32;
+    }
+    leaf enabled {
+      type boolean;
+    }
+    leaf name {
+      type string;
+    }
+    leaf address {
+      type inet:ip-address;
+    }
+  }
+}]</pre></div></div><p><br class="example-break">
+      </p><p>
+        The actual format of the payload should be represented either
+        in XML or JSON. Note how we indicate the type of content
+        using the <span class="emphasis"><em>Content-Type</em></span> HTTP header.
+        For XML it could look like this:
+      </p><p>
+        </p><div class="example"><a name="d5e13476"></a><p class="title"><b>Example&nbsp;25.36.&nbsp;Example of a <span class="emphasis"><em>start-query</em></span> request</b></p><div class="example-contents"><pre class="screen">
+POST /restconf/tailf/query
+Content-Type: application/yang-data+xml
+
+&lt;start-query xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+  &lt;foreach&gt;
+    /x/host[enabled = 'true']
+  &lt;/foreach&gt;
+  &lt;select&gt;
+    &lt;label&gt;Host name&lt;/label&gt;
+    &lt;expression&gt;name&lt;/expression&gt;
+    &lt;result-type&gt;string&lt;/result-type&gt;
+  &lt;/select&gt;
+  &lt;select&gt;
+    &lt;expression&gt;address&lt;/expression&gt;
+    &lt;result-type&gt;string&lt;/result-type&gt;
+  &lt;/select&gt;
+  &lt;sort-by&gt;name&lt;/sort-by&gt;
+  &lt;limit&gt;100&lt;/limit&gt;
+  &lt;offset&gt;1&lt;/offset&gt;
+  &lt;timeout&gt;600&lt;/timeout&gt;
+&lt;/start-query&gt;]</pre></div></div><p><br class="example-break">
+      </p><p>
+        The same request in JSON format would look like:
+      </p><p>
+        </p><div class="example"><a name="d5e13482"></a><p class="title"><b>Example&nbsp;25.37.&nbsp;JSON example of a <span class="emphasis"><em>start-query</em></span> request</b></p><div class="example-contents"><pre class="screen">
+POST /restconf/tailf/query
+Content-Type: application/yang-data+json
+
+{
+ "start-query": {
+   "foreach": "/x/host[enabled = 'true']",
+   "select": [
+     {
+       "label": "Host name",
+       "expression": "name",
+       "result-type": ["string"]
+     },
+     {
+       "expression": "address",
+       "result-type": ["string"]
+     }
+   ],
+   "sort-by": ["name"],
+   "limit": 100,
+   "offset": 1,
+   "timeout": 600
+ }
+}]</pre></div></div><p><br class="example-break">
+      </p><p>
+        An informal interpretation of this query is:
+      </p><p>
+        For each <span class="emphasis"><em>/x/host</em></span> where <span class="emphasis"><em>enabled</em></span>
+        is true, select its <span class="emphasis"><em>name</em></span>, and
+        <span class="emphasis"><em>address</em></span>, and return the result sorted by
+        <span class="emphasis"><em>name</em></span>, in chunks of 100 result items at a time.
+      </p><p>
+        Let us discuss the various pieces of this request.
+        To start with, when using XML, we need to specify the
+        name space as shown:
+      </p><pre class="programlisting">
+&lt;start-query xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+    </pre><p>
+        The actual XPath query to run is specified by the
+        <span class="emphasis"><em>foreach</em></span> element. In the example
+        below will search for all <span class="emphasis"><em>/x/host</em></span>
+        nodes that has the <span class="emphasis"><em>enabled</em></span> node set
+        to true:
+      </p><pre class="programlisting">
+&lt;foreach&gt;
+  /x/host[enabled = 'true']
+&lt;/foreach&gt;</pre><p>
+        Now we need to define what we
+        want to have returned from the node set by using one or more
+        <span class="emphasis"><em>select</em></span> sections. What to actually return
+        is defined by the XPath <span class="emphasis"><em>expression</em></span>.
+      </p><p>
+        Choose how the result should be represented.
+        Basically, it can be the actual value or the path leading to the
+        value. This is specified per select chunk. The possible
+        result-types are: <span class="emphasis"><em>string</em></span> ,
+        <span class="emphasis"><em>path</em></span> , <span class="emphasis"><em>leaf-value</em></span>
+        and <span class="emphasis"><em>inline</em></span>.
+      </p><p>
+        The difference between <span class="emphasis"><em>string</em></span> and
+        <span class="emphasis"><em>leaf-value</em></span> is somewhat subtle.
+        In the case of <span class="emphasis"><em>string</em></span> the result will be
+        processed by the XPath function: <span class="emphasis"><em>string()</em></span>
+        (which if the result is a node-set will concatenate all the values).
+        The <span class="emphasis"><em>leaf-value</em></span> will return
+        the value of the first node in the result. As long as the
+        result is a leaf node, <span class="emphasis"><em>string</em></span> and
+        <span class="emphasis"><em>leaf-value</em></span> will return the
+        same result. In the example above, the <span class="emphasis"><em>string</em></span>
+        is used as shown below. Note that at least one
+        <span class="emphasis"><em>result-type</em></span> must be specified.
+      </p><p>
+        The result-type <span class="emphasis"><em>inline</em></span> makes it possible to return
+        the full sub-tree of data, either in XML or in JSON format. The data will
+        be enclosed with a tag: <span class="emphasis"><em>data</em></span>.
+      </p><p>
+        It is possible to specify an optional <span class="emphasis"><em>label</em></span>
+        for a convenient way of labeling the returned data:
+      </p><pre class="programlisting">
+&lt;select&gt;
+  &lt;label&gt;Host name&lt;/label&gt;
+  &lt;expression&gt;name&lt;/expression&gt;
+  &lt;result-type&gt;string&lt;/result-type&gt;
+&lt;/select&gt;
+&lt;select&gt;
+  &lt;expression&gt;address&lt;/expression&gt;
+  &lt;result-type&gt;string&lt;/result-type&gt;
+&lt;/select&gt;</pre><p>
+        The returned result can be sorted. This is expressed as an
+        XPath expression, which in most cases is very simple and
+        refers to the found node set. In this example we sort the
+        result by the content of the <span class="emphasis"><em>name</em></span> node:
+      </p><pre class="programlisting">
+&lt;sort-by&gt;name&lt;/sort-by&gt;</pre><p>
+        With the <span class="emphasis"><em>offset</em></span> element we can specify at
+        which node we should start to receive the result. The default
+        is 1, i.e., the first node in the resulting node-set.
+      </p><pre class="programlisting">
+&lt;offset&gt;1&lt;/offset&gt;</pre><p>
+        It is possible to set a custom timeout when starting or
+        resetting a query. Each time a function is called, the timeout
+        timer resets. The default is 600 seconds, i.e. 10 minutes.
+      </p><pre class="programlisting">
+&lt;timeout&gt;600&lt;/timeout&gt;</pre><p>
+        The reply to this request would look something like this:
+      </p><pre class="programlisting">
+&lt;start-query-result&gt;
+  &lt;query-handle&gt;12345&lt;/query-handle&gt;
+&lt;/start-query-result&gt;</pre><p>
+        The query handle (in this example '12345') must be used in all
+        subsequent calls. To retrieve the result, we can now send:
+      </p><pre class="programlisting">
+&lt;fetch-query-result xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+  &lt;query-handle&gt;12345&lt;/query-handle&gt;
+&lt;/fetch-query-result&gt;</pre><p>
+        Which will result in something like the following:
+      </p><pre class="programlisting">
+&lt;query-result xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+  &lt;result&gt;
+    &lt;select&gt;
+      &lt;label&gt;Host name&lt;/label&gt;
+      &lt;value&gt;One&lt;/value&gt;
+    &lt;/select&gt;
+    &lt;select&gt;
+      &lt;value&gt;10.0.0.1&lt;/value&gt;
+    &lt;/select&gt;
+  &lt;/result&gt;
+  &lt;result&gt;
+    &lt;select&gt;
+      &lt;label&gt;Host name&lt;/label&gt;
+      &lt;value&gt;Three&lt;/value&gt;
+    &lt;/select&gt;
+    &lt;select&gt;
+      &lt;value&gt;10.0.0.3&lt;/value&gt;
+    &lt;/select&gt;
+  &lt;/result&gt;
+&lt;/query-result&gt;</pre><p>
+        If we try to get more data with the
+        <span class="emphasis"><em>fetch-query-result</em></span>
+        we might get more <span class="emphasis"><em>result</em></span> entries in return until
+        no more data exists and we get an empty query result back:
+      </p><pre class="programlisting">
+&lt;query-result xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+&lt;/query-result&gt;</pre><p>
+        Finally, when we are done we stop the query:
+      </p><pre class="programlisting">
+&lt;stop-query xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+  &lt;query-handle&gt;12345&lt;/query-handle&gt;
+&lt;/stop-query&gt;</pre></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13544"></a>25.14.2.&nbsp;Reset a Query</h3></div></div></div><p>
+        If we want to go back in the "stream" of received
+        data chunks and have them repeated, we can do that with the
+        'reset-query' request.  In the example below we ask to get
+        results from the 42:nd result entry:
+      </p><pre class="programlisting">
+&lt;reset-query xmlns="http://tail-f.com/ns/tailf-rest-query"&gt;
+  &lt;query-handle&gt;12345&lt;/query-handle&gt;
+  &lt;offset&gt;42&lt;/offset&gt;
+&lt;/reset-query&gt;</pre></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13548"></a>25.14.3.&nbsp;Immediate Query</h3></div></div></div><p>
+        If we want to get the entire result sent back to us, using only
+        one request, we can do this by using the
+        <span class="emphasis"><em>immediate-query</em></span>.
+        This function takes similar arguments as
+        <span class="emphasis"><em>start-query</em></span> and returns the
+        entire result analogous with the result from a
+        <span class="emphasis"><em>fetch-query-result</em></span> request.
+        Note that it is not possible to paginate or set an offset start
+        node for the result list; i.e. the options
+        <span class="emphasis"><em>limit</em></span> and <span class="emphasis"><em>offset</em></span> are ignored.
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.partial_response"></a>25.15.&nbsp;Partial Responses</h2></div></div></div><p>
+      This functionality is supported if the
+      <span class="emphasis"><em>http://tail-f.com/ns/restconf/partial-response/1.0</em></span>
+      capability is presented. See also:
+      <a class="xref" href="ch25.html#ug.restconf.capabilities" title="25.4.1.&nbsp;How to view the capabilities of the RESTCONF server">Section&nbsp;25.4.1, &#8220;How to view the capabilities of the RESTCONF server&#8221;</a>.
+    </p><p>
+      By default, the server sends back the full representation
+      of a resource after processing a request.  For better
+      performance, the server can be instructed to send only the
+      nodes the client really needs in a partial response.
+    </p><p>
+      To request a partial response for a set of list entries,
+      use the <span class="emphasis"><em>offset</em></span> and <span class="emphasis"><em>limit</em></span> query
+      parameters to specify a limited set of entries to be
+      returned.
+    </p><p>
+      In the following example we retrieve only 2 entries, skipping the
+      first entry and then returning the next two entries:
+    </p><p>
+      </p><div class="example"><a name="d5e13567"></a><p class="title"><b>Example&nbsp;25.38.&nbsp;Partial Response</b></p><div class="example-contents"><pre class="screen">
+GET /restconf/data/example-jukebox:jukebox/library/artist?offset=1&amp;limit=2
+Accept: application/yang-data+json
+
+...in return we will get the second and third elements of the list...
+</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.restconf.hidden_nodes"></a>25.16.&nbsp;Hidden Nodes</h2></div></div></div><p>
+      This functionality is supported if the
+      <span class="emphasis"><em>http://tail-f.com/ns/restconf/unhide/1.0</em></span>
+      capability is presented. See also:
+      <a class="xref" href="ch25.html#ug.restconf.capabilities" title="25.4.1.&nbsp;How to view the capabilities of the RESTCONF server">Section&nbsp;25.4.1, &#8220;How to view the capabilities of the RESTCONF server&#8221;</a>.
+    </p><p>
+      Hidden nodes are described in
+      <a class="xref" href="ch13.html#ug.transformations.hidden_data" title="13.7.&nbsp;Hidden Data">Section&nbsp;13.7, &#8220;Hidden Data&#8221;</a>. By default, hidden
+      nodes are not visible in the RESTCONF interface. In order to
+      unhide hidden nodes for retrieval or editing, clients can use
+      the query parameter <span class="emphasis"><em>unhide</em></span> or set parameter
+      <span class="emphasis"><em>showHidden</em></span> to <span class="emphasis"><em>true</em></span>
+      under <code class="sgmltag-element">/confdConfig/restconf</code> in confd.conf file.
+    </p><p>
+      The format of the <span class="emphasis"><em>unhide</em></span> query parameter is a
+      comma separated list of
+      </p><div class="informalexample"><pre class="programlisting">&lt;groupname&gt;[;&lt;password&gt;]</pre></div><p>
+      As an example:
+      </p><div class="informalexample"><pre class="programlisting">unhide=extra,debug;secret</pre></div><p>
+      This example unhides the unprotected group <span class="emphasis"><em>extra</em></span> and the
+      password protected group <span class="emphasis"><em>debug</em></span> with the password
+      <span class="emphasis"><em>secret</em></span>;.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13590"></a>25.17.&nbsp;Configuration Meta-Data</h2></div></div></div><p>
+      As described in <a class="xref" href="ch11.html" title="Chapter&nbsp;11.&nbsp;Configuration Meta-Data">Chapter&nbsp;11, <i>Configuration Meta-Data</i></a> it is possible
+      to associate meta-data with the configuration data. For RESTCONF,
+      resources such as containers, lists as well as leafs and leaf-lists
+      can have such meta-data. For XML, this meta-data is represented as
+      attributes attached to the XML element in question. For JSON, there
+      does not exist a natural way to represent this info. Hence a special
+      special notation has been introduced, based on the
+      <a class="link" href="http://www.ietf.org/rfc/rfc7952.txt" target="_top">RFC 7952</a>,
+      see the example below.
+    </p><div class="example"><a name="d5e13595"></a><p class="title"><b>Example&nbsp;25.39.&nbsp;XML representation of meta-data</b></p><div class="example-contents"><pre class="programlisting">
+&lt;x xmlns="urn:x"
+   y:self="/api/running/x"
+   xmlns:y="http://tail-f.com/ns/rest"
+   xmlns:x="urn:x"
+   y:path="/x:x"&gt;
+  &lt;id tags=" important ethernet " annotation="hello world"&gt;42&lt;/id&gt;
+  &lt;person y:self="/api/running/x/person" annotation="This is a person"&gt;
+    &lt;name&gt;Bill&lt;/name&gt;
+    &lt;person annotation="This is another person"&gt;grandma&lt;/person&gt;
+  &lt;/person&gt;
+&lt;/x&gt;
+</pre></div></div><br class="example-break"><div class="example"><a name="d5e13598"></a><p class="title"><b>Example&nbsp;25.40.&nbsp;JSON representation of meta-data</b></p><div class="example-contents"><pre class="programlisting">{
+  "x": {
+    "_self": "/api/running/x",
+    "_path": "/x:x",
+    "id": 42,
+    "@id": {"tags": ["important","ethernet"],"annotation": "hello world"},
+    "person": {
+      "_self": "/api/running/x/person",
+      // NB: the below refers to the parent object
+      "@@person": {"annotation": "This is a person"},
+      "name": "Bill",
+      "person": "grandma",
+      // NB: the below refers to the sibling object
+      "@person": {"annotation": "This is another person"}
+    }
+  }
+}
+</pre></div></div><br class="example-break"><p>
+      For JSON, note how we represent the meta data for a certain
+      object "x" by another object constructed of the
+      object name prefixed with either one or two "@" signs.
+      The meta-data object "@x" refers to the sibling
+      object "x" and the "@@x" object refers
+      to the parent object.
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+          <span class="emphasis"><em>This differs from the RFC 7952!</em></span>
+        </p></div><p>
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13605"></a>25.18.&nbsp;The Authentication Cache</h2></div></div></div><p>
+      The RESTCONF server maintains an authentication cache.
+      When authenticating an incoming request for a particular
+      <span class="emphasis"><em>User:Password</em></span>, it is first checked if the
+      User exists in the cache and if so, the request is processed.
+      This makes it possible to avoid the, potentially time consuming,
+      login procedure that will take place in case of a cache miss.
+    </p><p>
+      Cache entries has a maximum Time-To-Live (TTL) and upon expiry
+      a cache entry is removed which will cause the next request for that User
+      to perform the normal login procedure. The TTL value is configurable
+      via the <span class="emphasis"><em>authCacheTTL</em></span>
+       parameter, as shown
+      in the example. Note that, by setting the TTL value to
+      <span class="emphasis"><em>PT0S</em></span> (zero), the cache is effectively turned off.
+    </p><p>
+      It is also possible to combine the Clients IP address with
+      the User name as a key into the cache. This behaviour is disabled
+      by default. It can be enabled by setting the
+      <span class="emphasis"><em>enableAuthCacheClientIp</em></span>
+      
+      parameter to <span class="emphasis"><em>true</em></span>. With this enabled, only
+      a Client coming from the same IP address may get a hit in the
+      authentication cache.
+    </p><p>
+      </p><div class="example"><a name="d5e13616"></a><p class="title"><b>Example&nbsp;25.41.&nbsp;<span class="phrase">ConfD</span> configuration of the
+        authentication cache TTL</b></p><div class="example-contents"><pre class="screen">
+  ...
+  &lt;aaa&gt;
+     ...
+     &lt;restconf&gt;
+        &lt;!-- Set the TTL to 10 seconds! --&gt;
+        &lt;authCacheTTL&gt;PT10S&lt;/authCacheTTL&gt;
+        &lt;!-- Use both "User" and "ClientIP" as key into the AuthCache --&gt;
+        &lt;enableAuthCacheClientIp&gt;false&lt;/enableAuthCacheClientIp&gt;
+     &lt;/restconf&gt;
+     ...
+  &lt;/aaa&gt;
+  ...</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13620"></a>25.19.&nbsp;Client IP via Proxy</h2></div></div></div><p>
+      It is possible to configure the <span class="phrase">ConfD</span>
+      RESTCONF server
+      to pick up the client IP address via a HTTP header in the request.
+      A list of HTTP headers to look for is configurable via the
+      <span class="emphasis"><em>proxyHeaders</em></span>
+      
+      parameter as shown in the example.
+    </p><p>
+      To avoid misuse of this feature, only requests from trusted sources
+      will be searched for such a HTTP header. The list of trusted sources is
+      configured via the
+      <span class="emphasis"><em>allowedProxyIpPrefix</em></span>
+      
+      as shown in the example.
+    </p><p>
+      </p><div class="example"><a name="d5e13628"></a><p class="title"><b>Example&nbsp;25.42.&nbsp;<span class="phrase">ConfD</span> configuration of Client IP via Proxy</b></p><div class="example-contents"><pre class="screen">
+  ...
+  &lt;webui&gt;
+     ...
+     &lt;useForwardedClientIp&gt;
+       &lt;proxyHeaders&gt;X-Forwarded-For&lt;/proxyHeaders&gt;
+       &lt;proxyHeaders&gt;X-REAL-IP&lt;/proxyHeaders&gt;
+       &lt;allowedProxyIpPrefix&gt;10.12.34.0/24&lt;/allowedProxyIpPrefix&gt;
+       &lt;allowedProxyIpPrefix&gt;2001:db8:1234::/48&lt;/allowedProxyIpPrefix&gt;
+     &lt;/useForwardedClientIp&gt;
+     ...
+  &lt;/webui&gt;
+  ...</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13632"></a>25.20.&nbsp;External token authentication/validation</h2></div></div></div><p>
+      The ConfD RESTCONF server can be setup to pass a long
+      a <span class="emphasis"><em>token</em></span> used for authentication and/or
+      validation of the client.
+      Note that this require
+      <span class="emphasis"><em>external authentication/validation</em></span>
+      to be setup properly.
+      See <a class="xref" href="ch18.html#ug.aaa.External_validation" title="18.4.5.&nbsp;External token validation">Section&nbsp;18.4.5, &#8220;External token validation&#8221;</a> and
+      <a class="xref" href="ch18.html#ug.aaa.External_authentication" title="18.4.4.&nbsp;External authentication">Section&nbsp;18.4.4, &#8220;External authentication&#8221;</a> for details
+      on how to do that.
+    </p><p>
+      With <span class="emphasis"><em>token authentication</em></span> we mean that the
+      client sends a <span class="emphasis"><em>User:Password</em></span> to the
+      RESTCONF server, which will invoke an external executable that
+      perform the authentication and upon success produces a
+      <span class="emphasis"><em>token</em></span> that the RESTCONF server will return
+      in the <span class="emphasis"><em>X-Auth-Token</em></span> HTTP header of the reply.
+    </p><p>
+      With <span class="emphasis"><em>token validation</em></span> we mean that the
+      RESTCONF server will pass along any token, provided in the
+      <span class="emphasis"><em>X-Auth-Token</em></span> HTTP header, to an external
+      executable that performs the validation. This external program
+      may produce a new token that the RESTCONF server will return
+      in the <span class="emphasis"><em>X-Auth-Token</em></span> HTTP header of the reply.
+    </p><p>
+      To make this work, the following need to be configured in the
+      <code class="filename">confd.conf</code>
+      
+      file:
+    </p><p>
+      </p><div class="example"><a name="d5e13651"></a><p class="title"><b>Example&nbsp;25.43.&nbsp;Configure RESTCONF external token authentication/validation</b></p><div class="example-contents"><pre class="screen">
+  ...
+  &lt;restconf&gt;
+     ...
+    &lt;tokenResponse&gt;
+      &lt;xAuthToken&gt;true&lt;/xAuthToken&gt;
+    &lt;/tokenResponse&gt;
+     ...
+  &lt;/restconf&gt;
+  ...</pre></div></div><p><br class="example-break">
+    </p><p>
+      It is also possible to have the RESTCONF server to return a HTTP
+      <span class="emphasis"><em>cookie</em></span> containing the token.
+    </p><p>
+      An HTTP cookie (web cookie, browser cookie) is a
+      small piece of data that a server sends to the user's web browser.
+      The browser may store it and send it back with the next request
+      to the same server.
+      This can be convenient in certain solutions, where typically,
+      it is used to tell if two requests came from the same browser,
+      keeping a user logged-in, for example.
+    </p><p>
+      To make this happen, the name of the cookie need to be configured
+      as well as a <span class="emphasis"><em>directives</em></span> string which will be
+      sent as part of the cookie.
+    </p><p>
+      </p><div class="example"><a name="d5e13660"></a><p class="title"><b>Example&nbsp;25.44.&nbsp;Configure the RESTCONF token cookie</b></p><div class="example-contents"><pre class="screen">
+  ...
+  &lt;restconf&gt;
+     ...
+     &lt;tokenCookie&gt;
+       &lt;name&gt;X-JWT-ACCESS-TOKEN&lt;/name&gt;
+       &lt;directives&gt;path=/; Expires=Tue, 19 Jan 2038 03:14:07 GMT;&lt;/directives&gt;
+     &lt;/tokenCookie&gt;
+     ...
+  &lt;/restconf&gt;
+  ...</pre></div></div><p><br class="example-break">
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13663"></a>25.21.&nbsp;Custom Response HTTP Headers</h2></div></div></div><p>
+      The RESTCONF server can be configured to reply with particular HTTP
+      headers in the HTTP response. For example, to support
+      Cross-Origin Resource Sharing (CORS, http://www.w3.org/TR/cors/)
+      there is a need to add a couple of headers to the HTTP
+      Response.
+    </p><p>
+      We add the extra configuration parameter in
+      <code class="filename">confd.conf</code>
+      .
+    </p><p>
+      </p><div class="example"><a name="d5e13669"></a><p class="title"><b>Example&nbsp;25.45.&nbsp;ConfD RESTCONF custom header configuration</b></p><div class="example-contents"><pre class="screen">
+    &lt;restconf&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;customHeaders&gt;
+        &lt;header&gt;
+          &lt;name&gt;Access-Control-Allow-Origin&lt;/name&gt;
+          &lt;value&gt;*&lt;/value&gt;
+        &lt;/header&gt;
+      &lt;/customHeaders&gt;
+    &lt;/restconf&gt;
+        </pre></div></div><p><br class="example-break">
+    </p><p>
+      
+    </p><p>
+      A number of HTTP header has been deemed so important by
+      security reasons that they, with sensible default values,
+      per default will be included in the RESTCONF reply. The values
+      can be changed by configuration in the
+      <code class="filename">confd.conf</code>
+      
+      file. Note that a configured empty value will effectively turn
+      off that particular header from being included in the
+      RESTCONF reply. The headers and their default values are:
+    </p><p>
+      </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="emphasis"><em>xFrameOptions</em></span> : <span class="emphasis"><em>DENY</em></span>
+          </p><p>
+            The default value indicate that the page cannot be displayed
+            in a frame/iframe/embed/object regardless of the site attempting
+            to do so.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>xContentTypeOptions</em></span> : <span class="emphasis"><em>nosniff</em></span>
+          </p><p>
+            The default value indicate that the MIME types advertised
+            in the Content-Type headers should not be changed and be
+            followed. In particular should requests for CSS or Javascript
+            be blocked in case a proper MIME type is not used.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>xXssProtection</em></span> : <span class="emphasis"><em>1; mode=block</em></span>
+          </p><p>
+            This header is a feature of
+            Internet Explorer, Chrome and Safari that stops pages from
+            loading when they detect reflected cross-site scripting
+            (XSS) attacks. It enables XSS filtering and tell the browser
+            to prevent rendering of the page if an attack is detected.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>strictTransportSecurity</em></span> :
+            <span class="emphasis"><em>max-age=15552000; includeSubDomains</em></span>
+          </p><p>
+            The default value tell browsers that the RESTCONF server should
+            only be accessed using HTTPS, instead of using HTTP.
+            It set the time that the browser should remember this and
+            state that this rule applies to all of the servers subdomains
+            as well.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>contentSecurityPolicy</em></span> :
+            <span class="emphasis"><em>default-src 'self'; block-all-mixed-content; base-uri 'self'; frame-ancestors 'none';</em></span>
+          </p><p>
+            The default value means that: Resources like fonts, scripts,
+            connections, images, and styles will all only load from
+            the same origin as the protected resource.
+            All mixed contents will be blocked and frame-ancestors like
+            iframes and applets is prohibited.
+          </p></li></ul></div><p>
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13702"></a>25.22.&nbsp;Generating Swagger for RESTCONF</h2></div></div></div><p>
+      Swagger is a documentation language used to describe RESTful APIs. The
+      resulting specifications are used to both document APIs as well as
+      generating clients in a variety of languages. For more information about
+      the Swagger specification itself and the ecosystem of tools available for
+      it, see <a class="link" href="https://swagger.io" target="_top">swagger.io</a>.
+    </p><p>
+      The RESTCONF API in <span class="phrase">ConfD</span> provides an HTTP-based interface for
+      accessing data. The YANG modules loaded into the system
+      define the schema for the data structures that can be manipulated using
+      the RESTCONF protocol. The <span class="command"><strong>yanger</strong></span> tool provides
+      options to generate Swagger specifications from YANG files. The tool
+      currently supports generating specifications according to OpenAPI/Swagger
+      2.0 using JSON encoding. The tool supports validation of JSON bodies in
+      body parameters and response bodies, and XML content validation is not
+      supported.
+    </p><p>
+      YANG and Swagger are two different languages serving slightly different
+      purposes. YANG is a data modeling language used to model configuration
+      data, state data, Remote Procedure Calls, and notifications for network
+      management protocols such as NETCONF and RESTCONF. Swagger is an API
+      definition language that documents API resource structure as well as
+      HTTP body content validation for applicable HTTP request methods.
+      Translation from YANG to Swagger is not perfect in the sense that there
+      are certain constructs and features in YANG that is not possible to
+      capture completely in Swagger. The design of the translation is designed
+      such that the resulting Swagger definitions are <span class="emphasis"><em>more</em></span>
+      restrictive than what is expressed in the YANG definitions. This means
+      that there are certain cases where a client can do more in the RESTCONF
+      API than what the Swagger definition expresses. There is also a set of
+      well-known resources defined in the
+      <a class="link" href="https://tools.ietf.org/html/rfc8040" target="_top">RESTCONF RFC 8040</a>
+      that are not part of the generated Swagger specification, notably
+      resources related to event streams.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e13712"></a>25.22.1.&nbsp;Using <span class="command"><strong>yanger</strong></span> to generate Swagger</h3></div></div></div><p>
+        The <span class="command"><strong>yanger</strong></span> tool is a YANG parser and validator that
+        provides options to convert YANG modules to a multitude of formats
+        including Swagger. You use the <span class="command"><strong>-f swagger</strong></span> option to
+        generate a Swagger definition from one or more YANG files. The following
+        command generates a Swagger file named <code class="filename">example.json</code>
+        from the <code class="filename">example.yang</code> YANG file:
+        </p><pre class="screen"><strong class="userinput"><code>
+yanger -t expand -f swagger example.yang -o example.json
+        </code></strong></pre><p>
+      </p><p>
+        It is only supported to generate Swagger from one YANG module at a
+        time. It is possible however to augment this module by supplying
+        additional modules. The following command generates a Swagger document
+        from <code class="filename">base.yang</code> which is augmented by
+        <code class="filename">base-ext-1.yang</code> and
+        <code class="filename">base-ext-2.yang</code>:
+        </p><pre class="screen"><strong class="userinput"><code>
+yanger -t expand -f swagger base.yang base-ext-1.yang base-ext-2.yang -o base.json
+        </code></strong></pre><p>
+        Only supplying augmenting modules is not supported.
+      </p><p>
+        Use the <span class="command"><strong>--help</strong></span> option to the
+        <span class="command"><strong>yanger</strong></span> command to see all available options:
+        </p><pre class="screen"><strong class="userinput"><code>
+yanger --help
+        </code></strong></pre><p>
+      </p><p>
+        The complete list of options related to Swagger generation is:
+        </p><pre class="screen">
+Swagger output specific options:
+  --swagger-host                    Add host to the Swagger output
+  --swagger-basepath                Add basePath to the Swagger output
+  --swagger-version                 Add version url to the Swagger output.
+                                    NOTE: this will override any revision
+                                    in the yang file
+  --swagger-tag-mode                Set tag mode to group resources. Valid
+                                    values are: methods, resources, all
+                                    [default: all]
+  --swagger-terms                   Add termsOfService to the Swagger
+                                    output
+  --swagger-contact-name            Add contact name to the Swagger output
+  --swagger-contact-url             Add contact url to the Swagger output
+  --swagger-contact-email           Add contact email to the Swagger output
+  --swagger-license-name            Add license name to the Swagger output
+  --swagger-license-url             Add license url to the Swagger output
+  --swagger-top-resource            Generate only swagger resources from
+                                    this top resource. Valid values are:
+                                    root, data, operations, all [default:
+                                    all]
+  --swagger-omit-query-params       Omit RESTCONF query parameters
+                                    [default: false]
+  --swagger-omit-body-params        Omit RESTCONF body parameters
+                                    [default: false]
+  --swagger-omit-form-params        Omit RESTCONF form parameters
+                                    [default: false]
+  --swagger-omit-header-params      Omit RESTCONF header parameters
+                                    [default: false]
+  --swagger-omit-path-params        Omit RESTCONF path parameters
+                                    [default: false]
+  --swagger-omit-standard-statuses  Omit standard HTTP response statuses.
+                                    NOTE: at least one successful HTTP
+                                    status will still be included
+                                    [default: false]
+  --swagger-methods                 HTTP methods to include. Example:
+                                    --swagger-methods "get, post"
+                                    [default: "get, post, put, patch,
+                                    delete"]
+  --swagger-path-filter             Filter out paths matching a path filter.
+                                    Example: --swagger-path-filter
+                                    "/data/example-jukebox/jukebox"
+  </pre><p>
+      </p><p>
+        Using the <code class="filename">example-jukebox.yang</code> from the
+        <a class="link" href="https://tools.ietf.org/html/rfc8040" target="_top">
+          RESTCONF RFC 8040</a>,
+        the following example generates a comprehensive Swagger
+        definition using a variety of the Swagger-related options:
+        </p><div class="example"><a name="d5e13738"></a><p class="title"><b>Example&nbsp;25.46.&nbsp;Comprehensive Swagger generation example</b></p><div class="example-contents"><pre class="screen"><strong class="userinput"><code>
+yanger -p . -t expand -f swagger example-jukebox.yang \
+       --swagger-host 127.0.0.1:8008 \
+       --swagger-basepath /restconf \
+       --swagger-version "My swagger version 1.0.0.1" \
+       --swagger-tag-mode all \
+       --swagger-terms "http://my-terms.example.com" \
+       --swagger-contact-name "my contact name" \
+       --swagger-contact-url "http://my-contact-url.example.com" \
+       --swagger-contact-email "my-contact-email@example.com" \
+       --swagger-license-name "my license name" \
+       --swagger-license-url "http://my-license-url.example.com" \
+       --swagger-top-resource all \
+       --swagger-omit-query-params false \
+       --swagger-omit-body-params false \
+       --swagger-omit-form-params false \
+       --swagger-omit-header-params false \
+       --swagger-omit-path-params false \
+       --swagger-omit-standard-statuses false \
+       --swagger-methods "post, get, patch, put, delete, head, options"
+        </code></strong></pre></div></div><p><br class="example-break">
+      </p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch24.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch26.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;24.&nbsp;The web server&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;26.&nbsp;The Management Agent API</td></tr></table></div></body></html>

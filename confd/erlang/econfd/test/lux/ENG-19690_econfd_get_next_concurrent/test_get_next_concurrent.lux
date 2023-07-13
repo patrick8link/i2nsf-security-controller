@@ -1,0 +1,257 @@
+[doc Test concurrent get_next with a econfd DP]
+
+[config require=TEST_DIR]
+[config skip_unless=PYTHON]
+
+[include $TEST_DIR/luxinc/conditional.luxinc]
+
+[macro test_get_next path]
+    [progress \ntest iteration ($path)\n]
+    !${PYTHON} test_get_next_concurrent.py get_next $path
+    ?press enter to get next cursor values
+    !
+    ?iteration 1
+    ???c1: {one}
+    ???c2: {one}
+    ???c3: {one}
+    !
+    ?iteration 2
+    ???c1: {two}
+    ???c2: {two}
+    ???c3: {two}
+    !
+    ?iteration 3
+    ???c1: {three}
+    ???c2: {three}
+    ???c3: {three}
+    !
+    ?iteration 4
+    ???c1: {four}
+    ???c2: {four}
+    ???c3: {four}
+    !
+    ?iteration 5
+    ???c1: None
+    ???c2: None
+    ???c3: None
+    ?iteration complete, stopping
+    [invoke ok]
+[endmacro]
+
+[macro test_find_next path]
+    [progress \ntest find_next + iteration ($path)\n]
+    !${PYTHON} test_get_next_concurrent.py find_next $path
+    """???
+    c1 initial keys [<_confd.Value type=C_BUF(5) value='two'>]
+    c2 initial keys [<_confd.Value type=C_BUF(5) value='three'>]
+    c3 initial keys [<_confd.Value type=C_BUF(5) value='four'>]
+    """
+
+    ?press enter to get next cursor values
+    !
+    """???
+    iteration 1
+    c1: {two}
+    c2: {three}
+    c3: {four}
+    """
+
+    !
+    """???
+    iteration 2
+    c1: {three}
+    c2: {four}
+    c3: None
+    """
+
+    !
+    """???
+    iteration 3
+    c1: {four}
+    c2: None
+    c3: None
+    """
+
+    !
+    """???
+    iteration 4
+    c1: None
+    c2: None
+    c3: None
+    """
+
+    ?iteration complete, stopping
+    [invoke ok]
+[endmacro]
+
+[macro test_get_next_object path]
+    [progress \ntest iteration ($path)\n]
+    !${PYTHON} test_get_next_concurrent.py get_next_object $path
+    ?press enter to get next cursor values
+    !
+    ?iteration 1
+    """???
+    c1
+      - one
+      - extra-1
+    c2
+      - one
+      - extra-1
+    c3
+      - one
+      - extra-1
+    """
+
+    !
+    ?iteration 2
+    """???
+    c1
+      - two
+      - extra-2
+    c2
+      - two
+      - extra-2
+    c3
+      - two
+      - extra-2
+    """
+
+    !
+    ?iteration 3
+    """???
+    c1
+      - three
+      - extra-3
+    c2
+      - three
+      - extra-3
+    c3
+      - three
+      - extra-3
+    """
+
+    !
+    ?iteration 4
+    """???
+    c1
+      - four
+      - extra-4
+    c2
+      - four
+      - extra-4
+    c3
+      - four
+      - extra-4
+    """
+
+    # no entries should appear
+    -^  -
+    !
+    ?iteration 5
+    """???
+    c1
+    c2
+    c3
+    """
+
+    ?iteration complete, stopping
+    -
+[endmacro]
+
+[macro test_find_next_object path]
+    [progress \ntest find_next_object ($path)\n]
+    !${PYTHON} test_get_next_concurrent.py find_next_object $path
+
+    """???
+    c1 initial keys [<_confd.Value type=C_BUF(5) value='two'>]
+    c2 initial keys [<_confd.Value type=C_BUF(5) value='three'>]
+    c3 initial keys [<_confd.Value type=C_BUF(5) value='four'>]
+    """
+
+    ?press enter to get next cursor values
+
+    !
+    """???
+    iteration 1
+    c1
+      - three
+      - extra-3
+    c2
+      - four
+      - extra-4
+    c3
+    """
+
+    !
+    """???
+    iteration 2
+    c1
+      - four
+      - extra-4
+    c2
+    c3
+    """
+
+    # no entries should appear
+    -^  -
+    !
+    """???
+    iteration 3
+    c1
+    c2
+    c3
+    """
+
+    ?iteration complete, stopping
+    -
+    [invoke ok]
+[endmacro]
+
+[shell devel.log]
+    !touch devel.log
+    [invoke ok]
+    !tail -f devel.log
+
+[shell confd]
+    [invoke start_system]
+
+[shell python-cli]
+    -[Tt]raceback
+
+    [invoke test_get_next /ENG-19690/elements/element]
+    [invoke test_find_next /ENG-19690/elements/element]
+
+    [invoke test_get_next_object /ENG-19690/objects/object]
+    [invoke test_get_next_object /ENG-19690/objects/multi-object]
+
+    [invoke test_find_next_object /ENG-19690/objects/object]
+    [invoke test_find_next_object /ENG-19690/objects/multi-object]
+
+[shell cli]
+    [progress \ntest -1 return from get_next_object\n]
+    !confd_cli -J -u admin
+    ?>
+    !configure
+    ?%
+    !show ENG-19690 objects find-next-multi-object
+    """???
+    find-next-multi-object one {
+        extra extra-1;
+    }
+    find-next-multi-object two {
+        extra extra-2;
+    }
+    find-next-multi-object three {
+        extra extra-3;
+    }
+    find-next-multi-object four {
+        extra extra-4;
+    }
+    """
+    ?%
+
+[shell confd]
+    [invoke end_test]
+
+[cleanup]
+    [invoke stop_system]

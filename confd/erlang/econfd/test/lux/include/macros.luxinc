@@ -1,0 +1,75 @@
+[macro eval cmd]
+    !$cmd
+    ?SH-PROMPT:
+    [invoke check_ok]
+[endmacro]
+
+[macro check_ok]
+    !echo ==$$?==
+    ?==0==
+    ?SH-PROMPT:
+[endmacro]
+
+[macro eval_any cmd]
+    !$cmd
+    ?SH-PROMPT:
+    !echo ==$$?==
+    ?==[0-9]+==
+    ?SH-PROMPT:
+[endmacro]
+
+[macro refresh_local_pwd]
+    [invoke eval "export PWD=`pwd`"]
+    !echo $$PWD
+    """?
+    echo.*
+    (.*)
+    SH-PROMPT:
+    """
+    [local PWD=$1]
+    [invoke check_ok]
+[endmacro]
+
+[macro confd_check]
+    # Display error log on stdout at fail
+    ~if [ "$$LUX_START_REASON" = "fail" ]; then
+    ~  confd --printlog logs/confderr.log;
+    !fi; true
+    ?SH-PROMPT:
+
+    # Save logs at fail
+    ~if [ "$LUX_START_REASON" = "fail" ]; then
+    ~  mkdir -p $LUX_EXTRA_LOGS/confd;
+    ~  cp -r ./logs/* $LUX_EXTRA_LOGS/confd;
+    !fi; true
+    ?SH-PROMPT:
+
+    # Fail if not stopped
+    !confd --status
+    ?SH-PROMPT:
+    !echo "==$$?=="
+    ?==1==
+    ?SH-PROMPT:
+[endmacro]
+
+[macro ncs_check]
+    # Display error log on stdout at fail
+    ~if [ "$$LUX_START_REASON" = "fail" ]; then
+    ~  confd --printlog logs/confderr.log;
+    !fi; true
+    ?SH-PROMPT:
+
+    # Save logs at fail
+    ~if [ "$LUX_START_REASON" = "fail" ]; then
+    ~  mkdir -p $LUX_EXTRA_LOGS/confd;
+    ~  cp -r ./logs/* $LUX_EXTRA_LOGS/confd;
+    !fi; true
+    ?SH-PROMPT:
+
+    # Fail if not stopped
+    !ncs --status
+    ?SH-PROMPT:
+    !echo "==$$?=="
+    ?==1==
+    ?SH-PROMPT:
+[endmacro]

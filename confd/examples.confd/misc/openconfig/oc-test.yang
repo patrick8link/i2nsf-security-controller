@@ -1,0 +1,69 @@
+module oc-test {
+  namespace "http://tail-f.com/ns/example/oc-test";
+  prefix oc-test;
+
+  import openconfig-extensions {
+    prefix oc-ext;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+  contact
+    "info@tail-f.com";
+  description
+    "YANG datamodel for an example showing how OpenConfig models can
+     be used with ConfD.
+     (C) 2019 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted.
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-10-18 {
+    description
+      "Initial revision.";
+  }
+  oc-ext:regexp-posix;
+
+  container root {
+    leaf full {
+      description
+        "String consisting of some small letters and up to
+         two numbers.";
+      type string {
+        pattern '^[a-z]+[0-9]{0,2}$';
+      }
+    }
+    leaf initial {
+      description
+        "String starting with three alphanumeric characters.";
+      type string {
+        pattern '^[a-zA-Z0-9]{3}';
+      }
+    }
+    leaf terminal {
+      description
+        "String terminated by two digits.";
+      type string {
+        pattern '[0-9]{2}$';
+      }
+    }
+    leaf inside {
+      description
+        "String containing three consecutive 'A' somewhere
+         inside.";
+      type string {
+        pattern 'AAA';
+      }
+    }
+    leaf embedded {
+      description
+        "String with embedded '^' and '$'; they will remain as they
+         are, although true POSIX regex interpretation would refuse
+         such pattern.";
+      type string {
+        pattern 'a*^b*$c*';
+      }
+    }
+  }
+}

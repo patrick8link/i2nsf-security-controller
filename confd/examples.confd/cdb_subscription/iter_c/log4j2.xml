@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+  <Appenders>
+    <Console name="A1" target="SYSTEM_OUT">
+      <PatternLayout
+      pattern="&#60;%-4p&#62; %d{dd-MMM-yyyy::HH:mm:ss.SSS} %C{1} %t: - %m%n"/>
+    </Console>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="com.tailf" level="warn" additivity="false">
+      <AppenderRef ref="A1"/>
+    </Logger>
+    <Logger name="Cdbl" level="warn" additivity="false">
+      <AppenderRef ref="A1"/>
+    </Logger>
+    <Logger name="DiffIterateImpl" level="warn" additivity="false">
+      <AppenderRef ref="A1"/>
+    </Logger>
+    <Logger name="com.tailf.cdb" level="info" additivity="false">
+      <AppenderRef ref="A1"/>
+    </Logger>
+
+    <Root level="warn">
+      <AppenderRef ref="A1"/>
+    </Root>
+  </Loggers>
+</Configuration>

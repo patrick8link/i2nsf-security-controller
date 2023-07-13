@@ -1,0 +1,80 @@
+This example demonstrates the usage of origin as a list filter.
+
+The NETCONF origin-filter and negated-origin-filter parameters can be
+passed down to data provider as a list filter expression if the flag
+CONFD_DATA_WANT_FILTER has been set when the data callback are
+registered. A difference from other list filters is that the 'origin'
+expression in a list filter is true if any node in the list entry has
+an origin attribute that matches the given value. The data provider
+may be able to determine this without actually traversing the nodes,
+but the simple implementation in this example will do such a
+traversal. For the list entries that are returned from the data
+provider, ConfD will always perform filtering such that only the
+specific nodes that have a matching origin will be returned, as
+required by the specification.
+
+About the NETCONF Client used in the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A NETCONF client 'netconf-console', which is part of the ConfD
+installation, is used in this example. This client communicates with
+ConfD over SSH and requires Python Paramiko package (on Ubuntu you can
+install it by command 'apt-get install python-paramiko'). In case SSH
+cannot be used, there is 'netconf-console-tcp' variant. To use
+'netconf-console-tcp', update 'confd.conf' to enable
+'netconf/transport/tcp' and change all 'netconf-console' calls to
+'netconf-console-tcp'.
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+Two operational test interfaces lo and eth0 are pre-defined in the
+data provider module 'interface_dp.c. The first part of the example
+sets the CONFD_DATA_WANT_FILTER flag and ConfD passes the origin
+filters down to the DP. The same test is repeated without passing the
+filters to the DP in the second part.
+
+Starting the example
+~~~~~~~~~~~~~~~~~~~~~~
+ 1. Build the necessary files and start ConfD.
+
+    $ make all start
+
+ 2. On the same window, run interface_dp that wants list filters.
+    interface_dp will be running in the foreground.
+
+    $ make dp_want_filter
+
+ 3. In another window, retrieve interfaces that have origin
+    "intended". Typing the following command will pass the origin
+    filters to the DP.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+    --with-origin --origin-filter=intended
+
+ 4. Retrieve the data callback counters.
+    Typing the following command will show the number of registered data
+    callback calls.
+
+    $ echo g | nc localhost 9999
+
+    In order to repeat the test and get the same results without
+    restarting the dp module, use the following command to clear the
+    data callback counters.
+
+    $ echo c | nc localhost 9999
+
+ 5. Run the same test but this time without the flag
+    CONFD_DATA_WANT_FILTER:
+
+    $ make dp_not_want_filter
+
+ 6. Retrieve interfaces using the same command as in step 3.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+    --with-origin --origin-filter=intended
+
+ 7. Retrieve the data callback counters again and compare them with
+    the counters that are retrieved in step 4. Note that in the later
+    run the DP replies without filtering thus iteration on the list
+    required more number of API invocations.
+
+    $ echo g | nc localhost 9999

@@ -1,0 +1,12 @@
+# Created by: admin
+# Date: 2023-07-07 04:46:15
+# Via: netconf
+# Type: delta
+# Label: 
+# Comment: 
+# No: 10181
+# TransactionId: 11
+# Hostname: ubuntu
+
+delete:
+i2nsf-security-policy block_attack;

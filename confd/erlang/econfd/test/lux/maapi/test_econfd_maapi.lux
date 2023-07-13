@@ -1,0 +1,27 @@
+[doc Test econfd MAAPI API]
+
+[config require=$TEST_DIR]
+
+[include $TEST_DIR/luxinc/conditional.luxinc]
+
+[shell confd]
+    [invoke start_system]
+
+[shell test]
+    [progress \nrunning test\n]
+    -^init:boot_msg
+    !erl -pa ../../../ebin -noshell -s test_econfd_maapi test -s init stop
+    ?test_maapi_xpath_get_next
+    [progress \ntest_maapi_xpath_get_next\n]
+    ?^ALL READ OK
+    ?test_maapi_get_rollback_id
+    [progress \ntest_maapi_get_rollback_id\n]
+    ?^ALL READ/WRITE OK
+    [invoke ok]
+
+[shell confd]
+    [invoke end_test]
+
+[cleanup]
+    [progress \ncleanup\n]
+    [invoke stop_system]

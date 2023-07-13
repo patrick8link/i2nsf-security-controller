@@ -1,0 +1,23 @@
+module test {
+  namespace "urn:test";
+  prefix test;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  revision 2021-03-26 {
+    description
+      "Initial revision.";
+  }
+
+  tailf:snmp-mib-module-name TAIL-F-TEST-MIB;
+  tailf:snmp-oid "enterprises.24961.2";
+
+  container test {
+    leaf a_leaf {
+      tailf:snmp-oid .1;
+      type string;
+    }
+  }
+}

@@ -1,0 +1,1264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module econfd_maapi</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module econfd_maapi</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>A n Erlang interface equivalent to the MAAPI C-API.
+<p>Copyright © 2006 Tail-F Systems AB</p>
+
+<p><b>Version:</b> {$Id$}</p>
+
+<h2><a name="description">Description</a></h2><p>A n Erlang interface equivalent to the MAAPI C-API</p>
+  
+   This modules implements the Management Agent API. All functions in
+   this module have an equivalent function in the C library.  The
+   actual semantics of each of the API functions described here is
+   better described in the man page confd_lib_maapi(3).
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-confd_trans_ctx">confd_trans_ctx()</a></h3>
+<p><tt>confd_trans_ctx() = #confd_trans_ctx{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-confd_user_identification">confd_user_identification()</a></h3>
+<p><tt>confd_user_identification() = #confd_user_identification{vendor = undefined | string(), product = undefined | string(), version = undefined | string(), client_identity = undefined | string()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-confd_user_info">confd_user_info()</a></h3>
+<p><tt>confd_user_info() = #confd_user_info{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-dbname">dbname()</a></h3>
+<p><tt>dbname() = 0 | 1 | 2 | 3 | 4 | 6 | 7</tt></p>
+<p>  The DB name can be either<ul>
+  <li> 0 = CONFD_NO_DB </li>
+  <li> 1 = CONFD_CANDIDATE </li>
+  <li> 2 = CONFD_RUNNING </li>
+  <li> 3 = CONFD_STARTUP </li>
+  <li> 4 = CONFD_OPERATIONAL </li>
+  <li> 6 = CONFD_PRE_COMMIT_RUNNING </li>
+  <li> 7 = CONFD_INTENDED </li></ul>
+  Check <code>maapi_start_trans()</code> in confd_lib_maapi(3) for detailed information.</p>
+
+<h3 class="typedecl"><a name="type-err">err()</a></h3>
+<p><tt>err() = {error, {integer(), binary()}} | {error, closed}</tt></p>
+<p>  Errors can be either
+  <ul><li> {error, Ecode::integer(), Reason::binary()} where Ecode is
+  one of the error codes defined in econfd_errors.hrl, and Reason is
+  (possibly empty) textual description </li>
+  <li> {error, closed} if the socket gets closed </li></ul></p>
+
+<h3 class="typedecl"><a name="type-find_next_type">find_next_type()</a></h3>
+<p><tt>find_next_type() = 0 | 1</tt></p>
+<p>  The type is used in <a href="#find_next-3"><code>find_next/3</code></a> can be either<ul>
+  <li> 0 = CONFD_FIND_NEXT </li>
+  <li> 1 = CONFD_FIND_SAME_OR_NEXT </li></ul>
+  Check <code>maapi_find_next()</code> in confd_lib_maapi(3) for detailed information.</p>
+
+<h3 class="typedecl"><a name="type-maapi_cursor">maapi_cursor()</a></h3>
+<p><tt>maapi_cursor() = #maapi_cursor{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-maapi_rollback">maapi_rollback()</a></h3>
+<p><tt>maapi_rollback() = #maapi_rollback{nr = integer(), creator = binary(), date = binary(), via = binary(), fixed_nr = integer(), label = binary(), comment = binary()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-proto">proto()</a></h3>
+<p><tt>proto() = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9</tt></p>
+<p>  The protocol to start user session can be either<ul>
+  <li> 0 = CONFD_PROTO_UNKNOWN </li>
+  <li> 1 = CONFD_PROTO_TCP </li>
+  <li> 2 = CONFD_PROTO_SSH </li>
+  <li> 3 = CONFD_PROTO_SYSTEM </li>
+  <li> 4 = CONFD_PROTO_CONSOLE </li>
+  <li> 5 = CONFD_PROTO_SSL </li>
+  <li> 6 = CONFD_PROTO_HTTP </li>
+  <li> 7 = CONFD_PROTO_HTTPS </li>
+  <li> 8 = CONFD_PROTO_UDP </li>
+  <li> 9 = CONFD_PROTO_TLS </li></ul></p>
+
+<h3 class="typedecl"><a name="type-xpath_eval_option">xpath_eval_option()</a></h3>
+<p><tt>xpath_eval_option() = {tracefun, term()} | {context, <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a>} | {varbindings, [{Name::string(), ValueExpr::string() | binary()}]} | {root, <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a>}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#aaa_reload-2">aaa_reload/2</a></td><td>Tell AAA to reload external AAA data.</td></tr>
+<tr><td valign="top"><a href="#abort_trans-2">abort_trans/2</a></td><td>Abort transaction.</td></tr>
+<tr><td valign="top"><a href="#abort_upgrade-1">abort_upgrade/1</a></td><td>Abort in-service upgrade.</td></tr>
+<tr><td valign="top"><a href="#all_keys-3">all_keys/3</a></td><td>Utility function.</td></tr>
+<tr><td valign="top"><a href="#apply_trans-3">apply_trans/3</a></td><td>Equivalent to <a href="#apply_trans-4"><tt>apply_trans(Socket, Tid, KeepOpen, 0)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#apply_trans-4">apply_trans/4</a></td><td>Apply all in the transaction.</td></tr>
+<tr><td valign="top"><a href="#attach-3">attach/3</a></td><td>Attach to a running transaction.</td></tr>
+<tr><td valign="top"><a href="#attach2-4">attach2/4</a></td><td>Attach to a running transaction.</td></tr>
+<tr><td valign="top"><a href="#attach_init-1">attach_init/1</a></td><td>Attach to the CDB init/upgrade transaction in phase0.</td></tr>
+<tr><td valign="top"><a href="#authenticate-4">authenticate/4</a></td><td>Autenticate a user using ConfD AAA.</td></tr>
+<tr><td valign="top"><a href="#authenticate2-8">authenticate2/8</a></td><td>Autenticate a user using ConfD AAA.</td></tr>
+<tr><td valign="top"><a href="#candidate_abort_commit-1">candidate_abort_commit/1</a></td><td>Equivalent to <a href="#candidate_abort_commit-2"><tt>candidate_abort_commit(Socket, &lt;&lt;&gt;&gt;)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#candidate_abort_commit-2">candidate_abort_commit/2</a></td><td>Cancel persistent confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_commit-1">candidate_commit/1</a></td><td>Copies candidate to running or confirms a confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_commit-2">candidate_commit/2</a></td><td>Confirms persistent confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_commit_info-3">candidate_commit_info/3</a></td><td>Like <a href="#candidate_commit-1"><code>candidate_commit/1</code></a>, but set the "Label" and/or "Comment"  
+that is stored in the rollback file when the candidate is committed  
+to running.</td></tr>
+<tr><td valign="top"><a href="#candidate_commit_info-4">candidate_commit_info/4</a></td><td>Combines <a href="#candidate_commit-2"><code>candidate_commit/2</code></a> and <a href="#candidate_commit_info-3"><code>candidate_commit_info/3</code></a>  
+- set "Label" and/or "Comment" when confirming a persistent confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_confirmed_commit-2">candidate_confirmed_commit/2</a></td><td>Copy candidate into running, but rollback if not confirmed by a
+  call of <a href="#candidate_commit-1"><code>candidate_commit/1</code></a>.</td></tr>
+<tr><td valign="top"><a href="#candidate_confirmed_commit-4">candidate_confirmed_commit/4</a></td><td>Starts or extends persistent confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_confirmed_commit_info-4">candidate_confirmed_commit_info/4</a></td><td>Like <a href="#candidate_confirmed_commit-2"><code>candidate_confirmed_commit/2</code></a>, but set the "Label"  
+and/or "Comment" that is stored in the rollback file when the  
+candidate is committed to running.</td></tr>
+<tr><td valign="top"><a href="#candidate_confirmed_commit_info-6">candidate_confirmed_commit_info/6</a></td><td>Combines <a href="#candidate_confirmed_commit-4"><code>candidate_confirmed_commit/4</code></a> and <a href="#candidate_confirmed_commit_info-4"><code>candidate_confirmed_commit_info/4</code></a> - set "Label" and/or "Comment"  
+when starting or extending a persistent confirmed commit.</td></tr>
+<tr><td valign="top"><a href="#candidate_reset-1">candidate_reset/1</a></td><td>Copy running into candidate.</td></tr>
+<tr><td valign="top"><a href="#candidate_validate-1">candidate_validate/1</a></td><td>Validate the candidate config.</td></tr>
+<tr><td valign="top"><a href="#cli_prompt-4">cli_prompt/4</a></td><td>Prompt CLI user for a reply.</td></tr>
+<tr><td valign="top"><a href="#cli_prompt-5">cli_prompt/5</a></td><td>Prompt CLI user for a reply - return error if no reply is
+       received within Timeout seconds.</td></tr>
+<tr><td valign="top"><a href="#cli_prompt_oneof-4">cli_prompt_oneof/4</a></td><td>Prompt CLI user for a reply.</td></tr>
+<tr><td valign="top"><a href="#cli_prompt_oneof-5">cli_prompt_oneof/5</a></td><td>Prompt CLI user for a reply - return error if no reply is
+       received within Timeout seconds.</td></tr>
+<tr><td valign="top"><a href="#cli_read_eof-3">cli_read_eof/3</a></td><td>Read data from CLI until EOF.</td></tr>
+<tr><td valign="top"><a href="#cli_read_eof-4">cli_read_eof/4</a></td><td>Read data from CLI until EOF - return error if no reply is
+       received within Timeout seconds.</td></tr>
+<tr><td valign="top"><a href="#cli_write-3">cli_write/3</a></td><td>Write mesage to the CLI.</td></tr>
+<tr><td valign="top"><a href="#close-1">close/1</a></td><td>Close socket.</td></tr>
+<tr><td valign="top"><a href="#commit_trans-2">commit_trans/2</a></td><td>Commit a transaction.</td></tr>
+<tr><td valign="top"><a href="#commit_upgrade-1">commit_upgrade/1</a></td><td>Commit in-service upgrade.</td></tr>
+<tr><td valign="top"><a href="#confirmed_commit_in_progress-1">confirmed_commit_in_progress/1</a></td><td>Is a confirmed commit in progress.</td></tr>
+<tr><td valign="top"><a href="#connect-2">connect/2</a></td><td>Connect a maapi socket to ConfD.</td></tr>
+<tr><td valign="top"><a href="#copy-3">copy/3</a></td><td>Copy data from one transaction to another.</td></tr>
+<tr><td valign="top"><a href="#copy_running_to_startup-1">copy_running_to_startup/1</a></td><td>Copy running to startup.</td></tr>
+<tr><td valign="top"><a href="#copy_tree-4">copy_tree/4</a></td><td>Copy an entire subtree in the configuration from one point to another.</td></tr>
+<tr><td valign="top"><a href="#create-3">create/3</a></td><td>Create a new element.</td></tr>
+<tr><td valign="top"><a href="#delete-3">delete/3</a></td><td> Delete an element.</td></tr>
+<tr><td valign="top"><a href="#delete_config-2">delete_config/2</a></td><td>Delete all data from a data store.</td></tr>
+<tr><td valign="top"><a href="#detach-2">detach/2</a></td><td>Detach from the transaction.</td></tr>
+<tr><td valign="top"><a href="#diff_iterate-4">diff_iterate/4</a></td><td>Equivalent to <a href="#diff_iterate-5"><tt>diff_iterate(Sock, Tid, Fun, 0, InitState)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#diff_iterate-5">diff_iterate/5</a></td><td>Iterate through a diff.</td></tr>
+<tr><td valign="top"><a href="#end_user_session-1">end_user_session/1</a></td><td>Ends a user session.</td></tr>
+<tr><td valign="top"><a href="#exists-3">exists/3</a></td><td> Check if an element exists.</td></tr>
+<tr><td valign="top"><a href="#find_next-3">find_next/3</a></td><td>find the list entry matching Type and Key.</td></tr>
+<tr><td valign="top"><a href="#finish_trans-2">finish_trans/2</a></td><td>Finish a transaction.</td></tr>
+<tr><td valign="top"><a href="#get_attrs-4">get_attrs/4</a></td><td>Get the selected attributes for an element.</td></tr>
+<tr><td valign="top"><a href="#get_authorization_info-2">get_authorization_info/2</a></td><td>Get authorization info for a user session.</td></tr>
+<tr><td valign="top"><a href="#get_case-4">get_case/4</a></td><td>Get the current case for a choice.</td></tr>
+<tr><td valign="top"><a href="#get_elem-3">get_elem/3</a></td><td>Read an element.</td></tr>
+<tr><td valign="top"><a href="#get_elem_no_defaults-3">get_elem_no_defaults/3</a></td><td>(<em>Deprecated</em>.) Read an element, but return 'default' instead of the value if
+  the default value is in effect.</td></tr>
+<tr><td valign="top"><a href="#get_my_user_session_id-1">get_my_user_session_id/1</a></td><td>Get my user session id.</td></tr>
+<tr><td valign="top"><a href="#get_next-1">get_next/1</a></td><td>iterate through the entries of a list.</td></tr>
+<tr><td valign="top"><a href="#get_object-3">get_object/3</a></td><td>Read all the values in a container or list entry.</td></tr>
+<tr><td valign="top"><a href="#get_objects-2">get_objects/2</a></td><td>Read all the values for NumEntries list entries,  
+starting at the point given by the cursor C.</td></tr>
+<tr><td valign="top"><a href="#get_rollback_id-2">get_rollback_id/2</a></td><td>Get rollback id of commited transaction.</td></tr>
+<tr><td valign="top"><a href="#get_running_db_status-1">get_running_db_status/1</a></td><td>Get the "running status".</td></tr>
+<tr><td valign="top"><a href="#get_user_session-2">get_user_session/2</a></td><td>Get session info for a user session.</td></tr>
+<tr><td valign="top"><a href="#get_user_sessions-1">get_user_sessions/1</a></td><td>Get all user sessions.</td></tr>
+<tr><td valign="top"><a href="#get_values-4">get_values/4</a></td><td>Read the values for the leafs that have the "value" 'not_found'  
+in the Values list.</td></tr>
+<tr><td valign="top"><a href="#hkeypath2ikeypath-2">hkeypath2ikeypath/2</a></td><td>(<em>Deprecated</em>.) Convert a hkeypath to an ikeypath.</td></tr>
+<tr><td valign="top"><a href="#init_cursor-3">init_cursor/3</a></td><td>Equivalent to <a href="#init_cursor-4"><tt>init_cursor(Socket, Tik, IKeypath, undefined)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#init_cursor-4">init_cursor/4</a></td><td>Initalize a get_next() cursor.</td></tr>
+<tr><td valign="top"><a href="#init_upgrade-3">init_upgrade/3</a></td><td>Start in-service upgrade.</td></tr>
+<tr><td valign="top"><a href="#insert-3">insert/3</a></td><td>Insert an entry in an integer-keyed list.</td></tr>
+<tr><td valign="top"><a href="#install_crypto_keys-1">install_crypto_keys/1</a></td><td>Fetch keys for the encrypted data types from the server.</td></tr>
+<tr><td valign="top"><a href="#is_candidate_modified-1">is_candidate_modified/1</a></td><td>Check if candidate has been modified.</td></tr>
+<tr><td valign="top"><a href="#is_lock_set-2">is_lock_set/2</a></td><td>Check if a db is locked or not.</td></tr>
+<tr><td valign="top"><a href="#is_running_modified-1">is_running_modified/1</a></td><td>Check if running has been modified since
+  the last copy to startup was done.</td></tr>
+<tr><td valign="top"><a href="#iterate-6">iterate/6</a></td><td>Iterate over all the data in the transaction and the underlying  
+data store.</td></tr>
+<tr><td valign="top"><a href="#keypath_diff_iterate-5">keypath_diff_iterate/5</a></td><td>Iterate through a diff.</td></tr>
+<tr><td valign="top"><a href="#keypath_diff_iterate-6">keypath_diff_iterate/6</a></td><td></td></tr>
+<tr><td valign="top"><a href="#kill_user_session-2">kill_user_session/2</a></td><td>Kill a user session.</td></tr>
+<tr><td valign="top"><a href="#list_rollbacks-1">list_rollbacks/1</a></td><td>Get a list of available rollback files.</td></tr>
+<tr><td valign="top"><a href="#load_rollback-3">load_rollback/3</a></td><td>Load a rollback file.</td></tr>
+<tr><td valign="top"><a href="#lock-2">lock/2</a></td><td>Lock a database.</td></tr>
+<tr><td valign="top"><a href="#lock_partial-3">lock_partial/3</a></td><td>Request a partial lock on a database.</td></tr>
+<tr><td valign="top"><a href="#move-4">move/4</a></td><td>Move (rename) an entry in a list.</td></tr>
+<tr><td valign="top"><a href="#move_ordered-4">move_ordered/4</a></td><td>Move an entry in an "ordered-by user" list.</td></tr>
+<tr><td valign="top"><a href="#ncs_apply_template-7">ncs_apply_template/7</a></td><td>Apply a template that has been loaded into NCS.</td></tr>
+<tr><td valign="top"><a href="#ncs_apply_trans_params-4">ncs_apply_trans_params/4</a></td><td>Apply transaction with commit parameters.</td></tr>
+<tr><td valign="top"><a href="#ncs_get_trans_params-2">ncs_get_trans_params/2</a></td><td>Get transaction commit parameters.</td></tr>
+<tr><td valign="top"><a href="#ncs_template_variables-3">ncs_template_variables/3</a></td><td>Retrieve the variables used in a template.</td></tr>
+<tr><td valign="top"><a href="#ncs_templates-1">ncs_templates/1</a></td><td>Retrieve a list of the templates currently loaded into NCS.</td></tr>
+<tr><td valign="top"><a href="#ncs_write_service_log_entry-5">ncs_write_service_log_entry/5</a></td><td>Write a service log entry.</td></tr>
+<tr><td valign="top"><a href="#netconf_ssh_call_home-3">netconf_ssh_call_home/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#netconf_ssh_call_home_opaque-4">netconf_ssh_call_home_opaque/4</a></td><td></td></tr>
+<tr><td valign="top"><a href="#num_instances-3">num_instances/3</a></td><td> Find the number of entries in a list.</td></tr>
+<tr><td valign="top"><a href="#perform_upgrade-2">perform_upgrade/2</a></td><td>Do in-service upgrade.</td></tr>
+<tr><td valign="top"><a href="#prepare_trans-2">prepare_trans/2</a></td><td>Equivalent to <a href="#prepare_trans-3"><tt>prepare_trans(Socket, Tid, 0)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#prepare_trans-3">prepare_trans/3</a></td><td>Prepare for commit.</td></tr>
+<tr><td valign="top"><a href="#prio_message-3">prio_message/3</a></td><td>Write priority message.</td></tr>
+<tr><td valign="top"><a href="#reload_config-1">reload_config/1</a></td><td>Tell ConfD daemon to reload its configuration.</td></tr>
+<tr><td valign="top"><a href="#request_action-3">request_action/3</a></td><td>Invoke an action defined in the data model.</td></tr>
+<tr><td valign="top"><a href="#revert-2">revert/2</a></td><td>Remove all changes in the transaction.</td></tr>
+<tr><td valign="top"><a href="#set_attr-5">set_attr/5</a></td><td>Set the an attribute for an element.</td></tr>
+<tr><td valign="top"><a href="#set_comment-3">set_comment/3</a></td><td>Set the "Comment" that is stored in the rollback file when a
+  transaction towards running is committed.</td></tr>
+<tr><td valign="top"><a href="#set_delayed_when-3">set_delayed_when/3</a></td><td>Enable/disable the "delayed when" mode for a transaction.</td></tr>
+<tr><td valign="top"><a href="#set_elem-4">set_elem/4</a></td><td>Write an element.</td></tr>
+<tr><td valign="top"><a href="#set_elem2-4">set_elem2/4</a></td><td>Write an element using the textual value representation.</td></tr>
+<tr><td valign="top"><a href="#set_flags-3">set_flags/3</a></td><td>Change flag settings for a transaction.</td></tr>
+<tr><td valign="top"><a href="#set_label-3">set_label/3</a></td><td>Set the "Label" that is stored in the rollback file when a
+  transaction towards running is committed.</td></tr>
+<tr><td valign="top"><a href="#set_object-4">set_object/4</a></td><td>Write an entire object, i.e.</td></tr>
+<tr><td valign="top"><a href="#set_readonly_mode-2">set_readonly_mode/2</a></td><td>Control if we can create rw transactions.</td></tr>
+<tr><td valign="top"><a href="#set_running_db_status-2">set_running_db_status/2</a></td><td>Set the "running status".</td></tr>
+<tr><td valign="top"><a href="#set_user_session-2">set_user_session/2</a></td><td>Assign a user session.</td></tr>
+<tr><td valign="top"><a href="#set_values-4">set_values/4</a></td><td>Write a list of tagged values.</td></tr>
+<tr><td valign="top"><a href="#shared_create-3">shared_create/3</a></td><td>Create a new element, and also set an attribute indicating
+  how many times this element has been created.</td></tr>
+<tr><td valign="top"><a href="#shared_set_elem-4">shared_set_elem/4</a></td><td>Write an element from NCS FastMap.</td></tr>
+<tr><td valign="top"><a href="#shared_set_elem2-4">shared_set_elem2/4</a></td><td>Write an element using the textual value representation
+   from NCS fastmap.</td></tr>
+<tr><td valign="top"><a href="#shared_set_values-4">shared_set_values/4</a></td><td>Write a list of tagged values from NCS FastMap.</td></tr>
+<tr><td valign="top"><a href="#snmpa_reload-2">snmpa_reload/2</a></td><td>Tell ConfD to reload external SNMP Agent config data.</td></tr>
+<tr><td valign="top"><a href="#start_phase-3">start_phase/3</a></td><td>Tell ConfD to proceed to next start phase.</td></tr>
+<tr><td valign="top"><a href="#start_trans-3">start_trans/3</a></td><td>Start a new transaction.</td></tr>
+<tr><td valign="top"><a href="#start_trans-4">start_trans/4</a></td><td>Start a new transaction within an existing user session.</td></tr>
+<tr><td valign="top"><a href="#start_trans-5">start_trans/5</a></td><td>Start a new transaction within an existing user session and/or  
+with flags.</td></tr>
+<tr><td valign="top"><a href="#start_trans_in_trans-4">start_trans_in_trans/4</a></td><td>Start a new transaction with an existing transaction as backend.</td></tr>
+<tr><td valign="top"><a href="#start_trans_in_trans-5">start_trans_in_trans/5</a></td><td>Start a new transaction with an existing transaction as backend.</td></tr>
+<tr><td valign="top"><a href="#start_user_session-6">start_user_session/6</a></td><td>Equivalent to <a href="#start_user_session-7"><tt>start_user_session(Socket, UserName, Context, Groups,
+		   SrcIp, 0, Proto)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#start_user_session-7">start_user_session/7</a></td><td>Equivalent to <a href="#start_user_session-8"><tt>start_user_session(Socket, UserName, Context, Groups,
+		   SrcIp, 0, Proto, undefined)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#start_user_session-8">start_user_session/8</a></td><td>Initiate a new maapi user session.</td></tr>
+<tr><td valign="top"><a href="#stop-1">stop/1</a></td><td>Tell ConfD daemon to stop, returns when daemon has exited.</td></tr>
+<tr><td valign="top"><a href="#stop-2">stop/2</a></td><td>Tell ConfD daemon to stop, if Synchronous is true won't return       
+until daemon has come to a halt.</td></tr>
+<tr><td valign="top"><a href="#sys_message-3">sys_message/3</a></td><td>Write system message.</td></tr>
+<tr><td valign="top"><a href="#unlock-2">unlock/2</a></td><td>Unlock a database.</td></tr>
+<tr><td valign="top"><a href="#unlock_partial-2">unlock_partial/2</a></td><td>Remove the partial lock identified by LockId.</td></tr>
+<tr><td valign="top"><a href="#user_message-4">user_message/4</a></td><td>Write user message.</td></tr>
+<tr><td valign="top"><a href="#validate_trans-4">validate_trans/4</a></td><td>Validate the transaction.</td></tr>
+<tr><td valign="top"><a href="#wait_start-1">wait_start/1</a></td><td>Wait until ConfD daemon has completely started.</td></tr>
+<tr><td valign="top"><a href="#wait_start-2">wait_start/2</a></td><td>Wait until ConfD daemon has reached a certain start phase.</td></tr>
+<tr><td valign="top"><a href="#xpath_eval-6">xpath_eval/6</a></td><td>Evaluate the XPath expression Expr, invoking ResultFun for each node  
+in the resulting node set.</td></tr>
+<tr><td valign="top"><a href="#xpath_eval-7">xpath_eval/7</a></td><td>(<em>Deprecated</em>.) Evaluate the XPath expression Expr, invoking ResultFun for each node  
+in the resulting node set.</td></tr>
+<tr><td valign="top"><a href="#xpath_eval_expr-4">xpath_eval_expr/4</a></td><td>Evaluate the XPath expression Expr, returning the result as a string.</td></tr>
+<tr><td valign="top"><a href="#xpath_eval_expr-5">xpath_eval_expr/5</a></td><td>Evaluate the XPath expression Expr, returning the result as a string.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="aaa_reload-2">aaa_reload/2</a></h3>
+<div class="spec">
+<p><tt>aaa_reload(Socket, Synchronous) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Synchronous = boolean()</tt></li></ul></p>
+</div><p>Tell AAA to reload external AAA data.</p>
+
+<h3 class="function"><a name="abort_trans-2">abort_trans/2</a></h3>
+<div class="spec">
+<p><tt>abort_trans(Socket, Tid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Abort transaction.</p>
+
+<h3 class="function"><a name="abort_upgrade-1">abort_upgrade/1</a></h3>
+<div class="spec">
+<p><tt>abort_upgrade(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Abort in-service upgrade.</p>
+
+<h3 class="function"><a name="all_keys-3">all_keys/3</a></h3>
+<div class="spec">
+<p><tt>all_keys(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-key">econfd:key()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Utility function. Return all keys in a list.</p>
+
+<h3 class="function"><a name="apply_trans-3">apply_trans/3</a></h3>
+<div class="spec">
+<p><tt>apply_trans(Socket, Tid, KeepOpen) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>KeepOpen = boolean()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#apply_trans-4"><tt>apply_trans(Socket, Tid, KeepOpen, 0)</tt></a>.</p>
+
+
+<h3 class="function"><a name="apply_trans-4">apply_trans/4</a></h3>
+<div class="spec">
+<p><tt>apply_trans(Socket, Tid, KeepOpen, Flags) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>KeepOpen = boolean()</tt></li><li><tt>Flags = non_neg_integer()</tt></li></ul></p>
+</div><p><p>Apply all in the transaction.</p>
+ 
+  This is the combination of validate/prepare/commit done in the
+  right order.</p>
+
+<h3 class="function"><a name="attach-3">attach/3</a></h3>
+<div class="spec">
+<p><tt>attach(Socket, Ns, Tctx) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Ns = <a href="econfd.html#type-namespace">econfd:namespace()</a> | 0</tt></li><li><tt>Tctx = <a href="#type-confd_trans_ctx">confd_trans_ctx()</a></tt></li></ul></p>
+</div><p><p>Attach to a running transaction.</p>
+ 
+  Give NameSpace as 0 if
+  it doesn't matter (-1 works too but is deprecated).</p>
+
+<h3 class="function"><a name="attach2-4">attach2/4</a></h3>
+<div class="spec">
+<p><tt>attach2(Socket, Ns, USid, Thandle) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Ns = <a href="econfd.html#type-namespace">econfd:namespace()</a> | 0</tt></li><li><tt>USid = integer()</tt></li><li><tt>Thandle = integer()</tt></li></ul></p>
+</div><p>Attach to a running transaction. Give NameSpace as 0 if
+  it doesn't matter (-1 works too but is deprecated).</p>
+
+<h3 class="function"><a name="attach_init-1">attach_init/1</a></h3>
+<div class="spec">
+<p><tt>attach_init(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, Thandle} | <a href="#type-err">err()</a></tt></li><li><tt>Thandle = integer()</tt></li></ul></p>
+</div><p><p>Attach to the CDB init/upgrade transaction in phase0.</p>
+ 
+  Returns the transaction handle to use in subsequent maapi calls on success.</p>
+
+<h3 class="function"><a name="authenticate-4">authenticate/4</a></h3>
+<div class="spec">
+<p><tt>authenticate(Socket, User, Pass, Groups) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>User = binary()</tt></li><li><tt>Pass = binary()</tt></li><li><tt>Groups = [binary()]</tt></li></ul></p>
+</div><p>Autenticate a user using ConfD AAA.</p>
+
+<h3 class="function"><a name="authenticate2-8">authenticate2/8</a></h3>
+<div class="spec">
+<p><tt>authenticate2(Socket, User, Pass, SrcIp, SrcPort, Context, Proto, Groups) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>User = binary()</tt></li><li><tt>Pass = binary()</tt></li><li><tt>SrcIp = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>SrcPort = non_neg_integer()</tt></li><li><tt>Context = binary()</tt></li><li><tt>Proto = integer()</tt></li><li><tt>Groups = [binary()]</tt></li></ul></p>
+</div><p>Autenticate a user using ConfD AAA.</p>
+
+<h3 class="function"><a name="candidate_abort_commit-1">candidate_abort_commit/1</a></h3>
+<div class="spec">
+<p><tt>candidate_abort_commit(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_abort_commit-2"><tt>candidate_abort_commit(Socket, &lt;&lt;&gt;&gt;)</tt></a>.</p>
+
+
+<h3 class="function"><a name="candidate_abort_commit-2">candidate_abort_commit/2</a></h3>
+<div class="spec">
+<p><tt>candidate_abort_commit(Socket, PersistId) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>PersistId = binary()</tt></li></ul></p>
+</div><p>Cancel persistent confirmed commit.</p>
+
+<h3 class="function"><a name="candidate_commit-1">candidate_commit/1</a></h3>
+<div class="spec">
+<p><tt>candidate_commit(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_commit_info-4"><tt>candidate_commit_info(Socket, undefined, &lt;&lt;&gt;&gt;, &lt;&lt;&gt;&gt;)</tt></a>.</p>
+<p>Copies candidate to running or confirms a confirmed commit.
+ </p>
+
+<h3 class="function"><a name="candidate_commit-2">candidate_commit/2</a></h3>
+<div class="spec">
+<p><tt>candidate_commit(Socket, PersistId) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>PersistId = binary()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_commit_info-4"><tt>candidate_commit_info(Socket, PersistId, &lt;&lt;&gt;&gt;, &lt;&lt;&gt;&gt;)</tt></a>.</p>
+<p>Confirms persistent confirmed commit.
+ </p>
+
+<h3 class="function"><a name="candidate_commit_info-3">candidate_commit_info/3</a></h3>
+<div class="spec">
+<p><tt>candidate_commit_info(Socket, Label, Comment) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Label = binary()</tt></li><li><tt>Comment = binary()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_commit_info-4"><tt>candidate_commit_info(Socket, undefined, Label, Comment)</tt></a>.</p>
+<p><p>Like <a href="#candidate_commit-1"><code>candidate_commit/1</code></a>, but set the "Label" and/or "Comment"  
+that is stored in the rollback file when the candidate is committed  
+to running.</p>
+ 
+  <p>To set only the "Label", give Comment as an empty binary,  
+and to set only the "Comment", give Label as an empty binary.</p>
+ 
+  Note: To ensure that the "Label" and/or "Comment" are stored
+  in the rollback file in all cases when doing a confirmed commit,
+  they must be given both with the confirmed commit (using
+  <a href="#candidate_confirmed_commit_info-4"><code>candidate_confirmed_commit_info/4</code></a>) and
+  with the confirming commit (using this function).
+ </p>
+
+<h3 class="function"><a name="candidate_commit_info-4">candidate_commit_info/4</a></h3>
+<div class="spec">
+<p><tt>candidate_commit_info(Socket, PersistId, Label, Comment) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>PersistId = binary() | undefined</tt></li><li><tt>Label = binary()</tt></li><li><tt>Comment = binary()</tt></li></ul></p>
+</div><p><p>Combines <a href="#candidate_commit-2"><code>candidate_commit/2</code></a> and <a href="#candidate_commit_info-3"><code>candidate_commit_info/3</code></a>  
+- set "Label" and/or "Comment" when confirming a persistent confirmed commit.</p>
+ 
+  Note: To ensure that the "Label" and/or "Comment" are stored
+  in the rollback file in all cases when doing a confirmed commit,
+  they must be given both with the confirmed commit (using
+  <a href="#candidate_confirmed_commit_info-6"><code>candidate_confirmed_commit_info/6</code></a>) and
+  with the confirming commit (using this function).</p>
+
+<h3 class="function"><a name="candidate_confirmed_commit-2">candidate_confirmed_commit/2</a></h3>
+<div class="spec">
+<p><tt>candidate_confirmed_commit(Socket, TimeoutSecs) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>TimeoutSecs = integer()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_confirmed_commit_info-6"><tt>candidate_confirmed_commit_info(Socket, TimeoutSecs,
+				undefined, undefined, &lt;&lt;&gt;&gt;, &lt;&lt;&gt;&gt;)</tt></a>.</p>
+<p>Copy candidate into running, but rollback if not confirmed by a
+  call of <a href="#candidate_commit-1"><code>candidate_commit/1</code></a>.
+ </p>
+
+<h3 class="function"><a name="candidate_confirmed_commit-4">candidate_confirmed_commit/4</a></h3>
+<div class="spec">
+<p><tt>candidate_confirmed_commit(Socket, TimeoutSecs, Persist, PersistId) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>TimeoutSecs = integer()</tt></li><li><tt>Persist = binary() | undefined</tt></li><li><tt>PersistId = binary() | undefined</tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_confirmed_commit_info-6"><tt>candidate_confirmed_commit_info(Socket, TimeoutSecs,
+				Persist, PersistId, &lt;&lt;&gt;&gt;, &lt;&lt;&gt;&gt;)</tt></a>.</p>
+<p>Starts or extends persistent confirmed commit.
+ </p>
+
+<h3 class="function"><a name="candidate_confirmed_commit_info-4">candidate_confirmed_commit_info/4</a></h3>
+<div class="spec">
+<p><tt>candidate_confirmed_commit_info(Socket, TimeoutSecs, Label, Comment) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>TimeoutSecs = integer()</tt></li><li><tt>Label = binary()</tt></li><li><tt>Comment = binary()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#candidate_confirmed_commit_info-6"><tt>candidate_confirmed_commit_info(Socket, TimeoutSecs,
+				undefined, undefined, Label, Comment)</tt></a>.</p>
+<p><p>Like <a href="#candidate_confirmed_commit-2"><code>candidate_confirmed_commit/2</code></a>, but set the "Label"  
+and/or "Comment" that is stored in the rollback file when the  
+candidate is committed to running.</p>
+ 
+  <p>To set only the "Label", give  
+Comment as an empty binary, and to set only the "Comment", give Label  
+as an empty binary.</p>
+ 
+  Note: To ensure that the "Label" and/or "Comment" are stored in the
+  rollback file in all cases when doing a confirmed commit, they must
+  be given both with the confirmed commit (using this function) and
+  with the confirming commit (using <a href="#candidate_commit_info-3"><code>candidate_commit_info/3</code></a>).
+ </p>
+
+<h3 class="function"><a name="candidate_confirmed_commit_info-6">candidate_confirmed_commit_info/6</a></h3>
+<div class="spec">
+<p><tt>candidate_confirmed_commit_info(Socket, TimeoutSecs, Persist, PersistId, Label, Comment) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>TimeoutSecs = integer()</tt></li><li><tt>Persist = binary() | undefined</tt></li><li><tt>PersistId = binary() | undefined</tt></li><li><tt>Label = binary()</tt></li><li><tt>Comment = binary()</tt></li></ul></p>
+</div><p><p>Combines <a href="#candidate_confirmed_commit-4"><code>candidate_confirmed_commit/4</code></a> and <a href="#candidate_confirmed_commit_info-4"><code>candidate_confirmed_commit_info/4</code></a> - set "Label" and/or "Comment"  
+when starting or extending a persistent confirmed commit.</p>
+ 
+  Note: To ensure that the "Label" and/or "Comment" are stored
+  in the rollback file in all cases when doing a confirmed commit,
+  they must be given both with the confirmed commit (using this function)
+  and with the confirming commit (using <a href="#candidate_commit_info-4"><code>candidate_commit_info/4</code></a>).</p>
+
+<h3 class="function"><a name="candidate_reset-1">candidate_reset/1</a></h3>
+<div class="spec">
+<p><tt>candidate_reset(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Copy running into candidate.</p>
+
+<h3 class="function"><a name="candidate_validate-1">candidate_validate/1</a></h3>
+<div class="spec">
+<p><tt>candidate_validate(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Validate the candidate config.</p>
+
+<h3 class="function"><a name="cli_prompt-4">cli_prompt/4</a></h3>
+<div class="spec">
+<p><tt>cli_prompt(Socket, USid, Prompt, Echo) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Prompt = binary()</tt></li><li><tt>Echo = boolean()</tt></li></ul></p>
+</div><p>Prompt CLI user for a reply.</p>
+
+<h3 class="function"><a name="cli_prompt-5">cli_prompt/5</a></h3>
+<div class="spec">
+<p><tt>cli_prompt(Socket, USid, Prompt, Echo, Timeout) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Prompt = binary()</tt></li><li><tt>Echo = boolean()</tt></li><li><tt>Timeout = non_neg_integer()</tt></li></ul></p>
+</div><p>Prompt CLI user for a reply - return error if no reply is
+       received within Timeout seconds.</p>
+
+<h3 class="function"><a name="cli_prompt_oneof-4">cli_prompt_oneof/4</a></h3>
+<div class="spec">
+<p><tt>cli_prompt_oneof(Socket, USid, Prompt, Choice) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Prompt = binary()</tt></li><li><tt>Choice = binary()</tt></li></ul></p>
+</div><p>Prompt CLI user for a reply.</p>
+
+<h3 class="function"><a name="cli_prompt_oneof-5">cli_prompt_oneof/5</a></h3>
+<div class="spec">
+<p><tt>cli_prompt_oneof(Socket, USid, Prompt, Choice, Timeout) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Prompt = binary()</tt></li><li><tt>Choice = binary()</tt></li><li><tt>Timeout = non_neg_integer()</tt></li></ul></p>
+</div><p>Prompt CLI user for a reply - return error if no reply is
+       received within Timeout seconds.</p>
+
+<h3 class="function"><a name="cli_read_eof-3">cli_read_eof/3</a></h3>
+<div class="spec">
+<p><tt>cli_read_eof(Socket, USid, Echo) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Echo = boolean()</tt></li></ul></p>
+</div><p>Read data from CLI until EOF.</p>
+
+<h3 class="function"><a name="cli_read_eof-4">cli_read_eof/4</a></h3>
+<div class="spec">
+<p><tt>cli_read_eof(Socket, USid, Echo, Timeout) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Echo = boolean()</tt></li><li><tt>Timeout = non_neg_integer()</tt></li></ul></p>
+</div><p>Read data from CLI until EOF - return error if no reply is
+       received within Timeout seconds.</p>
+
+<h3 class="function"><a name="cli_write-3">cli_write/3</a></h3>
+<div class="spec">
+<p><tt>cli_write(Socket, USid, Message) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Message = binary()</tt></li></ul></p>
+</div><p>Write mesage to the CLI.</p>
+
+<h3 class="function"><a name="close-1">close/1</a></h3>
+<div class="spec">
+<p><tt>close(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = ok | {error, <a href="econfd.html#type-error_reason">econfd:error_reason()</a>}</tt></li></ul></p>
+</div><p>Close socket.</p>
+
+<h3 class="function"><a name="commit_trans-2">commit_trans/2</a></h3>
+<div class="spec">
+<p><tt>commit_trans(Socket, Tid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Commit a transaction.</p>
+
+<h3 class="function"><a name="commit_upgrade-1">commit_upgrade/1</a></h3>
+<div class="spec">
+<p><tt>commit_upgrade(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Commit in-service upgrade.</p>
+
+<h3 class="function"><a name="confirmed_commit_in_progress-1">confirmed_commit_in_progress/1</a></h3>
+<div class="spec">
+<p><tt>confirmed_commit_in_progress(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, boolean()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Is a confirmed commit in progress.</p>
+
+<h3 class="function"><a name="connect-2">connect/2</a></h3>
+<div class="spec">
+<p><tt>connect(Address, Port) -&gt; <a href="econfd.html#type-connect_result">econfd:connect_result()</a></tt>
+<ul class="definitions"><li><tt>Address = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>Port = non_neg_integer()</tt></li></ul></p>
+</div><p>Connect a maapi socket to ConfD.</p>
+
+<h3 class="function"><a name="copy-3">copy/3</a></h3>
+<div class="spec">
+<p><tt>copy(Socket, FromTH, ToTH) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>FromTH = integer()</tt></li><li><tt>ToTH = integer()</tt></li></ul></p>
+</div><p>Copy data from one transaction to another.</p>
+
+<h3 class="function"><a name="copy_running_to_startup-1">copy_running_to_startup/1</a></h3>
+<div class="spec">
+<p><tt>copy_running_to_startup(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Copy running to startup.</p>
+
+<h3 class="function"><a name="copy_tree-4">copy_tree/4</a></h3>
+<div class="spec">
+<p><tt>copy_tree(Socket, Tid, FromIKeypath, ToIKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>FromIKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>ToIKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Copy an entire subtree in the configuration from one point to another.</p>
+
+<h3 class="function"><a name="create-3">create/3</a></h3>
+<div class="spec">
+<p><tt>create(Socket, Tid, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Create a new element.</p>
+
+<h3 class="function"><a name="delete-3">delete/3</a></h3>
+<div class="spec">
+<p><tt>delete(Socket, Tid, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p> Delete an element.</p>
+
+<h3 class="function"><a name="delete_config-2">delete_config/2</a></h3>
+<div class="spec">
+<p><tt>delete_config(Socket, DbName) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li></ul></p>
+</div><p>Delete all data from a data store.</p>
+
+<h3 class="function"><a name="detach-2">detach/2</a></h3>
+<div class="spec">
+<p><tt>detach(Socket, Thandle) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Thandle = integer()</tt></li></ul></p>
+</div><p>Detach from the transaction.</p>
+
+<h3 class="function"><a name="diff_iterate-4">diff_iterate/4</a></h3>
+<div class="spec">
+<p><tt>diff_iterate(Sock, Tid, Fun, InitState) -&gt; any()</tt></p>
+</div><p>Equivalent to <a href="#diff_iterate-5"><tt>diff_iterate(Sock, Tid, Fun, 0, InitState)</tt></a>.</p>
+
+
+<h3 class="function"><a name="diff_iterate-5">diff_iterate/5</a></h3>
+<div class="spec">
+<p><tt>diff_iterate(Socket, Tid, Fun, Flags, State) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Fun = fun((IKeypath, Op, OldValue, Value, State) -&gt; {ok, Ret, State} | {error, term()})</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Op = integer()</tt></li><li><tt>OldValue = <a href="econfd.html#type-value">econfd:value()</a> | undefined</tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | undefined | <a href="econfd.html#type-key">econfd:key()</a> | {}</tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, State} | {error, term()}</tt></li></ul></p>
+</div><p><p>Iterate through a diff.</p>
+ 
+  This function is used in combination with the notifications API
+  where we get a chance to iterate through the diff of a transaction
+  just before it gets commited. The transaction hangs until we have called
+  <a href="econfd_notif.html#notification_done-2"><code>econfd_notif:notification_done/2</code></a>.
+  The function can also be called from within validate() callbacks to
+  traverse a diff while validating.
+  Currently OldValue is always the atom 'undefined'.
+  When Op == ?MOP_MOVED_AFTER (only for "ordered-by user" list entry),
+  Value == {} means that the entry was moved first in the list, otherwise
+  Value is a econfd:key() tuple that identifies the entry it was moved after.</p>
+
+<h3 class="function"><a name="end_user_session-1">end_user_session/1</a></h3>
+<div class="spec">
+<p><tt>end_user_session(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Ends a user session.</p>
+
+<h3 class="function"><a name="exists-3">exists/3</a></h3>
+<div class="spec">
+<p><tt>exists(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, boolean()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p> Check if an element exists.</p>
+
+<h3 class="function"><a name="find_next-3">find_next/3</a></h3>
+<div class="spec">
+<p><tt>find_next(Cursor, Type, Key) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Cursor = <a href="#type-maapi_cursor">maapi_cursor()</a></tt></li><li><tt>Type = <a href="#type-find_next_type">find_next_type()</a></tt></li><li><tt>Key = <a href="econfd.html#type-key">econfd:key()</a></tt></li><li><tt>Result = {ok, <a href="econfd.html#type-key">econfd:key()</a>, Cursor} | done | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>find the list entry matching Type and Key.</p>
+
+<h3 class="function"><a name="finish_trans-2">finish_trans/2</a></h3>
+<div class="spec">
+<p><tt>finish_trans(Socket, Tid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Finish a transaction.</p>
+
+<h3 class="function"><a name="get_attrs-4">get_attrs/4</a></h3>
+<div class="spec">
+<p><tt>get_attrs(Socket, Tid, IKeypath, AttrList) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>AttrList = [Attr]</tt></li><li><tt>Attr = integer()</tt></li><li><tt>Result = {ok, [{Attr, Value}]} | <a href="#type-err">err()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a></tt></li></ul></p>
+</div><p><p>Get the selected attributes for an element.</p>
+ 
+  Calling with an empty attribute list returns all attributes.</p>
+
+<h3 class="function"><a name="get_authorization_info-2">get_authorization_info/2</a></h3>
+<div class="spec">
+<p><tt>get_authorization_info(Socket, USid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Result = {ok, Info} | <a href="#type-err">err()</a></tt></li><li><tt>Info = {[Group]}</tt></li><li><tt>Group = binary()</tt></li></ul></p>
+</div><p>Get authorization info for a user session.</p>
+
+<h3 class="function"><a name="get_case-4">get_case/4</a></h3>
+<div class="spec">
+<p><tt>get_case(Socket, Tid, IKeypath, Choice) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Choice = <a href="econfd.html#type-qtag">econfd:qtag()</a> | [<a href="econfd.html#type-qtag">econfd:qtag()</a>]</tt></li><li><tt>Result = {ok, Case} | <a href="#type-err">err()</a></tt></li><li><tt>Case = <a href="econfd.html#type-qtag">econfd:qtag()</a></tt></li></ul></p>
+</div><p>Get the current case for a choice.</p>
+
+<h3 class="function"><a name="get_elem-3">get_elem/3</a></h3>
+<div class="spec">
+<p><tt>get_elem(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, <a href="econfd.html#type-value">econfd:value()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Read an element.</p>
+
+<h3 class="function"><a name="get_elem_no_defaults-3">get_elem_no_defaults/3</a></h3>
+<div class="spec">
+<p><tt>get_elem_no_defaults(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, Value} | <a href="#type-err">err()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | default</tt></li></ul></p>
+</div><p><b>This function is deprecated:</b> Use set_flags/3 with ?MAAPI_FLAG_NO_DEFAULTS instead - this
+  will take effect for all the functions that read values.</p>
+<p>Read an element, but return 'default' instead of the value if
+  the default value is in effect.
+ </p>
+
+<h3 class="function"><a name="get_my_user_session_id-1">get_my_user_session_id/1</a></h3>
+<div class="spec">
+<p><tt>get_my_user_session_id(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, USid} | <a href="#type-err">err()</a></tt></li><li><tt>USid = integer()</tt></li></ul></p>
+</div><p>Get my user session id.</p>
+
+<h3 class="function"><a name="get_next-1">get_next/1</a></h3>
+<div class="spec">
+<p><tt>get_next(Cursor) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Cursor = <a href="#type-maapi_cursor">maapi_cursor()</a></tt></li><li><tt>Result = {ok, <a href="econfd.html#type-key">econfd:key()</a>, Cursor} | done | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>iterate through the entries of a list.</p>
+
+<h3 class="function"><a name="get_object-3">get_object/3</a></h3>
+<div class="spec">
+<p><tt>get_object(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-value">econfd:value()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Read all the values in a container or list entry.</p>
+
+<h3 class="function"><a name="get_objects-2">get_objects/2</a></h3>
+<div class="spec">
+<p><tt>get_objects(Cursor, NumEntries) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Cursor = <a href="#type-maapi_cursor">maapi_cursor()</a></tt></li><li><tt>NumEntries = integer()</tt></li><li><tt>Result = {ok, Cursor, Values} | {done, Values} | <a href="#type-err">err()</a></tt></li><li><tt>Values = [[<a href="econfd.html#type-value">econfd:value()</a>]]</tt></li></ul></p>
+</div><p><p>Read all the values for NumEntries list entries,  
+starting at the point given by the cursor C.</p>
+ 
+  The return value has one
+  Erlang list for each YANG list entry, i.e. it is a list of at most
+  NumEntries lists. If we reached the end of the YANG list,
+  {done, Values} is returned, and there will be fewer than NumEntries
+  lists in Values - otherwise {ok, C2, Values} is returned, where C2
+  can be used to continue the traversal.</p>
+
+<h3 class="function"><a name="get_rollback_id-2">get_rollback_id/2</a></h3>
+<div class="spec">
+<p><tt>get_rollback_id(Socket, Tid) -&gt; non_neg_integer() | -1</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Get rollback id of commited transaction.</p>
+
+<h3 class="function"><a name="get_running_db_status-1">get_running_db_status/1</a></h3>
+<div class="spec">
+<p><tt>get_running_db_status(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, Status} | <a href="#type-err">err()</a></tt></li><li><tt>Status = Valid | Invalid</tt></li><li><tt>Valid = 1</tt></li><li><tt>Invalid = 0</tt></li></ul></p>
+</div><p>Get the "running status".</p>
+
+<h3 class="function"><a name="get_user_session-2">get_user_session/2</a></h3>
+<div class="spec">
+<p><tt>get_user_session(Socket, USid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li><li><tt>Result = {ok, <a href="#type-confd_user_info">confd_user_info()</a>} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Get session info for a user session.</p>
+
+<h3 class="function"><a name="get_user_sessions-1">get_user_sessions/1</a></h3>
+<div class="spec">
+<p><tt>get_user_sessions(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, [USid]} | <a href="#type-err">err()</a></tt></li><li><tt>USid = integer()</tt></li></ul></p>
+</div><p>Get all user sessions.</p>
+
+<h3 class="function"><a name="get_values-4">get_values/4</a></h3>
+<div class="spec">
+<p><tt>get_values(Socket, Tid, IKeypath, Values) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Values = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-tagval">econfd:tagval()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Read the values for the leafs that have the "value" 'not_found'  
+in the Values list.</p>
+ 
+  This can be used to read an arbitrary set of
+  sub-elements of a container or list entry. The return value is a list
+  of the same length as Values, i.e. the requested leafs are in the same
+  position in the returned list as in the Values argument. The elements
+  in the returned list are always "canonical" though, i.e. of the form
+  <a href="econfd.html#type-tagval"><code>econfd:tagval()</code></a>.</p>
+
+<h3 class="function"><a name="hkeypath2ikeypath-2">hkeypath2ikeypath/2</a></h3>
+<div class="spec">
+<p><tt>hkeypath2ikeypath(Socket, HKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>HKeypath = [non_neg_integer()]</tt></li><li><tt>Result = {ok, IKeypath} | <a href="#type-err">err()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p><b>This function is deprecated:</b> hkeypaths are not used in the erlang API.</p>
+<p>Convert a hkeypath to an ikeypath.
+ </p>
+
+<h3 class="function"><a name="init_cursor-3">init_cursor/3</a></h3>
+<div class="spec">
+<p><tt>init_cursor(Socket, Tid, IKeypath) -&gt; <a href="#type-maapi_cursor">maapi_cursor()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#init_cursor-4"><tt>init_cursor(Socket, Tik, IKeypath, undefined)</tt></a>.</p>
+
+
+<h3 class="function"><a name="init_cursor-4">init_cursor/4</a></h3>
+<div class="spec">
+<p><tt>init_cursor(Socket, Tid, IKeypath, XPath) -&gt; <a href="#type-maapi_cursor">maapi_cursor()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>XPath = undefined | binary() | string()</tt></li></ul></p>
+</div><p>Initalize a get_next() cursor.</p>
+
+<h3 class="function"><a name="init_upgrade-3">init_upgrade/3</a></h3>
+<div class="spec">
+<p><tt>init_upgrade(Socket, TimeoutSecs, Flags) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>TimeoutSecs = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li></ul></p>
+</div><p>Start in-service upgrade.</p>
+
+<h3 class="function"><a name="insert-3">insert/3</a></h3>
+<div class="spec">
+<p><tt>insert(Socket, Tid, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Insert an entry in an integer-keyed list.</p>
+
+<h3 class="function"><a name="install_crypto_keys-1">install_crypto_keys/1</a></h3>
+<div class="spec">
+<p><tt>install_crypto_keys(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p><p>Fetch keys for the encrypted data types from the server.</p>
+ 
+  Encrypted data type can be tailf:des3-cbc-encrypted-string,
+  tailf:aes-cfb-128-encrypted-string and
+  tailf:aes-256-cfb-128-encrypted-string.</p>
+
+<h3 class="function"><a name="is_candidate_modified-1">is_candidate_modified/1</a></h3>
+<div class="spec">
+<p><tt>is_candidate_modified(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, boolean()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Check if candidate has been modified.</p>
+
+<h3 class="function"><a name="is_lock_set-2">is_lock_set/2</a></h3>
+<div class="spec">
+<p><tt>is_lock_set(Socket, DbName) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Check if a db is locked or not.</p>
+ 
+  Return 0 or the Usid of the lock owner.</p>
+
+<h3 class="function"><a name="is_running_modified-1">is_running_modified/1</a></h3>
+<div class="spec">
+<p><tt>is_running_modified(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, boolean()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Check if running has been modified since
+  the last copy to startup was done.</p>
+
+<h3 class="function"><a name="iterate-6">iterate/6</a></h3>
+<div class="spec">
+<p><tt>iterate(Socket, Tid, IKeypath, Fun, Flags, State) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Fun = fun((IKeypath, Value, Attrs, State) -&gt; {ok, Ret, State} | {error, term()})</tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | undefined</tt></li><li><tt>Attrs = [{Attr, Value}] | undefined</tt></li><li><tt>Attr = integer()</tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, State} | {error, term()}</tt></li></ul></p>
+</div><p><p>Iterate over all the data in the transaction and the underlying  
+data store.</p>
+ 
+  Flags can be given as ?MAAPI_ITER_WANT_ATTR to request that
+  attributes (if any) are passed to the Fun, otherwise it should be 0.
+  The possible values for Ret in the return value for Fun are the same
+  as for <a href="#diff_iterate-5"><code>diff_iterate/5</code></a>.</p>
+
+<h3 class="function"><a name="keypath_diff_iterate-5">keypath_diff_iterate/5</a></h3>
+<div class="spec">
+<p><tt>keypath_diff_iterate(Socket, Tid, IKeypath, Fun, State) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Fun = fun((IKeypath, Op, OldValue, Value, State) -&gt; {ok, Ret, State} | {error, term()})</tt></li><li><tt>Op = integer()</tt></li><li><tt>OldValue = <a href="econfd.html#type-value">econfd:value()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | <a href="econfd.html#type-key">econfd:key()</a></tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>Result = {ok, State} | {error, term()}</tt></li></ul></p>
+</div><p><p>Iterate through a diff.</p>
+ 
+  This function behaves like <a href="#diff_iterate-5"><code>diff_iterate/5</code></a> with the exception that
+  the provided keypath IKP, prunes the tree and only diffs below that
+  path are considered.</p>
+
+<h3 class="function"><a name="keypath_diff_iterate-6">keypath_diff_iterate/6</a></h3>
+<div class="spec">
+<p><tt>keypath_diff_iterate(Sock, Tid, IKP, Fun, Flags, InitState) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="kill_user_session-2">kill_user_session/2</a></h3>
+<div class="spec">
+<p><tt>kill_user_session(Socket, USid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li></ul></p>
+</div><p>Kill a user session.</p>
+
+<h3 class="function"><a name="list_rollbacks-1">list_rollbacks/1</a></h3>
+<div class="spec">
+<p><tt>list_rollbacks(Socket) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Result = {ok, [<a href="#type-maapi_rollback">maapi_rollback()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Get a list of available rollback files.</p>
+
+<h3 class="function"><a name="load_rollback-3">load_rollback/3</a></h3>
+<div class="spec">
+<p><tt>load_rollback(Socket, Tid, Id) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Id = integer() | {fixed, integer()}</tt></li></ul></p>
+</div><p>Load a rollback file.</p>
+
+<h3 class="function"><a name="lock-2">lock/2</a></h3>
+<div class="spec">
+<p><tt>lock(Socket, DbName) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li></ul></p>
+</div><p>Lock a database.</p>
+
+<h3 class="function"><a name="lock_partial-3">lock_partial/3</a></h3>
+<div class="spec">
+<p><tt>lock_partial(Socket, DbName, XPath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li><li><tt>XPath = [binary()]</tt></li><li><tt>Result = {ok, LockId} | <a href="#type-err">err()</a></tt></li><li><tt>LockId = integer()</tt></li></ul></p>
+</div><p><p>Request a partial lock on a database.</p>
+ 
+  The set of nodes to lock is specified as a list of XPath expressions.</p>
+
+<h3 class="function"><a name="move-4">move/4</a></h3>
+<div class="spec">
+<p><tt>move(Socket, Tid, IKeypath, ToKey) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>ToKey = <a href="econfd.html#type-key">econfd:key()</a></tt></li></ul></p>
+</div><p>Move (rename) an entry in a list.</p>
+
+<h3 class="function"><a name="move_ordered-4">move_ordered/4</a></h3>
+<div class="spec">
+<p><tt>move_ordered(Socket, Tid, IKeypath, To) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>To = first | last | {before | 'after', <a href="econfd.html#type-key">econfd:key()</a>}</tt></li></ul></p>
+</div><p>Move an entry in an "ordered-by user" list.</p>
+
+<h3 class="function"><a name="ncs_apply_template-7">ncs_apply_template/7</a></h3>
+<div class="spec">
+<p><tt>ncs_apply_template(Socket, Tid, TemplateName, RootIKeypath, Variables, Documents, Shared) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>TemplateName = binary()</tt></li><li><tt>RootIKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Variables = term()</tt></li><li><tt>Documents = term()</tt></li><li><tt>Shared = boolean()</tt></li></ul></p>
+</div><p><p>Apply a template that has been loaded into NCS.</p>
+ 
+  The TemplateName parameter gives the name of the template. The Variables
+  parameter is a list of variables and names for substitution into the
+  template.</p>
+
+<h3 class="function"><a name="ncs_apply_trans_params-4">ncs_apply_trans_params/4</a></h3>
+<div class="spec">
+<p><tt>ncs_apply_trans_params(Socket, Tid, KeepOpen, Params) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>KeepOpen = boolean()</tt></li><li><tt>Params = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li><li><tt>Result = ok | {ok, [<a href="econfd.html#type-tagval">econfd:tagval()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Apply transaction with commit parameters.</p>
+ 
+  This is a version of apply_trans that takes commit parameters in form of
+  a list of tagged values according to the input parameters for
+  rpc prepare-transaction as defined in tailf-netconf-ncs.yang module.
+  The result of this function may include a list of tagged values according to
+  the output parameters of rpc prepare-transaction or output parameters of rpc
+  commit-transaction as defined in tailf-netconf-ncs.yang module.</p>
+
+<h3 class="function"><a name="ncs_get_trans_params-2">ncs_get_trans_params/2</a></h3>
+<div class="spec">
+<p><tt>ncs_get_trans_params(Socket, Tid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Result = {ok, [<a href="econfd.html#type-tagval">econfd:tagval()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Get transaction commit parameters.</p>
+
+<h3 class="function"><a name="ncs_template_variables-3">ncs_template_variables/3</a></h3>
+<div class="spec">
+<p><tt>ncs_template_variables(Socket, Tid, TemplateName) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>TemplateName = binary()</tt></li></ul></p>
+</div><p>Retrieve the variables used in a template.</p>
+
+<h3 class="function"><a name="ncs_templates-1">ncs_templates/1</a></h3>
+<div class="spec">
+<p><tt>ncs_templates(Socket) -&gt; {ok, binary()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Retrieve a list of the templates currently loaded into NCS.</p>
+
+<h3 class="function"><a name="ncs_write_service_log_entry-5">ncs_write_service_log_entry/5</a></h3>
+<div class="spec">
+<p><tt>ncs_write_service_log_entry(Socket, IKeypath, Message, Type, Level) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Message = string()</tt></li><li><tt>Type = <a href="econfd.html#type-value">econfd:value()</a></tt></li><li><tt>Level = <a href="econfd.html#type-value">econfd:value()</a></tt></li></ul></p>
+</div><p>Write a service log entry.</p>
+
+<h3 class="function"><a name="netconf_ssh_call_home-3">netconf_ssh_call_home/3</a></h3>
+<div class="spec">
+<p><tt>netconf_ssh_call_home(Socket, Host, Port) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Host = <a href="econfd.html#type-ip">econfd:ip()</a> | string()</tt></li><li><tt>Port = non_neg_integer()</tt></li></ul></p>
+</div>
+
+<h3 class="function"><a name="netconf_ssh_call_home_opaque-4">netconf_ssh_call_home_opaque/4</a></h3>
+<div class="spec">
+<p><tt>netconf_ssh_call_home_opaque(Socket, Host, Opaque, Port) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Host = <a href="econfd.html#type-ip">econfd:ip()</a> | string()</tt></li><li><tt>Opaque = string()</tt></li><li><tt>Port = non_neg_integer()</tt></li></ul></p>
+</div>
+
+<h3 class="function"><a name="num_instances-3">num_instances/3</a></h3>
+<div class="spec">
+<p><tt>num_instances(Socket, Tid, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p> Find the number of entries in a list.</p>
+
+<h3 class="function"><a name="perform_upgrade-2">perform_upgrade/2</a></h3>
+<div class="spec">
+<p><tt>perform_upgrade(Socket, LoadPathList) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>LoadPathList = [binary()]</tt></li></ul></p>
+</div><p>Do in-service upgrade.</p>
+
+<h3 class="function"><a name="prepare_trans-2">prepare_trans/2</a></h3>
+<div class="spec">
+<p><tt>prepare_trans(Socket, Tid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#prepare_trans-3"><tt>prepare_trans(Socket, Tid, 0)</tt></a>.</p>
+
+
+<h3 class="function"><a name="prepare_trans-3">prepare_trans/3</a></h3>
+<div class="spec">
+<p><tt>prepare_trans(Socket, Tid, Flags) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li></ul></p>
+</div><p>Prepare for commit.</p>
+
+<h3 class="function"><a name="prio_message-3">prio_message/3</a></h3>
+<div class="spec">
+<p><tt>prio_message(Socket, To, Message) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>To = binary()</tt></li><li><tt>Message = binary()</tt></li></ul></p>
+</div><p>Write priority message.</p>
+
+<h3 class="function"><a name="reload_config-1">reload_config/1</a></h3>
+<div class="spec">
+<p><tt>reload_config(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Tell ConfD daemon to reload its configuration.</p>
+
+<h3 class="function"><a name="request_action-3">request_action/3</a></h3>
+<div class="spec">
+<p><tt>request_action(Socket, Params, IKeypath) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Params = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Result = ok | {ok, [<a href="econfd.html#type-tagval">econfd:tagval()</a>]} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Invoke an action defined in the data model.</p>
+
+<h3 class="function"><a name="revert-2">revert/2</a></h3>
+<div class="spec">
+<p><tt>revert(Socket, Tid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li></ul></p>
+</div><p>Remove all changes in the transaction.</p>
+
+<h3 class="function"><a name="set_attr-5">set_attr/5</a></h3>
+<div class="spec">
+<p><tt>set_attr(Socket, Tid, IKeypath, Attr, Value) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Attr = integer()</tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | undefined</tt></li></ul></p>
+</div><p>Set the an attribute for an element. Value == undefined means
+  that the attribute should be deleted.</p>
+
+<h3 class="function"><a name="set_comment-3">set_comment/3</a></h3>
+<div class="spec">
+<p><tt>set_comment(Socket, Tid, Comment) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Comment = binary()</tt></li></ul></p>
+</div><p>Set the "Comment" that is stored in the rollback file when a
+  transaction towards running is committed.</p>
+
+<h3 class="function"><a name="set_delayed_when-3">set_delayed_when/3</a></h3>
+<div class="spec">
+<p><tt>set_delayed_when(Socket, Tid, Value) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Value = boolean()</tt></li><li><tt>Result = {ok, OldValue} | <a href="#type-err">err()</a></tt></li><li><tt>OldValue = boolean()</tt></li></ul></p>
+</div><p><p>Enable/disable the "delayed when" mode for a transaction.</p>
+ 
+  Returns the old setting on success.</p>
+
+<h3 class="function"><a name="set_elem-4">set_elem/4</a></h3>
+<div class="spec">
+<p><tt>set_elem(Socket, Tid, IKeypath, Value) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a></tt></li></ul></p>
+</div><p>Write an element.</p>
+
+<h3 class="function"><a name="set_elem2-4">set_elem2/4</a></h3>
+<div class="spec">
+<p><tt>set_elem2(Socket, Tid, IKeypath, BinValue) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>BinValue = binary()</tt></li></ul></p>
+</div><p>Write an element using the textual value representation.</p>
+
+<h3 class="function"><a name="set_flags-3">set_flags/3</a></h3>
+<div class="spec">
+<p><tt>set_flags(Socket, Tid, Flags) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li></ul></p>
+</div><p><p>Change flag settings for a transaction.</p>
+ 
+  See ?MAAPI_FLAG_XXX in
+  econfd.hrl for the available flags, however ?MAAPI_FLAG_HIDE_INACTIVE
+  and ?MAAPI_FLAG_DELAYED_WHEN cannot be changed after transaction start
+  (but see <a href="#set_delayed_when-3"><code>set_delayed_when/3</code></a>).</p>
+
+<h3 class="function"><a name="set_label-3">set_label/3</a></h3>
+<div class="spec">
+<p><tt>set_label(Socket, Tid, Label) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Label = binary()</tt></li></ul></p>
+</div><p>Set the "Label" that is stored in the rollback file when a
+  transaction towards running is committed.</p>
+
+<h3 class="function"><a name="set_object-4">set_object/4</a></h3>
+<div class="spec">
+<p><tt>set_object(Socket, Tid, IKeypath, ValueList) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>ValueList = [<a href="econfd.html#type-value">econfd:value()</a>]</tt></li></ul></p>
+</div><p>Write an entire object, i.e. YANG list entry or container.</p>
+
+<h3 class="function"><a name="set_readonly_mode-2">set_readonly_mode/2</a></h3>
+<div class="spec">
+<p><tt>set_readonly_mode(Socket, Mode) -&gt; {ok, boolean()} | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Mode = boolean()</tt></li></ul></p>
+</div><p>Control if we can create rw transactions.</p>
+
+<h3 class="function"><a name="set_running_db_status-2">set_running_db_status/2</a></h3>
+<div class="spec">
+<p><tt>set_running_db_status(Socket, Status) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Status = Valid | InValid</tt></li><li><tt>Valid = 1</tt></li><li><tt>InValid = 0</tt></li></ul></p>
+</div><p>Set the "running status".</p>
+
+<h3 class="function"><a name="set_user_session-2">set_user_session/2</a></h3>
+<div class="spec">
+<p><tt>set_user_session(Socket, USid) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>USid = integer()</tt></li></ul></p>
+</div><p>Assign a user session.</p>
+
+<h3 class="function"><a name="set_values-4">set_values/4</a></h3>
+<div class="spec">
+<p><tt>set_values(Socket, Tid, IKeypath, ValueList) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>ValueList = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li></ul></p>
+</div><p><p>Write a list of tagged values.</p>
+ 
+  This function is an alternative to
+  <a href="#set_object-4"><code>set_object/4</code></a>, and allows for writing more complex structures
+  (e.g. multiple entries in a list).</p>
+
+<h3 class="function"><a name="shared_create-3">shared_create/3</a></h3>
+<div class="spec">
+<p><tt>shared_create(Socket, Tid, IKeypath) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li></ul></p>
+</div><p>Create a new element, and also set an attribute indicating
+  how many times this element has been created.</p>
+
+<h3 class="function"><a name="shared_set_elem-4">shared_set_elem/4</a></h3>
+<div class="spec">
+<p><tt>shared_set_elem(Socket, Tid, IKeypath, Value) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a></tt></li></ul></p>
+</div><p>Write an element from NCS FastMap.</p>
+
+<h3 class="function"><a name="shared_set_elem2-4">shared_set_elem2/4</a></h3>
+<div class="spec">
+<p><tt>shared_set_elem2(Socket, Tid, IKeypath, BinValue) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>BinValue = binary()</tt></li></ul></p>
+</div><p>Write an element using the textual value representation
+   from NCS fastmap.</p>
+
+<h3 class="function"><a name="shared_set_values-4">shared_set_values/4</a></h3>
+<div class="spec">
+<p><tt>shared_set_values(Socket, Tid, IKeypath, ValueList) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>ValueList = [<a href="econfd.html#type-tagval">econfd:tagval()</a>]</tt></li></ul></p>
+</div><p>Write a list of tagged values from NCS FastMap.</p>
+
+<h3 class="function"><a name="snmpa_reload-2">snmpa_reload/2</a></h3>
+<div class="spec">
+<p><tt>snmpa_reload(Socket, Synchronous) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Synchronous = boolean()</tt></li></ul></p>
+</div><p>Tell ConfD to reload external SNMP Agent config data.</p>
+
+<h3 class="function"><a name="start_phase-3">start_phase/3</a></h3>
+<div class="spec">
+<p><tt>start_phase(Socket, Phase, Synchronous) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Phase = 1 | 2</tt></li><li><tt>Synchronous = boolean()</tt></li></ul></p>
+</div><p>Tell ConfD to proceed to next start phase.</p>
+
+<h3 class="function"><a name="start_trans-3">start_trans/3</a></h3>
+<div class="spec">
+<p><tt>start_trans(Socket, DbName, RwMode) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li><li><tt>RwMode = integer()</tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Start a new transaction.</p>
+
+<h3 class="function"><a name="start_trans-4">start_trans/4</a></h3>
+<div class="spec">
+<p><tt>start_trans(Socket, DbName, RwMode, USid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li><li><tt>RwMode = integer()</tt></li><li><tt>USid = integer()</tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Start a new transaction within an existing user session.</p>
+
+<h3 class="function"><a name="start_trans-5">start_trans/5</a></h3>
+<div class="spec">
+<p><tt>start_trans(Socket, DbName, RwMode, USid, Flags) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li><li><tt>RwMode = integer()</tt></li><li><tt>USid = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Start a new transaction within an existing user session and/or  
+with flags.</p>
+ 
+  See ?MAAPI_FLAG_XXX in econfd.hrl for the available flags.
+  To use the existing user session of the socket, give Usid = 0.</p>
+
+<h3 class="function"><a name="start_trans_in_trans-4">start_trans_in_trans/4</a></h3>
+<div class="spec">
+<p><tt>start_trans_in_trans(Socket, RwMode, USid, Tid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>RwMode = integer()</tt></li><li><tt>USid = integer()</tt></li><li><tt>Tid = integer()</tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Start a new transaction with an existing transaction as backend.</p>
+ 
+  To use the existing user session of the socket, give Usid = 0.</p>
+
+<h3 class="function"><a name="start_trans_in_trans-5">start_trans_in_trans/5</a></h3>
+<div class="spec">
+<p><tt>start_trans_in_trans(Socket, RwMode, USid, Tid, Flags) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>RwMode = integer()</tt></li><li><tt>USid = integer()</tt></li><li><tt>Tid = integer()</tt></li><li><tt>Flags = non_neg_integer()</tt></li><li><tt>Result = {ok, integer()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Start a new transaction with an existing transaction as backend.</p>
+ 
+  To use the existing user session of the socket, give Usid = 0.</p>
+
+<h3 class="function"><a name="start_user_session-6">start_user_session/6</a></h3>
+<div class="spec">
+<p><tt>start_user_session(Socket, UserName, Context, Groups, SrcIp, Proto) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>UserName = binary()</tt></li><li><tt>Context = binary()</tt></li><li><tt>Groups = [binary()]</tt></li><li><tt>SrcIp = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>Proto = <a href="#type-proto">proto()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#start_user_session-7"><tt>start_user_session(Socket, UserName, Context, Groups,
+		   SrcIp, 0, Proto)</tt></a>.</p>
+
+
+<h3 class="function"><a name="start_user_session-7">start_user_session/7</a></h3>
+<div class="spec">
+<p><tt>start_user_session(Socket, UserName, Context, Groups, SrcIp, SrcPort, Proto) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>UserName = binary()</tt></li><li><tt>Context = binary()</tt></li><li><tt>Groups = [binary()]</tt></li><li><tt>SrcIp = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>SrcPort = non_neg_integer()</tt></li><li><tt>Proto = <a href="#type-proto">proto()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#start_user_session-8"><tt>start_user_session(Socket, UserName, Context, Groups,
+		   SrcIp, 0, Proto, undefined)</tt></a>.</p>
+
+
+<h3 class="function"><a name="start_user_session-8">start_user_session/8</a></h3>
+<div class="spec">
+<p><tt>start_user_session(Socket, UserName, Context, Groups, SrcIp, SrcPort, Proto, UId) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>UserName = binary()</tt></li><li><tt>Context = binary()</tt></li><li><tt>Groups = [binary()]</tt></li><li><tt>SrcIp = <a href="econfd.html#type-ip">econfd:ip()</a></tt></li><li><tt>SrcPort = non_neg_integer()</tt></li><li><tt>Proto = <a href="#type-proto">proto()</a></tt></li><li><tt>UId = <a href="#type-confd_user_identification">confd_user_identification()</a> | undefined</tt></li></ul></p>
+</div><p><p>Initiate a new maapi user session.</p>
+ 
+  returns a maapi session id. Before we can execute any maapi functions
+  we must always have an associated user session.</p>
+
+<h3 class="function"><a name="stop-1">stop/1</a></h3>
+<div class="spec">
+<p><tt>stop(Socket) -&gt; ok</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#stop-2"><tt>stop(Sock, true)</tt></a>.</p>
+<p>Tell ConfD daemon to stop, returns when daemon has exited.
+ </p>
+
+<h3 class="function"><a name="stop-2">stop/2</a></h3>
+<div class="spec">
+<p><tt>stop(Socket, Synchronous) -&gt; ok</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Synchronous = boolean()</tt></li></ul></p>
+</div><p><p>Tell ConfD daemon to stop, if Synchronous is true won't return       
+until daemon has come to a halt.</p>
+ 
+  Note that the socket will most certainly not be possible to use again, since
+  ConfD will close its end when it exits.</p>
+
+<h3 class="function"><a name="sys_message-3">sys_message/3</a></h3>
+<div class="spec">
+<p><tt>sys_message(Socket, To, Message) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>To = binary()</tt></li><li><tt>Message = binary()</tt></li></ul></p>
+</div><p>Write system message.</p>
+
+<h3 class="function"><a name="unlock-2">unlock/2</a></h3>
+<div class="spec">
+<p><tt>unlock(Socket, DbName) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>DbName = <a href="#type-dbname">dbname()</a></tt></li></ul></p>
+</div><p>Unlock a database.</p>
+
+<h3 class="function"><a name="unlock_partial-2">unlock_partial/2</a></h3>
+<div class="spec">
+<p><tt>unlock_partial(Socket, LockId) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>LockId = integer()</tt></li></ul></p>
+</div><p>Remove the partial lock identified by LockId.</p>
+
+<h3 class="function"><a name="user_message-4">user_message/4</a></h3>
+<div class="spec">
+<p><tt>user_message(Socket, To, From, Message) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>To = binary()</tt></li><li><tt>From = binary()</tt></li><li><tt>Message = binary()</tt></li></ul></p>
+</div><p>Write user message.</p>
+
+<h3 class="function"><a name="validate_trans-4">validate_trans/4</a></h3>
+<div class="spec">
+<p><tt>validate_trans(Socket, Tid, UnLock, ForceValidation) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>UnLock = boolean()</tt></li><li><tt>ForceValidation = boolean()</tt></li></ul></p>
+</div><p>Validate the transaction.</p>
+
+<h3 class="function"><a name="wait_start-1">wait_start/1</a></h3>
+<div class="spec">
+<p><tt>wait_start(Socket) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#wait_start-2"><tt>wait_start(Socket, 2)</tt></a>.</p>
+<p>Wait until ConfD daemon has completely started.
+ </p>
+
+<h3 class="function"><a name="wait_start-2">wait_start/2</a></h3>
+<div class="spec">
+<p><tt>wait_start(Socket, Phase) -&gt; ok | <a href="#type-err">err()</a></tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Phase = 1 | 2</tt></li></ul></p>
+</div><p>Wait until ConfD daemon has reached a certain start phase.</p>
+
+<h3 class="function"><a name="xpath_eval-6">xpath_eval/6</a></h3>
+<div class="spec">
+<p><tt>xpath_eval(Socket, Tid, Expr, ResultFun, State, Options) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Expr = binary() | {compiled, Source, Compiled}</tt></li><li><tt>Source = binary()</tt></li><li><tt>Compiled = [binary() | tuple()]</tt></li><li><tt>ResultFun = fun((IKeypath, Value, State) -&gt; {Ret, State})</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Value = term()</tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>Options = [<a href="#type-xpath_eval_option">xpath_eval_option()</a>]</tt></li><li><tt>Result = {ok, State} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p><p>Evaluate the XPath expression Expr, invoking ResultFun for each node  
+in the resulting node set.</p>
+ 
+  The possible values for Ret in the
+  return value for ResultFun are ?ITER_CONTINUE and ?ITER_STOP.</p>
+
+<h3 class="function"><a name="xpath_eval-7">xpath_eval/7</a></h3>
+<div class="spec">
+<p><tt>xpath_eval(Socket, Tid, Expr, ResultFun, TraceFun, State, Context) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Expr = binary()</tt></li><li><tt>ResultFun = fun((IKeypath, Value, State) -&gt; {Ret, State})</tt></li><li><tt>IKeypath = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a></tt></li><li><tt>Value = <a href="econfd.html#type-value">econfd:value()</a> | undefined</tt></li><li><tt>State = term()</tt></li><li><tt>Ret = integer()</tt></li><li><tt>TraceFun = fun((binary()) -&gt; none()) | undefined</tt></li><li><tt>Context = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a> | []</tt></li><li><tt>Result = {ok, State} | {error, term()}</tt></li></ul></p>
+</div><p><b>This function is deprecated:</b> This function is kept for backwards compatibility,
+  use <a href="#xpath_eval-6"><code>xpath_eval/6</code></a>.</p>
+<p><p>Evaluate the XPath expression Expr, invoking ResultFun for each node  
+in the resulting node set.</p>
+ 
+  The possible values for Ret in the
+  return value for ResultFun are ?ITER_CONTINUE and ?ITER_STOP.</p>
+
+<h3 class="function"><a name="xpath_eval_expr-4">xpath_eval_expr/4</a></h3>
+<div class="spec">
+<p><tt>xpath_eval_expr(Socket, Tid, Expr, Options) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Expr = binary() | {compiled, Source, Compiled}</tt></li><li><tt>Source = binary()</tt></li><li><tt>Compiled = [binary() | tuple()]</tt></li><li><tt>Options = [<a href="#type-xpath_eval_option">xpath_eval_option()</a>]</tt></li><li><tt>Result = {ok, binary()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Evaluate the XPath expression Expr, returning the result as a string.</p>
+
+<h3 class="function"><a name="xpath_eval_expr-5">xpath_eval_expr/5</a></h3>
+<div class="spec">
+<p><tt>xpath_eval_expr(Socket, Tid, Expr, TraceFun, Context) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Socket = <a href="econfd.html#type-socket">econfd:socket()</a></tt></li><li><tt>Tid = integer()</tt></li><li><tt>Expr = binary()</tt></li><li><tt>TraceFun = fun((binary()) -&gt; none()) | undefined</tt></li><li><tt>Context = <a href="econfd.html#type-ikeypath">econfd:ikeypath()</a> | []</tt></li><li><tt>Result = {ok, binary()} | <a href="#type-err">err()</a></tt></li></ul></p>
+</div><p>Evaluate the XPath expression Expr, returning the result as a string.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

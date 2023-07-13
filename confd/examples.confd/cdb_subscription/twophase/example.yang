@@ -1,0 +1,65 @@
+module example {
+  namespace "http://tail-f.com/ns/example/config";
+  prefix example;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Two phase subscribtion example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2012-08-20 {
+    description "Initial revision.";
+  }
+
+  container system {
+
+    list nodes {
+      key name;
+      leaf name {
+        type string;
+      }
+      leaf node-a {
+        type uint32;
+      }
+      leaf node-b {
+      type uint32;
+      }
+      leaf node-c {
+        type uint32;
+      }
+      leaf node-d {
+        type uint32;
+      }
+      leaf node-e {
+        type uint32;
+      }
+      leaf node-f {
+        type uint32;
+      }
+    }
+  }
+}
+

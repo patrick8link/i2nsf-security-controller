@@ -1,0 +1,166 @@
+module simple {
+  namespace "http://tail-f.com/ns/simple";
+  prefix simple;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Scripting example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-12-05 {
+    description "YANG header information updated";
+  }
+
+  revision 2013-02-02 {
+    description "Initial revision.";
+  }
+
+  typedef name-type {
+    type string {
+      length "min .. 255";
+    }
+  }
+
+  container simple-objects {
+    leaf number-of-servers {
+      type uint16;
+      mandatory false;
+    }
+
+    leaf number-of-hosts {
+      type uint16;
+      mandatory true;
+    }
+
+    leaf max-number-of-servers {
+      type uint16;
+      mandatory false;
+    }
+
+    leaf max-number-of-hosts {
+      type uint16;
+      mandatory true;
+    }
+
+    container hosts {
+      list host {
+        key name;
+        max-elements 64;
+
+        leaf name {
+          type name-type;
+        }
+
+        leaf enabled {
+          type boolean;
+          mandatory true;
+        }
+
+        leaf number-of-servers {
+          type uint16;
+          mandatory true;
+        }
+
+        container servers {
+          list server {
+            key name;
+            unique "ip port";
+            max-elements 64;
+
+            leaf name {
+              type name-type;
+            }
+
+            leaf ip {
+              type inet:ipv4-address;
+              mandatory true;
+            }
+
+            leaf port {
+              type inet:port-number;
+              mandatory true;
+            }
+          }
+        }
+      }
+    }
+
+    container services {
+      list service {
+        key "address port-number";
+        max-elements 64;
+
+        leaf address {
+          type inet:ipv4-address;
+        }
+
+        leaf port-number {
+          type inet:port-number;
+        }
+
+        leaf host-name {
+          type name-type;
+          mandatory true;
+        }
+
+        leaf server-name {
+          type name-type;
+          mandatory true;
+        }
+      }
+    }
+
+    leaf descr {
+      type name-type;
+      default "test description";
+    }
+  }
+
+  container authentication-key {
+    presence true;
+    tailf:cli-sequence-commands;
+    tailf:cli-incomplete-command;
+    tailf:cli-compact-syntax;
+
+    leaf auth-type {
+      type string;
+      tailf:cli-drop-node-name;
+      tailf:cli-incomplete-command;
+    }
+
+    leaf password {
+      tailf:cli-drop-node-name;
+      type string;
+    }
+
+    leaf send {
+      type string;
+      default "send-and-receive";
+    }
+
+    leaf snp {
+      type string;
+      default "send-and-receive";
+    }
+  }
+}

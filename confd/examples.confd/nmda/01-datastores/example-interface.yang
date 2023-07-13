@@ -1,0 +1,42 @@
+module example-interface {
+  yang-version 1.1;
+  namespace urn:example:interface;
+  prefix interface;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  container interfaces {
+    tailf:callpoint interfaceCP {
+      tailf:operational;
+    }
+    tailf:callpoint interfaceCP {
+      tailf:config false;
+    }
+    list interface {
+      key name;
+      leaf name {
+        type string;
+      }
+      leaf mac {
+        type string;
+      }
+      leaf in-packets {
+        config false;
+        type uint32;
+      }
+      /*
+         For simplicity of the example
+         leaf is used instead of leaf-list
+      */
+      leaf ipv4-address {
+        type inet:ip-address;
+      }
+    }
+  }
+}

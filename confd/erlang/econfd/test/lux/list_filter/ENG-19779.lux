@@ -1,0 +1,158 @@
+[doc ENG-19779 - Test concurrent get_next with a econfd DP]
+
+[config timeout=3000]
+[config require=TEST_DIR]
+[config skip_unless=PYTHON]
+
+[include $TEST_DIR/luxinc/conditional.luxinc]
+
+[global DP=ENG-19779.py]
+
+[macro test_get_next_no_filter path cb]
+
+[shell python-cli]
+    [progress \ntest get_next no filter ($path)\n]
+    !$PYTHON $DP get_next $path None
+    ?press enter to get next cursor values
+    !
+    ???1 {One}
+    !
+    ???2 {Two}
+    !
+    ???3 {Three}
+    !
+    ?iteration complete, stopping
+    [invoke ok]
+
+[shell devel.log]
+    ??${cb}(
+    ?filter undefined
+
+[endmacro]
+
+[macro test_get_next_filter path cb]
+
+[shell python-cli]
+    [progress \ntest get_next filter ($path)\n]
+    !$PYTHON $DP get_next $path "size > 8"
+    ?press enter to get next cursor values
+    !
+    ???1 {One}
+    !
+    ???2 {Two}
+    !
+    ?iteration complete, stopping
+    [invoke ok]
+
+[shell devel.log]
+    ??${cb}(
+    ???filter [size] > <<"8">>
+
+[endmacro]
+
+[macro test_get_next_object_no_filter path]
+
+[shell python-cli]
+    [progress \ntest get_next_object no filter ($path)\n]
+    !$PYTHON $DP get_next_object $path None
+    ?press enter to get next cursor values
+    !
+    ?1
+    ?  - One
+    ?  - 8
+    !
+    ?2
+    ?  - Two
+    ?  - 16
+    !
+    ?3
+    ?  - Three
+    ?  - 24
+    !
+    ?iteration complete, stopping
+    [invoke ok]
+
+[shell devel.log]
+    ???get_next_object(
+    ?filter undefined
+
+[endmacro]
+
+[macro test_get_next_object_filter path]
+
+[shell python-cli]
+    [progress \ntest get_next_object filter ($path)\n]
+    !$PYTHON $DP get_next_object $path "size > 8"
+    ?press enter to get next cursor values
+    !
+    ?1
+    ?  - One
+    ?  - 8
+    !
+    ?2
+    ?  - Two
+    ?  - 16
+    !
+    ?iteration complete, stopping
+    [invoke ok]
+
+[shell devel.log]
+    ???get_next_object(
+    ???filter [size] > <<"8">>
+[endmacro]
+
+[macro test_filter path filter erl_filter]
+[shell python-cli]
+    !$PYTHON $DP filter $path '$filter'
+    ???first value {One}
+    [invoke ok]
+
+[shell devel.log]
+    ??get_next(
+    ??filter $erl_filter
+[endmacro]
+
+[macro test_filter_no_value path filter erl_filter]
+[shell python-cli]
+    !$PYTHON $DP filter $path '$filter'
+    ?NO value
+    [invoke ok]
+[endmacro]
+
+[shell devel.log]
+    !touch devel.log
+    [invoke ok]
+    !tail -f devel.log
+
+[shell confd]
+    [invoke start_system]
+
+[shell python-cli]
+    -[Tt]raceback
+
+    [progress \ntest filter conversion\n]
+    # true() filter is ignored, will always return the entries
+    [my path=/ENG-19779/elements/element]
+    [invoke test_filter $path "true()" "undefined"]
+    [invoke test_filter_no_value $path "false()" "undefined"]
+    [invoke test_filter $path "name = \"hello\" or size = 42" "[name] = <<\"hello\">> OR [size] = <<\"42\">>"]
+    [invoke test_filter $path "re-match(name, \"o$\") and size < 21" "re-match([name], <<\"o$\">>) AND [size] < <<\"21\">>"]
+    # previous a test for non prefixed derived was attempted, not
+    # supported by the xpath engine (does not make sense without a
+    # module).
+    [invoke test_filter $path "derived-from(ref, \"E19779:vehicle-type\")" "derived-from([ref], {44,{674994028,1054561983}})"]
+
+    [invoke test_get_next_no_filter /ENG-19779/elements/element get_next]
+    [invoke test_get_next_filter /ENG-19779/elements/element get_next]
+
+    [invoke test_get_next_no_filter /ENG-19779/elements/object-element get_next_object]
+    [invoke test_get_next_filter /ENG-19779/elements/object-element get_next_object]
+
+    [invoke test_get_next_object_no_filter /ENG-19779/elements/object-element]
+    [invoke test_get_next_object_filter /ENG-19779/elements/object-element]
+
+[shell confd]
+    [invoke end_test]
+
+[cleanup]
+    [invoke stop_system]

@@ -1,0 +1,50 @@
+ConfD Example - NETCONF TRACE_ID
+--------------------------------------------------------------------------------
+
+This example demonstrates NETCONF TRACE-ID feature that introduces the trace-id
+parameter into NETCONF responses, NETCONF logs, and traces.
+
+Please note that the feature is enabled by setting the confd.conf parameter
+/confdConfig/logs/traceId to true.
+
+To run
+------
+
+1. Build:
+    $ # One may stop any running ConfD daemon and clean the database if needed.
+    $ make stop
+    $ male clean
+    $ make build
+
+2. Start Confd and CDB Subscriber:
+    $ make start
+    $ make start-subs
+
+3. In a second shell, output the NETCONF Trace Log for observation.
+
+    $ make tail-netconf-trace
+
+4. In a third shell, start a daemon to observe ConfD events.
+   Notifications.
+
+    $ make start-notifications
+
+5. In order to trigger notifications and logging, edit some config.
+   In a fourth shell:
+
+    $ make edit-config
+
+6. Now we can observe the NETCONF response with an added trace-id as an
+   attribute to <rpc-reply> in the fourth shell and in the NETCONF Trace Log.
+
+   Also see the corresponding Notifications Events received by the daemon  that
+   is registered on ConfD Event Notifications which reflects the NETCONF logs.
+
+   In the first shell one may observe the trace outputs from the CDB Subscriber
+   application printing the call to MAAPI_NCS_GET_TRANS_PARAMS result and the
+   trace-id that can be correlated to the NETCONF response in NETCONF logs and
+   traces.
+
+6. To stop the system:
+
+    $ make stop

@@ -1,0 +1,37 @@
+module ietf-ip-ann {
+  namespace "urn:dummy";
+  prefix "dummy";
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import ietf-interfaces {
+    prefix if;
+  }
+
+  import ietf-ip {
+    prefix ip;
+  }
+
+  tailf:annotate-module "ietf-ip" {
+    tailf:annotate-statement "augment[name='/if:interfaces/if:interface']" {
+      tailf:annotate-statement "container[name='ipv4']" {
+        tailf:callpoint "ip_state_ipv4" {
+          tailf:operational;
+        }
+        tailf:callpoint "ip_state_ipv4" {
+          tailf:config false;
+        }
+      }
+      tailf:annotate-statement "container[name='ipv6']" {
+        tailf:callpoint "ip_state_ipv6" {
+          tailf:operational;
+        }
+        tailf:callpoint "ip_state_ipv6" {
+          tailf:config false;
+        }
+      }
+    }
+  }
+}

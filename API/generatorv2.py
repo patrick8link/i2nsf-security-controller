@@ -132,6 +132,7 @@ def coverSetNSF(convertedData):
     for u in Universe:
         
         NSF = mongo.findCapability(u,query={})
+        print(NSF)
         if NSF:
             for x in NSF:
                 if x["nsf-name"] in Subset:
@@ -278,8 +279,12 @@ def generate(nfi,provisioning):
         #print(nsf,":")
         result = pybindIETFXMLEncoder.serialise(nfi)
         #print(result)
+        result = result.replace('<ietf-i2nsf-nsf-facing-interface xmlns="urn:ietf:params:xml:ns:yang:ietf-i2nsf-nsf-facing-interface">','')
+        result = result.replace('</ietf-i2nsf-nsf-facing-interface>','')
+        result = result.replace('<i2nsf-security-policy>','<i2nsf-security-policy xmlns="urn:ietf:params:xml:ns:yang:ietf-i2nsf-nsf-facing-interface">')
         res[nsf] = result
         nfi._unset_i2nsf_security_policy()
+    
     return res
 
 
@@ -303,7 +308,7 @@ def gen(xml):
     nfi = ietf_i2nsf_nsf_facing_interface()
 
     provisioning = coverSetNSF(convMongo)
-    #print("Provisioning: ",provisioning)
+    print("Provisioning: ",provisioning)
     result = generate(nfi,provisioning)
     if isinstance(result,str):
         return {"ERROR":"NSF not Found"}

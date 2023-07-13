@@ -1,0 +1,182 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;31.&nbsp;Progress Trace</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch30.html" title="Chapter&nbsp;30.&nbsp;Plug-and-play Scripting"><link rel="next" href="ch32.html" title="Chapter&nbsp;32.&nbsp;Advanced Topics"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;31.&nbsp;Progress Trace</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch30.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch32.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.progress_trace"></a>Chapter&nbsp;31.&nbsp;Progress Trace</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch31.html#d5e15171">31.1. Introduction</a></span></dt><dt><span class="sect1"><a href="ch31.html#d5e15182">31.2. Configuring Progress Trace</a></span></dt><dt><span class="sect1"><a href="ch31.html#d5e15256">31.3. Report Progress Events from User Code</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e15171"></a>31.1.&nbsp;Introduction</h2></div></div></div><p>
+      Progress tracing in ConfD provides developers with useful
+      information for debugging, diagnostics and profiling. This
+      information can be used both during development cycles and after
+      release of the software. The system overhead for progress
+      tracing are <span class="emphasis"><em>usually</em></span> negligible.
+    </p><p>
+      When a transaction or action is applied, ConfD emits
+      progress events. These events can be displayed and recorded in a
+      number of different ways. The easiest way is to pipe an action
+      to details in the CLI.
+    </p><p>
+      </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>commit | details</code></strong>
+Possible completions:
+  debug  verbose  very-verbose
+admin@ncs% <strong class="userinput"><code>commit | details</code></strong>
+        </pre></div><p>
+      As seen by the details output, all events are recorded with a
+      timestamp and in some cases with the duration. All phases of the
+      transaction are printed.
+      </p><pre class="screen">
+ 2021-05-25T17:28:12.267 applying transaction...
+entering validate phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33
+ 2021-05-25T17:28:12.267 taking transaction lock... ok (0.000 s)
+ 2021-05-25T17:28:12.267 holding transaction lock...
+ 2021-05-25T17:28:12.268 creating rollback file... ok (0.004 s)
+ 2021-05-25T17:28:12.272 run transforms and transaction hooks...
+ 2021-05-25T17:28:12.273 run pre-transform validation... ok (0.000 s)
+ 2021-05-25T17:28:12.275 service /ordserv[name='o2']: run service... ok (0.035 s)
+ 2021-05-25T17:28:12.311 run transforms and transaction hooks: ok (0.038 s)
+ 2021-05-25T17:28:12.311 mark inactive... ok (0.000 s)
+ 2021-05-25T17:28:12.311 pre validate... ok (0.000 s)
+ 2021-05-25T17:28:12.311 run validation over the changeset... ok (0.000 s)
+ 2021-05-25T17:28:12.312 run dependency-triggered validation... ok (0.000 s)
+ 2021-05-25T17:28:12.312 check configuration policies... ok (0.000 s)
+leaving validate phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33 (0.045 s)
+entering write-start phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33
+ 2021-05-25T17:28:12.312 cdb: write-start
+ 2021-05-25T17:28:12.313 check data kickers... ok (0.000 s)
+leaving write-start phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33 (0.001 s)
+entering prepare phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33
+ 2021-05-25T17:28:12.314 cdb: prepare
+ 2021-05-25T17:28:12.314 ncs-internal-device-mgr: prepare
+leaving prepare phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33 (0.003 s)
+entering commit phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33
+ 2021-05-25T17:28:12.317 cdb: commit
+ 2021-05-25T17:28:12.318 ncs-internal-service-mux: commit
+ 2021-05-25T17:28:12.318 ncs-internal-device-mgr: commit
+ 2021-05-25T17:28:12.320 holding transaction lock: ok (0.033 s)
+leaving commit phase for running usid=41 tid=1761 trace-id=d7f06482-41ad-4151-938d-7a8bc7b3ce33 (0.002 s)
+ 2021-05-25T17:28:12.320 applying transaction: ok (0.053 s)
+      </pre><p>
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e15182"></a>31.2.&nbsp;Configuring Progress Trace</h2></div></div></div><p>
+      The pipe details in the CLI is useful during development cycles
+      of for example a service, but not as useful when tracing calls
+      from other northbound interfaces or events in a released running
+      system. Then it's better to configure a progress trace to be
+      outputted to a file or operational data which can be retrieved
+      through a northbound interface.
+    </p><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15185"></a>31.2.1.&nbsp;Unhide Progress Trace</h3></div></div></div><p>
+        The top level container <code class="code">progress</code> is by default
+        invisible due to a hidden attribute. In order to make
+        <code class="code">progress</code> visible in the CLI, two steps are
+        required. First the following XML snippet must be added to
+        
+        <code class="filename">confd.conf</code>:
+
+        </p><div class="informalexample"><pre class="programlisting">
+<strong class="hl-tag" style="color: #000096">&lt;hideGroup&gt;</strong>
+  <strong class="hl-tag" style="color: #000096">&lt;name&gt;</strong>debug<strong class="hl-tag" style="color: #000096">&lt;/name&gt;</strong>
+<strong class="hl-tag" style="color: #000096">&lt;/hideGroup&gt;</strong>
+
+          </pre></div><p>
+        
+        Now the unhide command may be used in the CLI session:
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>unhide debug</code></strong>
+          </pre></div><p>
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15196"></a>31.2.2.&nbsp;Log to File</h3></div></div></div><p>
+        Progress data can be outputted to a given file. This is useful
+        when the data is to be analyzed in some third party software
+        like a spreadsheet application.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>set progress trace test destination file event.csv format csv</code></strong>
+          </pre></div><p>
+        The file can be formatted as a comma-separated values file
+        defined by RFC 4180 or in a pretty printed log file with each
+        event on a single line.
+      </p><p>
+        The location of the file is the directory of
+        <code class="sgmltag-element">/confdConfig/logs/progressTrace/dir</code> in
+        <code class="filename">confd.conf</code>.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15205"></a>31.2.3.&nbsp;Log as Operational Data</h3></div></div></div><p>
+        When the data is to be retrieved through a northbound
+        interface it is more useful to output the progress events as
+        operational data.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>set progress trace test destination oper-data</code></strong>
+          </pre></div><p>
+        This will log non-persistent operational data to the
+        <code class="code">/progress:progress/trace/event</code> list.
+        As this list might grow rapidly there is a maximum size of
+        it (defaults to 1000 entries). When the maximum size is
+        reached, the oldest list entry is purged.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>set progress trace test max-size 2000</code></strong>
+          </pre></div><p>
+        Using the <code class="code">/progress:progress/trace/purge</code> action
+        the event list can be purged.
+        </p><div class="informalexample"><pre class="screen">
+admin# <strong class="userinput"><code>request progress trace test purge</code></strong>
+          </pre></div><p>
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15219"></a>31.2.4.&nbsp;Log as Notification Events</h3></div></div></div><p>
+        Progress events can be subscribed to as Notifications
+        events. See <a class="xref" href="ch16.html" title="Chapter&nbsp;16.&nbsp;Notifications">Chapter&nbsp;16, <i>Notifications</i></a>
+        
+        for further details.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15223"></a>31.2.5.&nbsp;Verbosity</h3></div></div></div><p>
+        The <em class="parameter"><code>verbosity</code></em> parameter is used to
+        control the level of output. The following levels are
+        available:
+      </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="emphasis"><em>normal</em></span> - Informational messages
+            that highlight the progress of the system
+            at a coarse-grained level. Used mainly to give a high
+            level overview. This is the default and the lowest
+            verbosity level.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>verbose</em></span> - Detailed informational
+            messages from the system.
+            
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>very-verbose</em></span> - Very detailed
+            informational messages from the system and its internal
+            operations.
+          </p></li><li class="listitem"><p>
+            <span class="emphasis"><em>debug</em></span> - The highest
+            verbosity level. Fine-grained informational messages
+            usable for debugging the system and its internal
+            operations. Internal system transactions as well as
+            data kicker evaluation and CDB subscribers will traced.
+            Setting this level could result in a large number of
+            events being generated.
+          </p></li></ul></div><p>
+        Additional debug tracing can be turned on for various parts.
+        These are consciously left out of the normal debug level
+        due to the high amount of output and should only be
+        turned on during development.
+      </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e15241"></a>31.2.6.&nbsp;Using Filters</h3></div></div></div><p>
+        By default all transaction and action events with the given
+        verbosity level will be logged. To get a more selective choice
+        of events, filters can be used.
+        
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>show progress trace filter ?</code></strong>
+Possible completions:
+  context    - Only log events for the specified context.
+  local-user - Only log events for the specified local user.
+          </pre></div><p>
+        The context filter can be used to only log events that
+        originate through a specific northbound interface. The context
+        is either one of <span class="emphasis"><em>netconf</em></span>,
+        <span class="emphasis"><em>cli</em></span>, <span class="emphasis"><em>webui</em></span>,
+        <span class="emphasis"><em>snmp</em></span>, <span class="emphasis"><em>rest</em></span>,
+        <span class="emphasis"><em>system</em></span> or it can be any other context
+        string defined through the use of MAAPI.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs% <strong class="userinput"><code>set progress trace test filter context netconf</code></strong>
+          </pre></div><p>
+      </p></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e15256"></a>31.3.&nbsp;Report Progress Events from User Code</h2></div></div></div><p>
+      API methods to report progress events exists for Java, Python and
+      C.
+      
+      </p><div class="informalexample"><pre class="programlisting">
+...
+maapi.reportProgress(tHandle, Maapi.Verbosity.VERBOSE, <strong class="hl-string"><em style="color:red">"test"</em></strong>);
+
+        </pre></div><p>
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch30.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch32.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;30.&nbsp;Plug-and-play Scripting&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;32.&nbsp;Advanced Topics</td></tr></table></div></body></html>

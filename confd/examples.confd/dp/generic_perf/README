@@ -1,0 +1,149 @@
+A Generic Data Provider Setup Targeting Optimal Wall-Clock Time Performance
+===========================================================================
+
+Run a generic ConfD Data Provider (DP API) example and explore the difference
+in performance when reading the config and operational state YANG "config
+true/false" data from various NETCONF, RESTCONF, MAAPI, and CLI north bound API
+clients.
+
+In addition, the DP application uses the ConfD CDB operational data store as an
+"external database" to provide data from by efficiently reading the requested
+data from the CDB operational data store using the CDB API.
+
+- For optimal general use-case performance we only implement the
+  following Data Provider application callbacks for reading configuration and
+  operational state data:
+  - exists_optional()
+  - get_case()
+  - num_instances()
+  - get_object()
+  - find_next()
+  - find_next_object()
+- We also implement callbacks for writing configuration data:
+  - set_elem()
+  - create()
+  - remove()
+  - move_after()
+  - set_case()
+  - t_commit()
+- See the src/cdboper_dp.c file for the implementation of the above callbacks.
+- The example assume that your root node is a container or a list, not a
+  leaf. We can then set the CONFD_DAEMON_FLAG_BULK_GET_CONTAINER flag using
+  confd_set_daemon_flags() and skip implementing the get_elem() data provider
+  callback. To have a container or list at the YANG root and not put any leaves
+  there are recommended YANG best practices.
+
+              YANG root
+                  |
+ Top-level YANG Container or List node
+                  |
+      ---------------------...-----
+     |            |                |
+ YANG Node x   YANG Node y ... YANG Node z
+
+- The Data Provider application read the data it provides from the CDB
+  operational data store.
+
+    MAAPI/NETCONF/RESTCONF/CLI Client(s)
+          |  ^
+  Request v  | Response
+  --------------------------------
+ | ConfD  |  ^       _.------._   |
+ | Core   |  |     .´          `. |
+ |        |  |     |-_        _-| |
+ |        |  |     |  `------´  | |
+ |        |  |     |  CDB-OPER  | |
+ |        |  |      `.        .´  |
+ |        |  |        `------´    |
+ |        v  |          |  |      |
+  --------------------------------
+          DP API      CDB API
+          |   ^         |  ^
+          |   |         v  |
+          |  Data Provider |
+           -> Application -
+
+- To achieve the above, we create a copy of the original YANG models, add
+  "-state" to their YANG module name, namespace, and prefix, and make all data
+  in them "config false".
+- The implementation of the data provider callbacks in the cdboper_dp.c data
+  provider application use the schema generated from the YANG models and the
+  following CDB API calls to provide the requested data and write changes:
+  - exists_optional() DP callback:
+    - cdb_exists()
+  - get_case() DP callback:
+    - cdb_get_case()
+  - num_instances() DP callback:
+    - cdb_num_instances()
+  - get_object() DP callback:
+    - cdb_index()
+    - cdb_get_values()
+  - find_next() DP callback:
+    - cdb_index()
+    - cdb_next_index()
+    - cdb_get_values()
+  - find_next_object() DP callback:
+    - cdb_index()
+    - cdb_next_index()
+    - cdb_num_instances()
+    - cdb_get_values()
+  - t_commit() DP callback:
+    - cdb_set_elem()
+    - cdb_create()
+    - cdb_delete()
+    - cdb_set_case()
+- The northbound NETCONF/RESTCONF/MAAPI/CLI interface clients requesting data:
+    - NETCONF <get-data>, an RFC 8526 NETCONF NMDA extension that allow us to
+      use a config-filter to get "config false" data only.
+    - NETCONF <get>, legacy way before <get-data> was available.
+    - RESTCONF GET in JSON format.
+    - maapi_save_config() of oper data in XML format.
+    - maapi_save_config() of oper data in JSON format.
+    - maapi_iterate() to get the oper data in ConfD keypath + value format to
+      for example transform it into any format that maapi_save_config() does
+      not support.
+    - maapi_get_objects() / object() of operational state data in ConfD
+      tag+value format that can be used to to transform the data into a format
+      not supported by maapi_save_config().
+    - CLI show of oper data in C-style format.
+    - See run.sh and maapi_save.c + maapi_iterate.c + maapi_get_objects.c +
+      cli-show-sys.sh for details.
+- Again, the purpose of the example is to show an example implementation of a
+  high-performance data provider, but the example also give some guidance in
+  how to use the CDB API, MAAPI, and other northbound clients.
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+1. Build the necessary files and start ConfD by typing
+
+       $ make all start
+
+2. To see what's happening inside ConfD, optionally tail the ConfD developer
+   log file and/or the libconfd.log DP application log file.
+
+       $ tail -F ./devel.log ./libconfd.log
+
+3. A few different pre-made read examples are available:
+
+       $ make ncgeta    # NETCONF <get> with a <filter type="subtree">
+       $ make ncgeto    # NETCONF <get-data> with a <subtree-filter> and
+                        # <config-filter>false</config-filter>
+       $ make ncgetd    # NETCONF <get-data> with a <subtree-filter>
+       $ make rcgeta    # RESTCONF GET
+       $ make msavex    # maapi_save_config() in XML format
+       $ make msavej    # maapi_save_config() in JSON format
+       $ make mgobjs    # maapi_get_objects() / object() in tag+value format
+       $ make mitera    # maapi_iterate() in ConfD keypath + value format
+       $ make clish     # CLI show in C-style format
+
+Further Reading
+~~~~~~~~~~~~~~~
+
++ A framework for measuring wall-clock time and memory high-watermark + rss:
+  https://github.com/ConfD-Developer/ConfD-Demos/dp-performance
++ ConfD Manual: Operational Data
++ man 3 confd_lib_dp
++ man 3 confd_types
++ man 3 confd_lib_maapi
++ man 3 confd_lib_cdb

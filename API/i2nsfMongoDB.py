@@ -56,6 +56,28 @@ def getUserGroup(key):
     res = col.find_one(query)
     return res
 
+# Register user-group to MongoDB
+# Data Model: {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
+def insertDeviceGroup(data):
+    try:
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+        db = client["endpoint"]
+        col = db["device"]
+        
+        res = col.insert_one(data)
+        return res
+    except pymongo.errors.DuplicateKeyError:
+        print("Duplicate Key for ",data["name"])
+
+def getDeviceGroup(key):
+    client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    db = client["endpoint"]
+    col = db["device"]
+    
+    query = {"name":key}
+    res = col.find_one(query)
+    return res
+
 # Register location-group to MongoDB
 # Data Model: {"name": string, "geo-ipv4-address": {}, "ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "ipv6-address": {"start": ipv6-address,"end": ipv6-address}}
 def insertLocationGroup(data):
@@ -219,5 +241,4 @@ def getICMPMessage(val):
     query = {"keyword":val}
     res = col.find_one(query)
     return res
-
 

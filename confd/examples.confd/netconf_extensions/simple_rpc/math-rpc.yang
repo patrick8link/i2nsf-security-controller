@@ -1,0 +1,93 @@
+module math-rpc {
+  namespace "http://example.com/math";
+  prefix math;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for NETCONF RPC example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-12-04 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-06-01 {
+    description "Initial revision.";
+  }
+
+  grouping math-input {
+    choice op {
+      container add {
+        leaf-list operand {
+          type int32;
+          min-elements 2;
+          max-elements 2;
+        }
+      }
+      container sub {
+        leaf-list operand {
+          type int32;
+          min-elements 2;
+          max-elements 2;
+        }
+      }
+    }
+  }
+
+  grouping math-output {
+    leaf result {
+      type int32;
+    }
+  }
+
+  rpc math {
+    tailf:exec "./math" {
+      tailf:wd ".";
+      tailf:raw-xml;
+    }
+    input {
+      uses math-input;
+    }
+    output {
+      uses math-output;
+    }
+  }
+
+  rpc math2 {
+    tailf:exec "./math2" {
+      tailf:wd ".";
+    }
+    input {
+      uses math-input;
+    }
+    output {
+      uses math-output;
+    }
+  }
+
+  rpc math3 {
+    tailf:actionpoint math3;
+    input {
+      uses math-input;
+    }
+    output {
+      uses math-output;
+    }
+  }
+
+  tailf:error-info {
+    uses math-input;
+  }
+}

@@ -1,0 +1,93 @@
+This example demonstrates new replies that contain value and
+attributes of a node.
+
+For performance reasons, new optional replies that contain value with
+attributes are implemented for the callbacks below. The attributes are
+stored in the object cache in a similar manner to how values are
+stored. So that C-API does not issue a get_attr callback and use the
+attributes in the object cache instead.
+
+get_elem:        confd_data_reply_value_attrs()
+get_next:        confd_data_reply_next_key_attrs()
+get_object:      confd_data_reply_tag_value_attrs_array()
+get_next_object: confd_data_reply_next_object_tag_value_attrs_array()
+                 confd_data_reply_next_object_tag_value_attrs_arrays()
+
+About the NETCONF Client used in the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A NETCONF client 'netconf-console', which is part of the ConfD
+installation, is used in this example. This client communicates with
+ConfD over SSH and requires Python Paramiko package (on Ubuntu you can
+install it by command 'apt-get install python-paramiko'). In case SSH
+cannot be used, there is 'netconf-console-tcp' variant. To use
+'netconf-console-tcp', update 'confd.conf' to enable
+'netconf/transport/tcp' and change all 'netconf-console' calls to
+'netconf-console-tcp'.
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+Two operational test interfaces lo and eth0 are pre-defined in the
+data provider module 'interface_dp.c.
+
+The first example registers get_elem, get_next and get_attrs callbacks
+and reads the list entries element by element while the second example
+registers a get_object function instead of get_elem and reads the list
+entries object by object. The third example registers a
+get_next_object and reads one list entry at a time while the last
+example registers another get_next_object and reads multiple list
+entries at once. Each reply contain not only values but also
+attributes of nodes. Thus the number of get_attrs callbacks reduced to
+1 (one) which is for the top container node.
+
+Starting Examples
+~~~~~~~~~~~~~~~~~~~~~~
+ 1. Build the necessary files and start ConfD.
+
+    $ make all start
+
+ 2. On the same window, run interface_dp to get list entries element
+    by element. interface_dp will be running in the foreground.
+
+    $ make dp_get_elem
+
+ 3. In another window, retrieve the origins of the operational-state content.
+
+    $ netconf-console --get-data --db operational -x /interfaces --with-origin
+
+ 4. Retrieve the data callback counters.
+    Typing the following command will show the number of all registers data
+    callback calls. Note that the get_attrs callback is called only
+    once for the container node. The attributes are taken from
+    get_elem and get_next replies for other nodes.
+
+    $ echo g | nc localhost 9999
+
+    In order to repeat the test and get the same results without
+    restarting the dp module, use the following command to clear the
+    data callback counters.
+
+    $ echo c | nc localhost 9999
+
+ 5. In the second example, run the same test using get_object by
+    running the "make dp_get_object" command in step 2.
+    This will call get_object instead of get_elem.
+
+    $ make dp_get_object
+
+ 6. In the third example, run the same test using get_next_object by
+    running the "make dp_get_next_object" command in step 2.
+    This will return one list entry at a time.
+
+    $ make dp_get_next_object
+
+ 7. In the fourth example, run the same test using get_next_objects by
+    running the "make dp_get_next_objects" command in step 2.
+    This will return all list entries at once.
+
+    $ make dp_get_next_objects
+
+    In order to repeat the test and get the same results without
+    restarting the dp module, use the following command to clear the
+    data callback counters.
+
+    $ echo c | nc localhost 9999

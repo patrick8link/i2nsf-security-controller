@@ -1,0 +1,60 @@
+module system {
+  namespace "http://tail-f.com/ns/system";
+  prefix system;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for AAA data rules example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-12-04 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-05-25 {
+    description "Initial revision.";
+  }
+
+  container system {
+    container interfaces {
+      list interface {
+        key name;
+        max-elements 64;
+        leaf name {
+          type string;
+        }
+        leaf ip {
+          type inet:ipv4-address;
+          mandatory true;
+        }
+        leaf enabled {
+          type boolean;
+          mandatory true;
+        }
+        leaf mtu {
+          type int64;
+          default 1500;
+        }
+        leaf metric {
+          type int64;
+          mandatory true;
+        }
+        leaf myflag {
+          type empty;
+        }
+      }
+    }
+  }
+}

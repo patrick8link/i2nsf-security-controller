@@ -1,0 +1,2660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>_confd.maapi API documentation</title>
+<meta name="description" content="Low level module for connecting to ConfD with a read/write interface
+inside transactions …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>_confd.maapi</code></h1>
+</header>
+<section id="section-intro">
+<p>Low level module for connecting to ConfD with a read/write interface
+inside transactions.</p>
+<p>This module is used to connect to the ConfD transaction manager.
+The API described here has several purposes. We can use MAAPI when we wish
+to implement our own proprietary management agent.
+We also use MAAPI to attach to already existing ConfD transactions, for
+example when we wish to implement semantic validation of configuration
+data in Python, and also when we wish to implement CLI wizards in Python.</p>
+<p>This documentation should be read together with the confd_lib_maapi(3) man page.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="_confd.maapi.aaa_reload"><code class="name flex">
+<span>def <span class="ident">aaa_reload</span></span>(<span>sock, synchronous)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a reload of aaa from external data provider.</p>
+<p>Used by external data provider to notify that there is a change to the AAA
+data. Calling the function with the argument 'synchronous' set to 1 or True
+means that the call will block until the loading is completed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>synchronous &ndash; if 1, will wait for the loading complete and return when
+the loading is complete; if 0, will only initiate the loading of AAA
+data and return immediately</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.aaa_reload_path"><code class="name flex">
+<span>def <span class="ident">aaa_reload_path</span></span>(<span>sock, synchronous, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a reload of aaa from external data provider.</p>
+<p>A variant of _maapi_aaa_reload() that causes only the AAA subtree given by
+path to be loaded.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>synchronous &ndash; if 1, will wait for the loading complete and return when
+the loading is complete; if 0, will only initiate the loading of AAA
+data and return immediately</li>
+<li>path &ndash; the subtree to be loaded</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.abort_trans"><code class="name flex">
+<span>def <span class="ident">abort_trans</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Final phase of a two phase transaction, aborting the trans.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.abort_upgrade"><code class="name flex">
+<span>def <span class="ident">abort_upgrade</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Can be called before committing upgrade in order to abort it.</p>
+<p>Final step in an upgrade.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.apply_trans"><code class="name flex">
+<span>def <span class="ident">apply_trans</span></span>(<span>sock, thandle, keepopen)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a transaction.</p>
+<p>Validates, prepares and eventually commits or aborts the transaction. If
+the validation fails and the 'keep_open' argument is set to 1 or True, the
+transaction is left open and the developer can react upon the validation
+errors.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>keepopen &ndash; if true, transaction is not discarded if validation fails</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.apply_trans_flags"><code class="name flex">
+<span>def <span class="ident">apply_trans_flags</span></span>(<span>sock, thandle, keepopen, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A variant of apply_trans() that takes an additional 'flags' argument.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>keepopen &ndash; if true, transaction is not discarded if validation fails</li>
+<li>flags &ndash; flags to set in the transaction</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.attach"><code class="name flex">
+<span>def <span class="ident">attach</span></span>(<span>sock, hashed_ns, ctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attach to a existing transaction.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>hashed_ns &ndash; the namespace to use</li>
+<li>ctx &ndash; transaction context</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.attach2"><code class="name flex">
+<span>def <span class="ident">attach2</span></span>(<span>sock, hashed_ns, usid, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used when there is no transaction context beforehand, to attach to a
+existing transaction.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>hashed_ns &ndash; the namespace to use</li>
+<li>usid &ndash; user session id, can be set to 0 to use the owner of the transaction</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.attach_init"><code class="name flex">
+<span>def <span class="ident">attach_init</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attach the _MAAPI socket to the special transaction available during phase0.
+Returns the thandle as an integer.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.authenticate"><code class="name flex">
+<span>def <span class="ident">authenticate</span></span>(<span>sock, user, password, n) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Authenticate a user session. Use the 'n' to get a list of n-1 groups that
+the user is a member of. Use n=1 if the function is used in a context
+where the group names are not needed. Returns 1 if accepted without groups.
+If the authentication failed or was accepted a tuple with first element
+status code, 0 for rejection and 1 for accepted is returned. The second
+element either contains the reason for the rejection as a string OR a list
+groupnames.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>user &ndash; username</li>
+<li>pass &ndash; password</li>
+<li>n &ndash; number of groups to return</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.authenticate2"><code class="name flex">
+<span>def <span class="ident">authenticate2</span></span>(<span>sock, user, password, src_addr, src_port, context, prot, n) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function does the same thing as maapi.authenticate(), but allows for
+passing of the additional parameters src_addr, src_port, context, and prot,
+which otherwise are passed only to maapi_start_user_session()/
+maapi_start_user_session2(). The parameters are passed on to an external
+authentication executable.
+Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>user &ndash; username</li>
+<li>pass &ndash; password</li>
+<li>src_addr &ndash; ip address</li>
+<li>src_port &ndash; port number</li>
+<li>context &ndash; context for the session</li>
+<li>prot &ndash; the protocol used by the client for connecting</li>
+<li>n &ndash; number of groups to return</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_abort_commit"><code class="name flex">
+<span>def <span class="ident">candidate_abort_commit</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Cancel an ongoing confirmed commit.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_abort_commit_persistent"><code class="name flex">
+<span>def <span class="ident">candidate_abort_commit_persistent</span></span>(<span>sock, persist_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Cancel an ongoing confirmed commit with the cookie given by persist_id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>persist_id &ndash; gives the cookie for an already ongoing persistent
+confirmed commit</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_commit"><code class="name flex">
+<span>def <span class="ident">candidate_commit</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function copies the candidate to running.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_commit_info"><code class="name flex">
+<span>def <span class="ident">candidate_commit_info</span></span>(<span>sock, persist_id, label, comment)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Commit the candidate to running, or confirm an ongoing confirmed commit,
+and set the Label and/or Comment that is stored in the rollback file when
+the candidate is committed to running.</p>
+<p>Note:</p>
+<blockquote>
+<p>To ensure the Label and/or Comment are stored in the rollback file in
+all cases when doing a confirmed commit, they must be given with both,
+the confirmed commit (using maapi_candidate_confirmed_commit_info())
+and the confirming commit (using this function).</p>
+</blockquote>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>persist_id &ndash; gives the cookie for an already ongoing persistent
+confirmed commit</li>
+<li>label &ndash; the Label</li>
+<li>comment &ndash; the Comment</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_commit_persistent"><code class="name flex">
+<span>def <span class="ident">candidate_commit_persistent</span></span>(<span>sock, persist_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Confirm an ongoing persistent commit with the cookie given by persist_id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>persist_id &ndash; gives the cookie for an already ongoing persistent
+confirmed commit</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_confirmed_commit"><code class="name flex">
+<span>def <span class="ident">candidate_confirmed_commit</span></span>(<span>sock, timeoutsecs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function also copies the candidate into running. However if a call to
+maapi_candidate_commit() is not done within timeoutsecs an automatic
+rollback will occur.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>timeoutsecs &ndash; timeout in seconds</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_confirmed_commit_info"><code class="name flex">
+<span>def <span class="ident">candidate_confirmed_commit_info</span></span>(<span>sock, timeoutsecs, persist, persist_id, label, comment)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Like candidate_confirmed_commit_persistent, but also allows for setting the
+Label and/or Comment that is stored in the rollback file when the candidate
+is committed to running.</p>
+<p>Note:</p>
+<blockquote>
+<p>To ensure the Label and/or Comment are stored in the rollback file in
+all cases when doing a confirmed commit, they must be given with both,
+the confirmed commit (using this function) and the confirming commit
+(using candidate_commit_info()).</p>
+</blockquote>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>timeoutsecs &ndash; timeout in seconds</li>
+<li>persist &ndash; sets the cookie for the persistent confirmed commit</li>
+<li>persist_id &ndash; gives the cookie for an already ongoing persistent
+confirmed commit</li>
+<li>label &ndash; the Label</li>
+<li>comment &ndash; the Comment</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_confirmed_commit_persistent"><code class="name flex">
+<span>def <span class="ident">candidate_confirmed_commit_persistent</span></span>(<span>sock, timeoutsecs, persist, persist_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start or extend a confirmed commit using persist id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>timeoutsecs &ndash; timeout in seconds</li>
+<li>persist &ndash; sets the cookie for the persistent confirmed commit</li>
+<li>persist_id &ndash; gives the cookie for an already ongoing persistent
+confirmed commit</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_reset"><code class="name flex">
+<span>def <span class="ident">candidate_reset</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copy running into candidate.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.candidate_validate"><code class="name flex">
+<span>def <span class="ident">candidate_validate</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function validates the candidate.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cd"><code class="name flex">
+<span>def <span class="ident">cd</span></span>(<span>sock, thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Change current position in the tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position to change to</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.clear_opcache"><code class="name flex">
+<span>def <span class="ident">clear_opcache</span></span>(<span>sock, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Clearing of operational data cache.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>path &ndash; the path to the subtree to clear</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_accounting"><code class="name flex">
+<span>def <span class="ident">cli_accounting</span></span>(<span>sock, user, usid, cmdstr)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates an audit log entry in the CLI audit log.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>user &ndash; user to generate the entry for</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd"><code class="name flex">
+<span>def <span class="ident">cli_cmd</span></span>(<span>sock, usess, buf)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute CLI command in the ongoing CLI session.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>buf &ndash; string to write</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd2"><code class="name flex">
+<span>def <span class="ident">cli_cmd2</span></span>(<span>sock, usess, buf, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute CLI command in a ongoing CLI session. With flags:
+CMD_NO_FULLPATH - Do not perform the fullpath check on show commands.
+CMD_NO_HIDDEN - Allows execution of hidden CLI commands.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>buf &ndash; string to write</li>
+<li>flags &ndash; as above</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd3"><code class="name flex">
+<span>def <span class="ident">cli_cmd3</span></span>(<span>sock, usess, buf, flags, unhide)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute CLI command in a ongoing CLI session.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>buf &ndash; string to write</li>
+<li>flags &ndash; as above</li>
+<li>unhide &ndash; The unhide parameter is used for passing a hide group which is
+unhidden during the execution of the command.</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd4"><code class="name flex">
+<span>def <span class="ident">cli_cmd4</span></span>(<span>sock, usess, buf, flags, unhide)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute CLI command in a ongoing CLI session.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>buf &ndash; string to write</li>
+<li>flags &ndash; as above</li>
+<li>unhide &ndash; The unhide parameter is used for passing a hide group which is
+unhidden during the execution of the command.</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd_to_path"><code class="name flex">
+<span>def <span class="ident">cli_cmd_to_path</span></span>(<span>sock, line, nsize, psize) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns string of the C/I namespaced CLI path that can be associated with
+the given command. Returns a tuple ns and path. </p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>line &ndash; data model path as string</li>
+<li>nsize &ndash; limit length of namespace</li>
+<li>psize &ndash; limit length of path</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_cmd_to_path2"><code class="name flex">
+<span>def <span class="ident">cli_cmd_to_path2</span></span>(<span>sock, thandle, line, nsize, psize) ‑> <a title="tuple" href="https://docs.python.org/3/library/typing.html#typing.tuple">tuple</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns string of the C/I namespaced CLI path that can be associated with
+the given command. In the context of the provided transaction handle.
+Returns a tuple ns and path.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>line &ndash; data model path as string</li>
+<li>nsize &ndash; limit length of namespace</li>
+<li>psize &ndash; limit length of path</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_diff_cmd"><code class="name flex">
+<span>def <span class="ident">cli_diff_cmd</span></span>(<span>sock, thandle, thandle_old, flags, path, size) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the diff between two sessions as a series C/I cli commands. Returns a
+string. If no changes exist between the two sessions for the given path a
+_confd.error.Error will be thrown with the error set to ERR_BADPATH</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>thandle_old &ndash; transaction handle</li>
+<li>flags &ndash; as for cli_path_cmd</li>
+<li>path &ndash; as for cli_path_cmd</li>
+<li>size &ndash; limit diff</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_get"><code class="name flex">
+<span>def <span class="ident">cli_get</span></span>(<span>sock, usess, opt, size) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read CLI session parameter or attribute.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>opt &ndash; option to get</li>
+<li>size &ndash; maximum response size (optional, default 1024)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_path_cmd"><code class="name flex">
+<span>def <span class="ident">cli_path_cmd</span></span>(<span>sock, thandle, flags, path, size) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns string of the C/I CLI command that can be associated with the given
+path. The flags can be given as FLAG_EMIT_PARENTS to enable the commands to
+reach the submode for the path to be emitted. The flags can be given as
+FLAG_DELETE to emit the command to delete the given path. The flags can be
+given as FLAG_NON_RECURSIVE to prevent that
+all children to a container or
+list item are displayed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>flags &ndash; as above</li>
+<li>path &ndash; the path for the cmd</li>
+<li>size &ndash; limit cmd</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_prompt"><code class="name flex">
+<span>def <span class="ident">cli_prompt</span></span>(<span>sock, usess, prompt, echo, size) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prompt user for a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>prompt &ndash; string to show the user</li>
+<li>echo &ndash; determines wether to control if the input should be echoed or not.
+ECHO shows the input, NOECHO does not</li>
+<li>size &ndash; maximum response size (optional, default 1024)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_prompt_oneof"><code class="name flex">
+<span>def <span class="ident">cli_prompt_oneof</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prompt user for a string.</p></div>
+</dd>
+<dt id="_confd.maapi.cli_prompt_oneof2"><code class="name flex">
+<span>def <span class="ident">cli_prompt_oneof2</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prompt user for a string.</p></div>
+</dd>
+<dt id="_confd.maapi.cli_read_eof"><code class="name flex">
+<span>def <span class="ident">cli_read_eof</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prompt user for a string.</p></div>
+</dd>
+<dt id="_confd.maapi.cli_read_eof2"><code class="name flex">
+<span>def <span class="ident">cli_read_eof2</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prompt user for a string.</p></div>
+</dd>
+<dt id="_confd.maapi.cli_set"><code class="name flex">
+<span>def <span class="ident">cli_set</span></span>(<span>sock, usess, opt, value)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set CLI session parameter.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>opt &ndash; option to set</li>
+<li>value &ndash; the new value of the session parameter</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cli_write"><code class="name flex">
+<span>def <span class="ident">cli_write</span></span>(<span>sock, usess, buf)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write to the cli.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usess &ndash; user session</li>
+<li>buf &ndash; string to write</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ends session and closes socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.commit_trans"><code class="name flex">
+<span>def <span class="ident">commit_trans</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Final phase of a two phase transaction, committing the trans.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.commit_upgrade"><code class="name flex">
+<span>def <span class="ident">commit_upgrade</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Final step in an upgrade.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.confirmed_commit_in_progress"><code class="name flex">
+<span>def <span class="ident">confirmed_commit_in_progress</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether a confirmed commit is ongoing. Returns a positive integer
+being the usid of confirmed commit operation in progress or 0 if no
+confirmed commit is in progress.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.connect"><code class="name flex">
+<span>def <span class="ident">connect</span></span>(<span>sock, ip, port, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Connect to the system daemon.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>ip &ndash; the ip address</li>
+<li>port &ndash; the port</li>
+<li>path &ndash; the path if socket is AF_UNIX (optional)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.copy"><code class="name flex">
+<span>def <span class="ident">copy</span></span>(<span>sock, from_thandle, to_thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copy all data from one data store to another.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>from_thandle &ndash; transaction handle</li>
+<li>to_thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.copy_path"><code class="name flex">
+<span>def <span class="ident">copy_path</span></span>(<span>sock, from_thandle, to_thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copy subtree rooted at path from one data store to another.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>from_thandle &ndash; transaction handle</li>
+<li>to_thandle &ndash; transaction handle</li>
+<li>path &ndash; the subtree rooted at path is copied</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.copy_running_to_startup"><code class="name flex">
+<span>def <span class="ident">copy_running_to_startup</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copies running to startup.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.copy_tree"><code class="name flex">
+<span>def <span class="ident">copy_tree</span></span>(<span>sock, thandle, frompath, topath)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copy subtree rooted at frompath to topath.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>frompath &ndash; the subtree rooted at path is copied</li>
+<li>topath &ndash; to which path the subtree is copied</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.create"><code class="name flex">
+<span>def <span class="ident">create</span></span>(<span>sock, thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new list entry, a presence container or a leaf of type empty
+in the data tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; path of item to create</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cs_node_cd"><code class="name flex">
+<span>def <span class="ident">cs_node_cd</span></span>(<span>socket, thandle, path) ‑> <a title="Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a title="_confd.CsNode" href="index.html#_confd.CsNode">CsNode</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Utility function which finds the resulting CsNode given a string keypath.</p>
+<p>Does the same thing as _confd.cs_node_cd(), but can handle paths that are
+ambiguous due to traversing a mount point, by sending a request to the
+daemon</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; the keypath</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.cs_node_children"><code class="name flex">
+<span>def <span class="ident">cs_node_children</span></span>(<span>sock, thandle, mount_point, path) ‑> <a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="_confd.CsNode" href="index.html#_confd.CsNode">CsNode</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieve a list of the children nodes of the node given by mount_point
+that are valid for path. The mount_point node must be a mount point
+(i.e. mount_point.is_mount_point() == True), and the path must lead to
+a specific instance of this node (including the final keys if mount_point
+is a list node). The thandle parameter is optional, i.e. it can be given
+as -1 if a transaction is not available.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>mount_point &ndash; a CsNode instance</li>
+<li>path &ndash; the path to the instance of the node</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.delete"><code class="name flex">
+<span>def <span class="ident">delete</span></span>(<span>sock, thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete an existing list entry, a presence container or a leaf of type empty
+from the data tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; path of item to delete</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.delete_all"><code class="name flex">
+<span>def <span class="ident">delete_all</span></span>(<span>sock, thandle, how)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete all data within a transaction.</p>
+<p>The how argument specifies how to delete:
+DEL_SAFE - Delete everything except namespaces that were exported with
+tailf:export none. Top-level nodes that cannot be deleted
+due to AAA rules are left in place (descendant nodes may be
+deleted if the rules allow it).
+DEL_EXPORTED - As DEL_SAFE, but AAA rules are ignored.
+DEL_ALL - Delete everything, AAA rules are ignored.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>how &ndash; DEL_SAFE, DEL_EXPORTED or DEL_ALL</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.delete_config"><code class="name flex">
+<span>def <span class="ident">delete_config</span></span>(<span>sock, name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Empties a datastore.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the datastore to empty</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.destroy_cursor"><code class="name flex">
+<span>def <span class="ident">destroy_cursor</span></span>(<span>mc)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deallocates memory which is associated with the cursor.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>mc &ndash; maapiCursor</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.detach"><code class="name flex">
+<span>def <span class="ident">detach</span></span>(<span>sock, ctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detaches an attached _MAAPI socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>ctx &ndash; transaction context</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.detach2"><code class="name flex">
+<span>def <span class="ident">detach2</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detaches an attached _MAAPI socket when we do not have a transaction context
+available.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.diff_iterate"><code class="name flex">
+<span>def <span class="ident">diff_iterate</span></span>(<span>sock, thandle, iter, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate through a transaction diff.</p>
+<p>For each diff in the transaction the callback function 'iter' will be
+called. The iter function needs to have the following signature:</p>
+<pre><code>def iter(keypath, operation, oldvalue, newvalue)
+</code></pre>
+<p>Where arguments are:</p>
+<ul>
+<li>keypath - the affected path (HKeypathRef)</li>
+<li>operation - one of MOP_CREATED, MOP_DELETED, MOP_MODIFIED, MOP_VALUE_SET,
+MOP_MOVED_AFTER, or MOP_ATTR_SET</li>
+<li>oldvalue - always None</li>
+<li>newvalue - see below</li>
+</ul>
+<p>The 'newvalue' argument may be set for operation MOP_VALUE_SET and is a
+Value object in that case. For MOP_MOVED_AFTER it may be set to a list of
+key values identifying an entry in the list - if it's None the list entry
+has been moved to the beginning of the list. For MOP_ATTR_SET it will be
+set to a 2-tuple of Value's where the first Value is the attribute set
+and the second Value is the value the attribute was set to. If the
+attribute has been deleted the second value is of type C_NOEXISTS</p>
+<p>The iter function should return one of:</p>
+<ul>
+<li>ITER_STOP - Stop further iteration</li>
+<li>ITER_RECURSE - Recurse further down the node children</li>
+<li>ITER_CONTINUE - Ignore node children and continue with the node's siblings</li>
+</ul>
+<p>One could also define a class implementing the call function as:</p>
+<pre><code>class DiffIterator(object):
+    def __init__(self):
+        self.count = 0
+
+    def __call__(self, kp, op, oldv, newv):
+        print('kp={0}, op={1}, oldv={2}, newv={3}'.format(
+            str(kp), str(op), str(oldv), str(newv)))
+        self.count += 1
+        return _confd.ITER_RECURSE
+</code></pre>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>iter &ndash; iterator function, will be called for every diff in the transaction</li>
+<li>flags &ndash; bitmask of ITER_WANT_ATTR and ITER_WANT_P_CONTAINER</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.disconnect_remote"><code class="name flex">
+<span>def <span class="ident">disconnect_remote</span></span>(<span>sock, address)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Disconnect all remote connections to 'address' except HA connections.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>address &ndash; ip address (string)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.disconnect_sockets"><code class="name flex">
+<span>def <span class="ident">disconnect_sockets</span></span>(<span>sock, sockets)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Disconnect 'sockets' which is a list of sockets (fileno).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>sockets &ndash; list of sockets (int)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.do_display"><code class="name flex">
+<span>def <span class="ident">do_display</span></span>(<span>sock, thandle, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the data model uses the YANG when or tailf:display-when statement, this
+function can be used to determine if the item given by 'path' should
+be displayed or not.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; path to the 'display-when' statement</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.end_user_session"><code class="name flex">
+<span>def <span class="ident">end_user_session</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>End the MAAPI user session associated with the socket</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.exists"><code class="name flex">
+<span>def <span class="ident">exists</span></span>(<span>sock, thandle, path) ‑> <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check wether a node in the data tree exists. Returns boolean.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position to check</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.find_next"><code class="name flex">
+<span>def <span class="ident">find_next</span></span>(<span>mc, type, inkeys) ‑> <a title="Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="_confd.Value" href="index.html#_confd.Value">Value</a>], <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update the cursor mc with the key(s) for the list entry designated by the
+type and inkeys parameters. This function may be used to start a traversal
+from an arbitrary entry in a list. Keys for subsequent entries may be
+retrieved with the get_next() function. When no more keys are found, False
+is returned.</p>
+<p>The strategy to use is defined by type:</p>
+<pre><code>FIND_NEXT - The keys for the first list entry after the one
+            indicated by the inkeys argument.
+FIND_SAME_OR_NEXT - If the values in the inkeys array completely
+            identifies an actual existing list entry, the keys for
+            this entry are requested. Otherwise the same logic as
+            for FIND_NEXT above.
+</code></pre>
+<p>Keyword arguments:</p>
+<ul>
+<li>mc &ndash; maapiCursor</li>
+<li>type &ndash; CONFD_FIND_NEXT or CONFD_FIND_SAME_OR_NEXT</li>
+<li>inkeys &ndash; where to start finding</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.finish_trans"><code class="name flex">
+<span>def <span class="ident">finish_trans</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finish a transaction.</p>
+<p>If the transaction is implemented by an external database, this will invoke
+the finish() callback.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_attrs"><code class="name flex">
+<span>def <span class="ident">get_attrs</span></span>(<span>sock, thandle, attrs, keypath) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get attributes for a node. Returns a list of attributes.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>attrs &ndash; list of type of attributes to get</li>
+<li>keypath &ndash; path to choice</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_authorization_info"><code class="name flex">
+<span>def <span class="ident">get_authorization_info</span></span>(<span>sock, usessid) ‑> <a title="_confd.AuthorizationInfo" href="index.html#_confd.AuthorizationInfo">AuthorizationInfo</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function retrieves authorization info for a user session,i.e. the groups that the user has been assigned to.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_case"><code class="name flex">
+<span>def <span class="ident">get_case</span></span>(<span>sock, thandle, choice, keypath) ‑> <a title="_confd.Value" href="index.html#_confd.Value">Value</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the case from a YANG choice statement.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>choice &ndash; choice name</li>
+<li>keypath &ndash; path to choice</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_elem"><code class="name flex">
+<span>def <span class="ident">get_elem</span></span>(<span>sock, thandle, path) ‑> <a title="_confd.Value" href="index.html#_confd.Value">Value</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Path must be a valid leaf node in the data tree. Returns a Value object.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position of elem</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_my_user_session_id"><code class="name flex">
+<span>def <span class="ident">get_my_user_session_id</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns user session id</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_next"><code class="name flex">
+<span>def <span class="ident">get_next</span></span>(<span>mc) ‑> <a title="Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="_confd.Value" href="index.html#_confd.Value">Value</a>], <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterates and gets the keys for the next entry in a list. When no more keys
+are found, False is returned.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>mc &ndash; maapiCursor</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_object"><code class="name flex">
+<span>def <span class="ident">get_object</span></span>(<span>sock, thandle, n, keypath) ‑> <a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="_confd.Value" href="index.html#_confd.Value">Value</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read at most n values from keypath in a list.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position of list entry</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_objects"><code class="name flex">
+<span>def <span class="ident">get_objects</span></span>(<span>mc, n, nobj) ‑> <a title="List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a title="_confd.Value" href="index.html#_confd.Value">Value</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read at most n values from each nobj lists starting at Cursor mc.
+Returns a list of Value's.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>mc &ndash; maapiCursor</li>
+<li>n &ndash; at most n values will be read</li>
+<li>nobj &ndash; number of nobj lists which n elements will be taken from</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_rollback_id"><code class="name flex">
+<span>def <span class="ident">get_rollback_id</span></span>(<span>sock, thandle) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get rollback id from a committed transaction. Returns int with fixed id,
+where -1 indicates an error or no rollback id available.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_running_db_status"><code class="name flex">
+<span>def <span class="ident">get_running_db_status</span></span>(<span>sock) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>If a transaction fails in the commit() phase, the configuration database is
+in in a possibly inconsistent state. This function queries ConfD on the
+consistency state. Returns 1 if the configuration is consistent and 0
+otherwise.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_schema_file_path"><code class="name flex">
+<span>def <span class="ident">get_schema_file_path</span></span>(<span>sock) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>If shared memory schema support has been enabled, this function will
+return the pathname of the file used for the shared memory mapping,
+which can then be passed to the mmap_schemas() function&gt;</p>
+<p>If creation of the schema file is in progress when the function
+is called, the call will block until the creation has completed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_stream_progress"><code class="name flex">
+<span>def <span class="ident">get_stream_progress</span></span>(<span>sock, id) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used in conjunction with a maapi stream to see how much data has been
+consumed.</p>
+<p>This function allows us to limit the amount of data 'in flight' between the
+application and the system. The sock parameter must be the maapi socket
+used for a function call that required a stream socket for writing
+(currently the only such function is load_config_stream()), and the id
+parameter is the id returned by that function.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>id &ndash; the id returned from load_config_stream()</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_user_session"><code class="name flex">
+<span>def <span class="ident">get_user_session</span></span>(<span>sock, usessid) ‑> <a title="_confd.UserInfo" href="index.html#_confd.UserInfo">UserInfo</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return user info.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_user_session_identification"><code class="name flex">
+<span>def <span class="ident">get_user_session_identification</span></span>(<span>sock, usessid) ‑> <a title="dict" href="https://docs.python.org/3/library/typing.html#typing.dict">dict</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get user session identification data.</p>
+<p>Get the user identification data related to a user session provided by the
+'usessid' argument. The function returns a dict with the user
+identification data.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_user_session_opaque"><code class="name flex">
+<span>def <span class="ident">get_user_session_opaque</span></span>(<span>sock, usessid) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a string containing additional 'opaque' information, if additional
+'opaque' information is available.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_user_sessions"><code class="name flex">
+<span>def <span class="ident">get_user_sessions</span></span>(<span>sock) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a list of session ids.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.get_values"><code class="name flex">
+<span>def <span class="ident">get_values</span></span>(<span>sock, thandle, values, keypath) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get values from keypath based on the Tag Value array values.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>values &ndash; list of tagValues</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.getcwd"><code class="name flex">
+<span>def <span class="ident">getcwd</span></span>(<span>sock, thandle) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the current position in the tree as a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.getcwd_kpath"><code class="name flex">
+<span>def <span class="ident">getcwd_kpath</span></span>(<span>sock, thandle) ‑> <a title="_confd.HKeypathRef" href="index.html#_confd.HKeypathRef">HKeypathRef</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the current position in the tree as a HKeypathRef.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.init_cursor"><code class="name flex">
+<span>def <span class="ident">init_cursor</span></span>(<span>sock, thandle, path) ‑> <a title="_confd.maapi.Cursor" href="#_confd.maapi.Cursor">Cursor</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Whenever we wish to iterate over the entries in a list in the data tree, we
+must first initialize a cursor.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position of elem</li>
+<li>secondary_index &ndash; name of secondary index to use (optional)</li>
+<li>xpath_expr &ndash; xpath expression used to filter results (optional)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.init_upgrade"><code class="name flex">
+<span>def <span class="ident">init_upgrade</span></span>(<span>sock, timeoutsecs, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>First step in an upgrade, initializes the upgrade procedure.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>timeoutsecs &ndash; maximum time to wait for user to voluntarily exit from
+'configuration' mode</li>
+<li>flags &ndash; 0 or 'UPGRADE_KILL_ON_TIMEOUT' (will terminate all ongoing
+transactions</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.insert"><code class="name flex">
+<span>def <span class="ident">insert</span></span>(<span>sock, thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Insert a new entry in a list, the key of the list must be a integer.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; the subtree rooted at path is copied</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.install_crypto_keys"><code class="name flex">
+<span>def <span class="ident">install_crypto_keys</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Copy configured DES3 and AES keys into the memory in the library.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.is_candidate_modified"><code class="name flex">
+<span>def <span class="ident">is_candidate_modified</span></span>(<span>sock) ‑> <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if candidate is modified.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.is_lock_set"><code class="name flex">
+<span>def <span class="ident">is_lock_set</span></span>(<span>sock, name) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if db name is locked. Return the 'usid' of the user holding the lock
+or 0 if not locked.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.is_running_modified"><code class="name flex">
+<span>def <span class="ident">is_running_modified</span></span>(<span>sock) ‑> <a title="bool" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if running is modified.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.iterate"><code class="name flex">
+<span>def <span class="ident">iterate</span></span>(<span>sock, thandle, iter, flags, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to iterate over all the data in a transaction and the underlying data
+store as opposed to only iterate over changes like diff_iterate.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>iter &ndash; iterator function, will be called for every diff in the transaction</li>
+<li>flags &ndash; ITER_WANT_ATTR or 0</li>
+<li>path &ndash; receive only changes from this path and below</li>
+</ul>
+<p>The iter callback function should have the following signature:</p>
+<pre><code>def my_iterator(kp, v, attr_vals)
+</code></pre></div>
+</dd>
+<dt id="_confd.maapi.keypath_diff_iterate"><code class="name flex">
+<span>def <span class="ident">keypath_diff_iterate</span></span>(<span>sock, thandle, iter, flags, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Like diff_iterate but takes an additional path argument.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>iter &ndash; iterator function, will be called for every diff in the transaction</li>
+<li>flags &ndash; bitmask of ITER_WANT_ATTR and ITER_WANT_P_CONTAINER</li>
+<li>path &ndash; receive only changes from this path and below</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.kill_user_session"><code class="name flex">
+<span>def <span class="ident">kill_user_session</span></span>(<span>sock, usessid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Kill MAAPI user session with session id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; the MAAPI session id to be killed</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.list_rollbacks"><code class="name flex">
+<span>def <span class="ident">list_rollbacks</span></span>(<span>sock, rp_size) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a list of rollbacks, at most rp_size big.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>rp_size &ndash; maximum number of rollback files to list</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_config"><code class="name flex">
+<span>def <span class="ident">load_config</span></span>(<span>sock, thandle, flags, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads configuration from 'filename'.
+The caller of the function has to indicate which format the file has by
+using one of the following flags:</p>
+<pre><code>    CONFIG_XML -- XML format
+    CONFIG_J -- Juniper curly bracket style
+    CONFIG_C -- Cisco XR style
+    CONFIG_TURBO_C -- A faster version of CONFIG_C
+    CONFIG_C_IOS -- Cisco IOS style
+</code></pre>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; a transaction handle</li>
+<li>flags &ndash; as above</li>
+<li>filename &ndash; to read the configuration from</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_config_cmds"><code class="name flex">
+<span>def <span class="ident">load_config_cmds</span></span>(<span>sock, thandle, flags, cmds, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads configuration from the string 'cmds'</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; a transaction handle</li>
+<li>cmds &ndash; a string of cmds</li>
+<li>flags &ndash; as above</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_config_stream"><code class="name flex">
+<span>def <span class="ident">load_config_stream</span></span>(<span>sock, th, flags) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads configuration from the stream socket. The th and flags parameters are
+the same as for load_config(). Returns and id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; a transaction handle</li>
+<li>flags &ndash; as for load_config()</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_config_stream_result"><code class="name flex">
+<span>def <span class="ident">load_config_stream_result</span></span>(<span>sock, id) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>We use this function to verify that the configuration we wrote on the
+stream socket was successfully loaded.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>id &ndash; the id returned from load_config_stream()</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_rollback"><code class="name flex">
+<span>def <span class="ident">load_rollback</span></span>(<span>sock, thandle, rollback_num)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Install a rollback file with number 'rollback_num'.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>rollback_num &ndash; rollback file no</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_rollback_fixed"><code class="name flex">
+<span>def <span class="ident">load_rollback_fixed</span></span>(<span>sock, thandle, fixed_num)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Install a rollback file with fixed number 'fixed_num'.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>fixed_num &ndash; rollback fixed number</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_schemas"><code class="name flex">
+<span>def <span class="ident">load_schemas</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads all schema information into the lib.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.load_schemas_list"><code class="name flex">
+<span>def <span class="ident">load_schemas_list</span></span>(<span>sock, flags, nshash, nsflags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads selected schema information into the lib.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>flags &ndash; the flags to set</li>
+<li>nshash &ndash; the listed namespaces that schema information should be loaded for</li>
+<li>nsflags &ndash; namespace specific flags</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.lock"><code class="name flex">
+<span>def <span class="ident">lock</span></span>(<span>sock, name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Lock database with name.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database to lock</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.lock_partial"><code class="name flex">
+<span>def <span class="ident">lock_partial</span></span>(<span>sock, name, xpaths) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Lock a subset (xpaths) of database name. Returns lockid.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>xpaths &ndash; a list of strings</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.move"><code class="name flex">
+<span>def <span class="ident">move</span></span>(<span>sock, thandle, tokey, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Moves an existing list entry, i.e. renames the entry using the tokey
+parameter.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>tokey &ndash; confdValue list</li>
+<li>path &ndash; the subtree rooted at path is copied</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.move_ordered"><code class="name flex">
+<span>def <span class="ident">move_ordered</span></span>(<span>sock, thandle, where, tokey, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Moves an entry in an 'ordered-by user' statement to a new position.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>where &ndash; FIRST, LAST, BEFORE or AFTER</li>
+<li>tokey &ndash; confdValue list</li>
+<li>path &ndash; the subtree rooted at path is copied</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.netconf_ssh_call_home"><code class="name flex">
+<span>def <span class="ident">netconf_ssh_call_home</span></span>(<span>sock, host, port)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initiates a NETCONF SSH Call Home connection.</p>
+<p>Keyword arguments:</p>
+<p>sock &ndash; a python socket instance
+host &ndash; an ipv4 addres, ipv6 address, or host name
+port &ndash; the port to connect to</p></div>
+</dd>
+<dt id="_confd.maapi.netconf_ssh_call_home_opaque"><code class="name flex">
+<span>def <span class="ident">netconf_ssh_call_home_opaque</span></span>(<span>sock, host, opaque, port)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initiates a NETCONF SSH Call Home connection.</p>
+<p>Keyword arguments:
+sock &ndash; a python socket instance
+host &ndash; an ipv4 addres, ipv6 address, or host name
+opaque &ndash; opaque string passed to an external call home session
+port &ndash; the port to connect to</p></div>
+</dd>
+<dt id="_confd.maapi.num_instances"><code class="name flex">
+<span>def <span class="ident">num_instances</span></span>(<span>sock, thandle, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the number of instances in a list in the tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position to check</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.perform_upgrade"><code class="name flex">
+<span>def <span class="ident">perform_upgrade</span></span>(<span>sock, loadpathdirs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Second step in an upgrade. Loads new data model files.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>loadpathdirs &ndash; list of directories that are searched for CDB 'init' files</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.popd"><code class="name flex">
+<span>def <span class="ident">popd</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return to earlier saved (pushd) position in the tree.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.prepare_trans"><code class="name flex">
+<span>def <span class="ident">prepare_trans</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>First phase of a two-phase trans.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.prepare_trans_flags"><code class="name flex">
+<span>def <span class="ident">prepare_trans_flags</span></span>(<span>sock, thandle, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>First phase of a two-phase trans with flags.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>flags &ndash; flags to set in the transaction</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.prio_message"><code class="name flex">
+<span>def <span class="ident">prio_message</span></span>(<span>sock, to, message)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Like sys_message but will be output directly instead of delivered when the
+receiver terminates any ongoing command.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>to &ndash; user to send message to or 'all' to send to all users</li>
+<li>message &ndash; the message</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.pushd"><code class="name flex">
+<span>def <span class="ident">pushd</span></span>(<span>sock, thandle, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Like cd, but saves the previous position in the tree. This can later be used
+by popd to return.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; position to change to</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_free_result"><code class="name flex">
+<span>def <span class="ident">query_free_result</span></span>(<span>qrs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deallocates the struct returned by 'query_result()'.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>qrs &ndash; the query result structure to free</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_reset"><code class="name flex">
+<span>def <span class="ident">query_reset</span></span>(<span>sock, qh)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset the query to the beginning again.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>qh &ndash; query handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_reset_to"><code class="name flex">
+<span>def <span class="ident">query_reset_to</span></span>(<span>sock, qh, offset)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset the query to offset.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>qh &ndash; query handle</li>
+<li>offset &ndash; offset counted from the beginning</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_result"><code class="name flex">
+<span>def <span class="ident">query_result</span></span>(<span>sock, qh) ‑> <a title="_confd.QueryResult" href="index.html#_confd.QueryResult">QueryResult</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetches the next available chunk of results associated with query handle
+qh.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>qh &ndash; query handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_result_count"><code class="name flex">
+<span>def <span class="ident">query_result_count</span></span>(<span>sock, qh) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Counts the number of query results</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>qh &ndash; query handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_start"><code class="name flex">
+<span>def <span class="ident">query_start</span></span>(<span>sock, thandle, expr, context_node, chunk_size, initial_offset, result_as, select, sort) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Starts a new query attached to the transaction given in 'th'.
+Returns a query handle.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>expr &ndash; the XPath Path expression to evaluate</li>
+<li>context_node &ndash; The context node (an ikeypath) for the primary expression,
+or None (which means that the context node will be /).</li>
+<li>chunk_size &ndash;
+How many results to return at a time. If set to 0,
+a default number will be used.</li>
+<li>initial_offset &ndash; Which result in line to begin with (1 means to start
+from the beginning).</li>
+<li>result_as &ndash; The format the results will be returned in.</li>
+<li>select &ndash; An array of XPath 'select' expressions.</li>
+<li>sort &ndash; An array of XPath expressions which will be used for sorting</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.query_stop"><code class="name flex">
+<span>def <span class="ident">query_stop</span></span>(<span>sock, qh)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stop the running query.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>qh &ndash; query handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.rebind_listener"><code class="name flex">
+<span>def <span class="ident">rebind_listener</span></span>(<span>sock, listener)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request that the subsystems specified by 'listeners' rebinds its listener
+socket(s).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>listener &ndash; One of the following parameters (ORed together if more than one)<pre><code>LISTENER_IPC  
+LISTENER_NETCONF
+LISTENER_SNMP
+LISTENER_CLI
+LISTENER_WEBUI
+</code></pre>
+</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.reload_config"><code class="name flex">
+<span>def <span class="ident">reload_config</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request that the system reloads its configuration files.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.reopen_logs"><code class="name flex">
+<span>def <span class="ident">reopen_logs</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request that the system closes and re-opens its log files.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.report_progress"><code class="name flex">
+<span>def <span class="ident">report_progress</span></span>(<span>sock, verbosity, msg)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report progress events.</p>
+<p>This function makes it possible to report transaction/action progress
+from user code.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>verbosity &ndash; at which verbosity level the message should be reported</li>
+<li>msg &ndash; message to report</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.report_progress_start"><code class="name flex">
+<span>def <span class="ident">report_progress_start</span></span>(<span>sock, verbosity, msg, package) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report progress events.
+Used for calculation of the duration between two events.</p>
+<p>This function makes it possible to report transaction/action progress
+from user code.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>verbosity &ndash; at which verbosity level the message should be reported</li>
+<li>msg &ndash; message to report</li>
+<li>package &ndash; from what package the message is reported (only NCS)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.report_progress_stop"><code class="name flex">
+<span>def <span class="ident">report_progress_stop</span></span>(<span>sock, verbosity, msg, annotation, package, timestamp) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Report progress events.
+Used for calculation of the duration between two events.</p>
+<p>This function makes it possible to report transaction/action progress
+from user code.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>verbosity &ndash; at which verbosity level the message should be reported</li>
+<li>msg &ndash; message to report</li>
+<li>annotation &ndash; metadata about the event, indicating error, explains latency
+or shows result etc</li>
+<li>package &ndash; from what package the message is reported (only NCS)</li>
+<li>timestamp &ndash; start of the event</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.request_action"><code class="name flex">
+<span>def <span class="ident">request_action</span></span>(<span>sock, params, hashed_ns, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Invoke an action defined in the data model. Returns a list oftagValues.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>params &ndash; tagValue parameters for the action</li>
+<li>hashed_ns &ndash; namespace</li>
+<li>path &ndash; path to action</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.request_action_str_th"><code class="name flex">
+<span>def <span class="ident">request_action_str_th</span></span>(<span>sock, thandle, cmd, path) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The same as request_action_th but takes the parameters as a string and
+returns the result as a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>cmd &ndash; string parameters</li>
+<li>path &ndash; path to action</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.request_action_th"><code class="name flex">
+<span>def <span class="ident">request_action_th</span></span>(<span>sock, thandle, params, path) ‑> <a title="list" href="https://docs.python.org/3/library/typing.html#typing.list">list</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Same as for request_action() but uses the current namespace.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>params &ndash; tagValue parameters for the action</li>
+<li>path &ndash; path to action</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.revert"><code class="name flex">
+<span>def <span class="ident">revert</span></span>(<span>sock, thandle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes all changes done to the transaction.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.roll_config"><code class="name flex">
+<span>def <span class="ident">roll_config</span></span>(<span>sock, thandle, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function can be used to save the equivalent of a rollback file for a
+given configuration before it is committed (or a subtree thereof) in curly
+bracket format. Returns an id</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>path &ndash; tree for which to save the rollback configuration</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.roll_config_result"><code class="name flex">
+<span>def <span class="ident">roll_config_result</span></span>(<span>sock, id) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>We use this function to assert that we received the entire rollback
+configuration over a stream socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>id &ndash; the id returned from roll_config()</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.save_config"><code class="name flex">
+<span>def <span class="ident">save_config</span></span>(<span>sock, thandle, flags, path) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save the config, returns an id.
+The flags parameter controls the saving as follows. The value is a bitmask.</p>
+<pre><code>    CONFIG_XML -- The configuration format is XML.
+    CONFIG_XML_PRETTY -- The configuration format is pretty printed XML.
+    CONFIG_JSON -- The configuration is in JSON format.
+    CONFIG_J -- The configuration is in curly bracket Juniper CLI
+        format.
+    CONFIG_C -- The configuration is in Cisco XR style format.
+    CONFIG_TURBO_C -- The configuration is in Cisco XR style format.
+        A faster parser than the normal CLI will be used.
+    CONFIG_C_IOS -- The configuration is in Cisco IOS style format.
+    CONFIG_XPATH -- The path gives an XPath filter instead of a
+        keypath. Can only be used with CONFIG_XML and
+        CONFIG_XML_PRETTY.
+    CONFIG_WITH_DEFAULTS -- Default values are part of the
+        configuration dump.
+    CONFIG_SHOW_DEFAULTS -- Default values are also shown next to
+        the real configuration value. Applies only to the CLI formats.
+    CONFIG_WITH_OPER -- Include operational data in the dump.
+    CONFIG_HIDE_ALL -- Hide all hidden nodes.
+    CONFIG_UNHIDE_ALL -- Unhide all hidden nodes.
+    CONFIG_NO_PARENTS -- When a path is provided its parent nodes are by
+        default included. With this option the output will begin
+        immediately at path - skipping any parents.
+    CONFIG_OPER_ONLY -- Include only operational data, and ancestors to
+        operational data nodes, in the dump.
+    CONFIG_NO_BACKQUOTE -- This option can only be used together with
+        CONFIG_C and CONFIG_C_IOS. When set backslash will not be quoted
+        in strings.
+    CONFIG_CDB_ONLY -- Include only data stored in CDB in the dump. By
+        default only configuration data is included, but the flag can be
+        combined with either CONFIG_WITH_OPER or CONFIG_OPER_ONLY to
+        save both configuration and operational data, or only
+        operational data, respectively.
+</code></pre>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>flags &ndash; as above</li>
+<li>path &ndash; save only configuration below path</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.save_config_result"><code class="name flex">
+<span>def <span class="ident">save_config_result</span></span>(<span>sock, id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Verify that we received the entire configuration over the stream socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>id &ndash; the id returned from save_config</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_attr"><code class="name flex">
+<span>def <span class="ident">set_attr</span></span>(<span>sock, thandle, attr, v, keypath)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set attributes for a node.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>attr &ndash; attributes to set</li>
+<li>v &ndash; value to set the attribute to</li>
+<li>keypath &ndash; path to choice</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_comment"><code class="name flex">
+<span>def <span class="ident">set_comment</span></span>(<span>sock, thandle, comment)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the Comment that is stored in the rollback file when a transaction
+towards running is committed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>comment &ndash; the Comment</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_delayed_when"><code class="name flex">
+<span>def <span class="ident">set_delayed_when</span></span>(<span>sock, thandle, on)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function enables (on non-zero) or disables (on == 0) the 'delayed when'
+mode of a transaction.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>on &ndash; disables when on=0, enables for all other n</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_elem"><code class="name flex">
+<span>def <span class="ident">set_elem</span></span>(<span>sock, thandle, v, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set element to confdValue.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>v &ndash; confdValue</li>
+<li>path &ndash; position of elem</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_elem2"><code class="name flex">
+<span>def <span class="ident">set_elem2</span></span>(<span>sock, thandle, strval, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set element to string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>strval &ndash; confdValue</li>
+<li>path &ndash; position of elem</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_flags"><code class="name flex">
+<span>def <span class="ident">set_flags</span></span>(<span>sock, thandle, flags)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modify read/write session aspect. See MAAPI_FLAG_xyz.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>flags &ndash; flags to set</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_label"><code class="name flex">
+<span>def <span class="ident">set_label</span></span>(<span>sock, thandle, label)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the Label that is stored in the rollback file when a transaction
+towards running is committed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>label &ndash; the Label</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_namespace"><code class="name flex">
+<span>def <span class="ident">set_namespace</span></span>(<span>sock, thandle, hashed_ns)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Indicate which namespace to use in case of ambiguities.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>hashed_ns &ndash; the namespace to use</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_next_user_session_id"><code class="name flex">
+<span>def <span class="ident">set_next_user_session_id</span></span>(<span>sock, usessid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the user session id that will be assigned to the next user session
+started. The given value is silently forced to be in the range 100 .. 2^31-1.
+This function can be used to ensure that session ids for user sessions
+started by northbound agents or via MAAPI are unique across a restart.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_object"><code class="name flex">
+<span>def <span class="ident">set_object</span></span>(<span>sock, thandle, values, keypath)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set leafs at path to object.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>values &ndash; list of values</li>
+<li>keypath &ndash; path to set</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_readonly_mode"><code class="name flex">
+<span>def <span class="ident">set_readonly_mode</span></span>(<span>sock, flag)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Control if northbound agents should be able to write or not.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>flag &ndash; non-zero means read-only mode</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_running_db_status"><code class="name flex">
+<span>def <span class="ident">set_running_db_status</span></span>(<span>sock, status)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the notion of consistent state of the running db.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>status &ndash; integer status to set</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_user_session"><code class="name flex">
+<span>def <span class="ident">set_user_session</span></span>(<span>sock, usessid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Associate a socket with an already existing user session.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>usessid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.set_values"><code class="name flex">
+<span>def <span class="ident">set_values</span></span>(<span>sock, thandle, values, keypath)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set leafs at path to values.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>values &ndash; list of tagValues</li>
+<li>keypath &ndash; path to set</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.snmpa_reload"><code class="name flex">
+<span>def <span class="ident">snmpa_reload</span></span>(<span>sock, synchronous)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a reload of SNMP Agent config from external data provider.</p>
+<p>Used by external data provider to notify that there is a change to the SNMP
+Agent config data. Calling the function with the argument 'synchronous' set
+to 1 or True means that the call will block until the loading is completed.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>synchronous &ndash; if 1, will wait for the loading complete and return when
+the loading is complete; if 0, will only initiate the loading and return
+immediately</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_phase"><code class="name flex">
+<span>def <span class="ident">start_phase</span></span>(<span>sock, phase, synchronous)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When the system has been started in phase0, this function tells the system
+to proceed to start phase 1 or 2.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>phase &ndash; phase to start, 1 or 2</li>
+<li>synchronous &ndash; if 1, will wait for the loading complete and return when
+the loading is complete; if 0, will only initiate the loading of AAA
+data and return immediately</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_trans"><code class="name flex">
+<span>def <span class="ident">start_trans</span></span>(<span>sock, name, readwrite) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a new transaction towards the data store specified by name, which
+can be one of CONFD_CANDIDATE, CONFD_RUNNING, or CONFD_STARTUP (however
+updating the startup data store is better done via
+maapi_copy_running_to_startup()). The readwrite parameter can be either
+CONFD_READ, to start a readonly transaction, or CONFD_READ_WRITE, to start
+a read-write transaction. The function returns the transaction id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database</li>
+<li>readwrite &ndash; CONFD_READ or CONFD_WRITE</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_trans2"><code class="name flex">
+<span>def <span class="ident">start_trans2</span></span>(<span>sock, name, readwrite, usid) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a transaction within an existing user session, returns the transaction
+id.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database</li>
+<li>readwrite &ndash; CONFD_READ or CONFD_WRITE</li>
+<li>usid &ndash; user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_trans_flags"><code class="name flex">
+<span>def <span class="ident">start_trans_flags</span></span>(<span>sock, name, readwrite, usid) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The same as start_trans2, but can also set the same flags that 'set_flags'
+can set.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database</li>
+<li>readwrite &ndash; CONFD_READ or CONFD_WRITE</li>
+<li>usid &ndash; user session id</li>
+<li>flags &ndash; same as for 'set_flags'</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_trans_flags2"><code class="name flex">
+<span>def <span class="ident">start_trans_flags2</span></span>(<span>sock, name, readwrite, usid, vendor, product, version, client_id) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function does the same as start_trans_flags() but allows for
+additional information to be passed to ConfD/NCS.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database</li>
+<li>readwrite &ndash; CONFD_READ or CONFD_WRITE</li>
+<li>usid &ndash; user session id</li>
+<li>flags &ndash; same as for 'set_flags'</li>
+<li>vendor &ndash; vendor string (may be None)</li>
+<li>product &ndash; product string (may be None)</li>
+<li>version &ndash; version string (may be None)</li>
+<li>client_id &ndash; client identification string (may be None)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_trans_in_trans"><code class="name flex">
+<span>def <span class="ident">start_trans_in_trans</span></span>(<span>sock, readwrite, usid, thandle) ‑> <a title="int" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a transaction within an existing transaction, using the started
+transaction as backend instead of an actual data store. Returns the
+transaction id as an integer.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>readwrite &ndash; CONFD_READ or CONFD_WRITE</li>
+<li>usid &ndash; user session id</li>
+<li>thandle &ndash; identifies the backend transaction to use</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_user_session"><code class="name flex">
+<span>def <span class="ident">start_user_session</span></span>(<span>sock, username, context, groups, src_addr, prot)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Establish a user session on the socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>username &ndash; the user for the session</li>
+<li>context &ndash; context for the session</li>
+<li>groups &ndash; groups</li>
+<li>src-addr &ndash; src address of e.g. the client connecting</li>
+<li>prot &ndash; the protocol used by the client for connecting</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_user_session2"><code class="name flex">
+<span>def <span class="ident">start_user_session2</span></span>(<span>sock, username, context, groups, src_addr, src_port, prot)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Establish a user session on the socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>username &ndash; the user for the session</li>
+<li>context &ndash; context for the session</li>
+<li>groups &ndash; groups</li>
+<li>src-addr &ndash; src address of e.g. the client connecting</li>
+<li>src-port &ndash; src port of e.g. the client connecting</li>
+<li>prot &ndash; the protocol used by the client for connecting</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.start_user_session3"><code class="name flex">
+<span>def <span class="ident">start_user_session3</span></span>(<span>sock, username, context, groups, src_addr, src_port, prot, vendor, product, version, client_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Establish a user session on the socket.</p>
+<p>This function does the same as start_user_session2() but allows for
+additional information to be passed to ConfD/NCS.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>username &ndash; the user for the session</li>
+<li>context &ndash; context for the session</li>
+<li>groups &ndash; groups</li>
+<li>src-addr &ndash; src address of e.g. the client connecting</li>
+<li>src-port &ndash; src port of e.g. the client connecting</li>
+<li>prot &ndash; the protocol used by the client for connecting</li>
+<li>vendor &ndash; vendor string (may be None)</li>
+<li>product &ndash; product string (may be None)</li>
+<li>version &ndash; version string (may be None)</li>
+<li>client_id &ndash; client identification string (may be None)</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request that the system stops.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.sys_message"><code class="name flex">
+<span>def <span class="ident">sys_message</span></span>(<span>sock, to, message)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Send a message to a specific user, a specific session or all user depending
+on the 'to' parameter. 'all', <session-id> or <user-name> can be used.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>to &ndash; user to send message to or 'all' to send to all users</li>
+<li>message &ndash; the message</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.unlock"><code class="name flex">
+<span>def <span class="ident">unlock</span></span>(<span>sock, name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Unlock database with name.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>name &ndash; name of the database to unlock</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.unlock_partial"><code class="name flex">
+<span>def <span class="ident">unlock_partial</span></span>(<span>sock, lockid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Unlock a subset of a database which is locked by lockid.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>lockid &ndash; id of the lock</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.user_message"><code class="name flex">
+<span>def <span class="ident">user_message</span></span>(<span>sock, to, message, sender)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Send a message to a specific user.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>to &ndash; user to send message to or 'all' to send to all users</li>
+<li>message &ndash; the message</li>
+<li>sender &ndash; send as</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.validate_trans"><code class="name flex">
+<span>def <span class="ident">validate_trans</span></span>(<span>sock, thandle, unlock, forcevalidation)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validates all data written in a transaction.</p>
+<p>If unlock is 1 (or True), the transaction is open for further editing even
+if validation succeeds. If unlock is 0 (or False) and the function returns
+CONFD_OK, the next function to be called MUST be maapi_prepare_trans() or
+maapi_finish_trans().</p>
+<p>unlock = 1 can be used to implement a 'validate' command which can be
+given in the middle of an editing session. The first thing that happens is
+that a lock is set. If unlock == 1, the lock is released on success. The
+lock is always released on failure.</p>
+<p>The forcevalidation argument should normally be 0 (or False). It has no
+effect for a transaction towards the running or startup data stores,
+validation is always performed. For a transaction towards the candidate
+data store, validation will not be done unless forcevalidation is non-zero.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>unlock &ndash; int or bool</li>
+<li>forcevalidation &ndash; int or bool</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.wait_start"><code class="name flex">
+<span>def <span class="ident">wait_start</span></span>(<span>sock, phase)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wait for the system to reach a certain start phase (0,1 or 2).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>phase &ndash; phase to wait for, 0, 1 or 2</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.xpath2kpath"><code class="name flex">
+<span>def <span class="ident">xpath2kpath</span></span>(<span>sock, xpath) ‑> <a title="_confd.HKeypathRef" href="index.html#_confd.HKeypathRef">HKeypathRef</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert an xpath to a hashed keypath.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>xpath &ndash; to convert</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.xpath2kpath_th"><code class="name flex">
+<span>def <span class="ident">xpath2kpath_th</span></span>(<span>sock, thandle, xpath) ‑> <a title="_confd.HKeypathRef" href="index.html#_confd.HKeypathRef">HKeypathRef</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert an xpath to a hashed keypath.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>xpath &ndash; to convert</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.xpath_eval"><code class="name flex">
+<span>def <span class="ident">xpath_eval</span></span>(<span>sock, thandle, expr, result, trace, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the xpath expression in 'expr'. For each node in the
+resulting
+node the function 'result' is called with the keypath to the resulting
+node as the first argument and, if the node is a leaf and has a value. the
+value of that node as the second argument. For each invocation of 'result'
+the function should return ITER_CONTINUE to tell the XPath evaluator to
+continue or ITER_STOP to stop the evaluation. A trace function, 'pytrace',
+could be supplied and will be called with a single string as an argument.
+'None' can be used if no trace is needed. Unless a 'path' is given the
+root node will be used as a context for the evaluations.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>expr &ndash; the XPath Path expression to evaluate</li>
+<li>result &ndash; the result function</li>
+<li>trace &ndash; a trace function that takes a string as a parameter</li>
+<li>path &ndash; the context node</li>
+</ul></div>
+</dd>
+<dt id="_confd.maapi.xpath_eval_expr"><code class="name flex">
+<span>def <span class="ident">xpath_eval_expr</span></span>(<span>sock, thandle, expr, trace, path) ‑> <a title="str" href="https://docs.python.org/3/library/functions.html#func-str">str</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Like xpath_eval but returns a string.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a python socket instance</li>
+<li>thandle &ndash; transaction handle</li>
+<li>expr &ndash; the XPath Path expression to evaluate</li>
+<li>trace &ndash; a trace function that takes a string as a parameter</li>
+<li>path &ndash; the context node</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="_confd.maapi.Cursor"><code class="flex name class">
+<span>class <span class="ident">Cursor</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>struct maapi_cursor object</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback"><code class="flex name class">
+<span>class <span class="ident">MaapiRollback</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This type represents the c-type struct maapi_rollback.</p>
+<p>MaapRollback cannot be directly instantiated from Python.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="_confd.maapi.MaapiRollback.comment"><code class="name">var <span class="ident">comment</span></code></dt>
+<dd>
+<div class="desc"><p>the comment (string)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.creator"><code class="name">var <span class="ident">creator</span></code></dt>
+<dd>
+<div class="desc"><p>the creator (string)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.datestr"><code class="name">var <span class="ident">datestr</span></code></dt>
+<dd>
+<div class="desc"><p>the date (string)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.fixed_nr"><code class="name">var <span class="ident">fixed_nr</span></code></dt>
+<dd>
+<div class="desc"><p>the fixed_nr (int)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<div class="desc"><p>the label (string)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.nr"><code class="name">var <span class="ident">nr</span></code></dt>
+<dd>
+<div class="desc"><p>the nr attribute (int)</p></div>
+</dd>
+<dt id="_confd.maapi.MaapiRollback.via"><code class="name">var <span class="ident">via</span></code></dt>
+<dd>
+<div class="desc"><p>the via (string)</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="_confd" href="index.html">_confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="_confd.maapi.aaa_reload" href="#_confd.maapi.aaa_reload">aaa_reload</a></code></li>
+<li><code><a title="_confd.maapi.aaa_reload_path" href="#_confd.maapi.aaa_reload_path">aaa_reload_path</a></code></li>
+<li><code><a title="_confd.maapi.abort_trans" href="#_confd.maapi.abort_trans">abort_trans</a></code></li>
+<li><code><a title="_confd.maapi.abort_upgrade" href="#_confd.maapi.abort_upgrade">abort_upgrade</a></code></li>
+<li><code><a title="_confd.maapi.apply_trans" href="#_confd.maapi.apply_trans">apply_trans</a></code></li>
+<li><code><a title="_confd.maapi.apply_trans_flags" href="#_confd.maapi.apply_trans_flags">apply_trans_flags</a></code></li>
+<li><code><a title="_confd.maapi.attach" href="#_confd.maapi.attach">attach</a></code></li>
+<li><code><a title="_confd.maapi.attach2" href="#_confd.maapi.attach2">attach2</a></code></li>
+<li><code><a title="_confd.maapi.attach_init" href="#_confd.maapi.attach_init">attach_init</a></code></li>
+<li><code><a title="_confd.maapi.authenticate" href="#_confd.maapi.authenticate">authenticate</a></code></li>
+<li><code><a title="_confd.maapi.authenticate2" href="#_confd.maapi.authenticate2">authenticate2</a></code></li>
+<li><code><a title="_confd.maapi.candidate_abort_commit" href="#_confd.maapi.candidate_abort_commit">candidate_abort_commit</a></code></li>
+<li><code><a title="_confd.maapi.candidate_abort_commit_persistent" href="#_confd.maapi.candidate_abort_commit_persistent">candidate_abort_commit_persistent</a></code></li>
+<li><code><a title="_confd.maapi.candidate_commit" href="#_confd.maapi.candidate_commit">candidate_commit</a></code></li>
+<li><code><a title="_confd.maapi.candidate_commit_info" href="#_confd.maapi.candidate_commit_info">candidate_commit_info</a></code></li>
+<li><code><a title="_confd.maapi.candidate_commit_persistent" href="#_confd.maapi.candidate_commit_persistent">candidate_commit_persistent</a></code></li>
+<li><code><a title="_confd.maapi.candidate_confirmed_commit" href="#_confd.maapi.candidate_confirmed_commit">candidate_confirmed_commit</a></code></li>
+<li><code><a title="_confd.maapi.candidate_confirmed_commit_info" href="#_confd.maapi.candidate_confirmed_commit_info">candidate_confirmed_commit_info</a></code></li>
+<li><code><a title="_confd.maapi.candidate_confirmed_commit_persistent" href="#_confd.maapi.candidate_confirmed_commit_persistent">candidate_confirmed_commit_persistent</a></code></li>
+<li><code><a title="_confd.maapi.candidate_reset" href="#_confd.maapi.candidate_reset">candidate_reset</a></code></li>
+<li><code><a title="_confd.maapi.candidate_validate" href="#_confd.maapi.candidate_validate">candidate_validate</a></code></li>
+<li><code><a title="_confd.maapi.cd" href="#_confd.maapi.cd">cd</a></code></li>
+<li><code><a title="_confd.maapi.clear_opcache" href="#_confd.maapi.clear_opcache">clear_opcache</a></code></li>
+<li><code><a title="_confd.maapi.cli_accounting" href="#_confd.maapi.cli_accounting">cli_accounting</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd" href="#_confd.maapi.cli_cmd">cli_cmd</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd2" href="#_confd.maapi.cli_cmd2">cli_cmd2</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd3" href="#_confd.maapi.cli_cmd3">cli_cmd3</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd4" href="#_confd.maapi.cli_cmd4">cli_cmd4</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd_to_path" href="#_confd.maapi.cli_cmd_to_path">cli_cmd_to_path</a></code></li>
+<li><code><a title="_confd.maapi.cli_cmd_to_path2" href="#_confd.maapi.cli_cmd_to_path2">cli_cmd_to_path2</a></code></li>
+<li><code><a title="_confd.maapi.cli_diff_cmd" href="#_confd.maapi.cli_diff_cmd">cli_diff_cmd</a></code></li>
+<li><code><a title="_confd.maapi.cli_get" href="#_confd.maapi.cli_get">cli_get</a></code></li>
+<li><code><a title="_confd.maapi.cli_path_cmd" href="#_confd.maapi.cli_path_cmd">cli_path_cmd</a></code></li>
+<li><code><a title="_confd.maapi.cli_prompt" href="#_confd.maapi.cli_prompt">cli_prompt</a></code></li>
+<li><code><a title="_confd.maapi.cli_prompt_oneof" href="#_confd.maapi.cli_prompt_oneof">cli_prompt_oneof</a></code></li>
+<li><code><a title="_confd.maapi.cli_prompt_oneof2" href="#_confd.maapi.cli_prompt_oneof2">cli_prompt_oneof2</a></code></li>
+<li><code><a title="_confd.maapi.cli_read_eof" href="#_confd.maapi.cli_read_eof">cli_read_eof</a></code></li>
+<li><code><a title="_confd.maapi.cli_read_eof2" href="#_confd.maapi.cli_read_eof2">cli_read_eof2</a></code></li>
+<li><code><a title="_confd.maapi.cli_set" href="#_confd.maapi.cli_set">cli_set</a></code></li>
+<li><code><a title="_confd.maapi.cli_write" href="#_confd.maapi.cli_write">cli_write</a></code></li>
+<li><code><a title="_confd.maapi.close" href="#_confd.maapi.close">close</a></code></li>
+<li><code><a title="_confd.maapi.commit_trans" href="#_confd.maapi.commit_trans">commit_trans</a></code></li>
+<li><code><a title="_confd.maapi.commit_upgrade" href="#_confd.maapi.commit_upgrade">commit_upgrade</a></code></li>
+<li><code><a title="_confd.maapi.confirmed_commit_in_progress" href="#_confd.maapi.confirmed_commit_in_progress">confirmed_commit_in_progress</a></code></li>
+<li><code><a title="_confd.maapi.connect" href="#_confd.maapi.connect">connect</a></code></li>
+<li><code><a title="_confd.maapi.copy" href="#_confd.maapi.copy">copy</a></code></li>
+<li><code><a title="_confd.maapi.copy_path" href="#_confd.maapi.copy_path">copy_path</a></code></li>
+<li><code><a title="_confd.maapi.copy_running_to_startup" href="#_confd.maapi.copy_running_to_startup">copy_running_to_startup</a></code></li>
+<li><code><a title="_confd.maapi.copy_tree" href="#_confd.maapi.copy_tree">copy_tree</a></code></li>
+<li><code><a title="_confd.maapi.create" href="#_confd.maapi.create">create</a></code></li>
+<li><code><a title="_confd.maapi.cs_node_cd" href="#_confd.maapi.cs_node_cd">cs_node_cd</a></code></li>
+<li><code><a title="_confd.maapi.cs_node_children" href="#_confd.maapi.cs_node_children">cs_node_children</a></code></li>
+<li><code><a title="_confd.maapi.delete" href="#_confd.maapi.delete">delete</a></code></li>
+<li><code><a title="_confd.maapi.delete_all" href="#_confd.maapi.delete_all">delete_all</a></code></li>
+<li><code><a title="_confd.maapi.delete_config" href="#_confd.maapi.delete_config">delete_config</a></code></li>
+<li><code><a title="_confd.maapi.destroy_cursor" href="#_confd.maapi.destroy_cursor">destroy_cursor</a></code></li>
+<li><code><a title="_confd.maapi.detach" href="#_confd.maapi.detach">detach</a></code></li>
+<li><code><a title="_confd.maapi.detach2" href="#_confd.maapi.detach2">detach2</a></code></li>
+<li><code><a title="_confd.maapi.diff_iterate" href="#_confd.maapi.diff_iterate">diff_iterate</a></code></li>
+<li><code><a title="_confd.maapi.disconnect_remote" href="#_confd.maapi.disconnect_remote">disconnect_remote</a></code></li>
+<li><code><a title="_confd.maapi.disconnect_sockets" href="#_confd.maapi.disconnect_sockets">disconnect_sockets</a></code></li>
+<li><code><a title="_confd.maapi.do_display" href="#_confd.maapi.do_display">do_display</a></code></li>
+<li><code><a title="_confd.maapi.end_user_session" href="#_confd.maapi.end_user_session">end_user_session</a></code></li>
+<li><code><a title="_confd.maapi.exists" href="#_confd.maapi.exists">exists</a></code></li>
+<li><code><a title="_confd.maapi.find_next" href="#_confd.maapi.find_next">find_next</a></code></li>
+<li><code><a title="_confd.maapi.finish_trans" href="#_confd.maapi.finish_trans">finish_trans</a></code></li>
+<li><code><a title="_confd.maapi.get_attrs" href="#_confd.maapi.get_attrs">get_attrs</a></code></li>
+<li><code><a title="_confd.maapi.get_authorization_info" href="#_confd.maapi.get_authorization_info">get_authorization_info</a></code></li>
+<li><code><a title="_confd.maapi.get_case" href="#_confd.maapi.get_case">get_case</a></code></li>
+<li><code><a title="_confd.maapi.get_elem" href="#_confd.maapi.get_elem">get_elem</a></code></li>
+<li><code><a title="_confd.maapi.get_my_user_session_id" href="#_confd.maapi.get_my_user_session_id">get_my_user_session_id</a></code></li>
+<li><code><a title="_confd.maapi.get_next" href="#_confd.maapi.get_next">get_next</a></code></li>
+<li><code><a title="_confd.maapi.get_object" href="#_confd.maapi.get_object">get_object</a></code></li>
+<li><code><a title="_confd.maapi.get_objects" href="#_confd.maapi.get_objects">get_objects</a></code></li>
+<li><code><a title="_confd.maapi.get_rollback_id" href="#_confd.maapi.get_rollback_id">get_rollback_id</a></code></li>
+<li><code><a title="_confd.maapi.get_running_db_status" href="#_confd.maapi.get_running_db_status">get_running_db_status</a></code></li>
+<li><code><a title="_confd.maapi.get_schema_file_path" href="#_confd.maapi.get_schema_file_path">get_schema_file_path</a></code></li>
+<li><code><a title="_confd.maapi.get_stream_progress" href="#_confd.maapi.get_stream_progress">get_stream_progress</a></code></li>
+<li><code><a title="_confd.maapi.get_user_session" href="#_confd.maapi.get_user_session">get_user_session</a></code></li>
+<li><code><a title="_confd.maapi.get_user_session_identification" href="#_confd.maapi.get_user_session_identification">get_user_session_identification</a></code></li>
+<li><code><a title="_confd.maapi.get_user_session_opaque" href="#_confd.maapi.get_user_session_opaque">get_user_session_opaque</a></code></li>
+<li><code><a title="_confd.maapi.get_user_sessions" href="#_confd.maapi.get_user_sessions">get_user_sessions</a></code></li>
+<li><code><a title="_confd.maapi.get_values" href="#_confd.maapi.get_values">get_values</a></code></li>
+<li><code><a title="_confd.maapi.getcwd" href="#_confd.maapi.getcwd">getcwd</a></code></li>
+<li><code><a title="_confd.maapi.getcwd_kpath" href="#_confd.maapi.getcwd_kpath">getcwd_kpath</a></code></li>
+<li><code><a title="_confd.maapi.init_cursor" href="#_confd.maapi.init_cursor">init_cursor</a></code></li>
+<li><code><a title="_confd.maapi.init_upgrade" href="#_confd.maapi.init_upgrade">init_upgrade</a></code></li>
+<li><code><a title="_confd.maapi.insert" href="#_confd.maapi.insert">insert</a></code></li>
+<li><code><a title="_confd.maapi.install_crypto_keys" href="#_confd.maapi.install_crypto_keys">install_crypto_keys</a></code></li>
+<li><code><a title="_confd.maapi.is_candidate_modified" href="#_confd.maapi.is_candidate_modified">is_candidate_modified</a></code></li>
+<li><code><a title="_confd.maapi.is_lock_set" href="#_confd.maapi.is_lock_set">is_lock_set</a></code></li>
+<li><code><a title="_confd.maapi.is_running_modified" href="#_confd.maapi.is_running_modified">is_running_modified</a></code></li>
+<li><code><a title="_confd.maapi.iterate" href="#_confd.maapi.iterate">iterate</a></code></li>
+<li><code><a title="_confd.maapi.keypath_diff_iterate" href="#_confd.maapi.keypath_diff_iterate">keypath_diff_iterate</a></code></li>
+<li><code><a title="_confd.maapi.kill_user_session" href="#_confd.maapi.kill_user_session">kill_user_session</a></code></li>
+<li><code><a title="_confd.maapi.list_rollbacks" href="#_confd.maapi.list_rollbacks">list_rollbacks</a></code></li>
+<li><code><a title="_confd.maapi.load_config" href="#_confd.maapi.load_config">load_config</a></code></li>
+<li><code><a title="_confd.maapi.load_config_cmds" href="#_confd.maapi.load_config_cmds">load_config_cmds</a></code></li>
+<li><code><a title="_confd.maapi.load_config_stream" href="#_confd.maapi.load_config_stream">load_config_stream</a></code></li>
+<li><code><a title="_confd.maapi.load_config_stream_result" href="#_confd.maapi.load_config_stream_result">load_config_stream_result</a></code></li>
+<li><code><a title="_confd.maapi.load_rollback" href="#_confd.maapi.load_rollback">load_rollback</a></code></li>
+<li><code><a title="_confd.maapi.load_rollback_fixed" href="#_confd.maapi.load_rollback_fixed">load_rollback_fixed</a></code></li>
+<li><code><a title="_confd.maapi.load_schemas" href="#_confd.maapi.load_schemas">load_schemas</a></code></li>
+<li><code><a title="_confd.maapi.load_schemas_list" href="#_confd.maapi.load_schemas_list">load_schemas_list</a></code></li>
+<li><code><a title="_confd.maapi.lock" href="#_confd.maapi.lock">lock</a></code></li>
+<li><code><a title="_confd.maapi.lock_partial" href="#_confd.maapi.lock_partial">lock_partial</a></code></li>
+<li><code><a title="_confd.maapi.move" href="#_confd.maapi.move">move</a></code></li>
+<li><code><a title="_confd.maapi.move_ordered" href="#_confd.maapi.move_ordered">move_ordered</a></code></li>
+<li><code><a title="_confd.maapi.netconf_ssh_call_home" href="#_confd.maapi.netconf_ssh_call_home">netconf_ssh_call_home</a></code></li>
+<li><code><a title="_confd.maapi.netconf_ssh_call_home_opaque" href="#_confd.maapi.netconf_ssh_call_home_opaque">netconf_ssh_call_home_opaque</a></code></li>
+<li><code><a title="_confd.maapi.num_instances" href="#_confd.maapi.num_instances">num_instances</a></code></li>
+<li><code><a title="_confd.maapi.perform_upgrade" href="#_confd.maapi.perform_upgrade">perform_upgrade</a></code></li>
+<li><code><a title="_confd.maapi.popd" href="#_confd.maapi.popd">popd</a></code></li>
+<li><code><a title="_confd.maapi.prepare_trans" href="#_confd.maapi.prepare_trans">prepare_trans</a></code></li>
+<li><code><a title="_confd.maapi.prepare_trans_flags" href="#_confd.maapi.prepare_trans_flags">prepare_trans_flags</a></code></li>
+<li><code><a title="_confd.maapi.prio_message" href="#_confd.maapi.prio_message">prio_message</a></code></li>
+<li><code><a title="_confd.maapi.pushd" href="#_confd.maapi.pushd">pushd</a></code></li>
+<li><code><a title="_confd.maapi.query_free_result" href="#_confd.maapi.query_free_result">query_free_result</a></code></li>
+<li><code><a title="_confd.maapi.query_reset" href="#_confd.maapi.query_reset">query_reset</a></code></li>
+<li><code><a title="_confd.maapi.query_reset_to" href="#_confd.maapi.query_reset_to">query_reset_to</a></code></li>
+<li><code><a title="_confd.maapi.query_result" href="#_confd.maapi.query_result">query_result</a></code></li>
+<li><code><a title="_confd.maapi.query_result_count" href="#_confd.maapi.query_result_count">query_result_count</a></code></li>
+<li><code><a title="_confd.maapi.query_start" href="#_confd.maapi.query_start">query_start</a></code></li>
+<li><code><a title="_confd.maapi.query_stop" href="#_confd.maapi.query_stop">query_stop</a></code></li>
+<li><code><a title="_confd.maapi.rebind_listener" href="#_confd.maapi.rebind_listener">rebind_listener</a></code></li>
+<li><code><a title="_confd.maapi.reload_config" href="#_confd.maapi.reload_config">reload_config</a></code></li>
+<li><code><a title="_confd.maapi.reopen_logs" href="#_confd.maapi.reopen_logs">reopen_logs</a></code></li>
+<li><code><a title="_confd.maapi.report_progress" href="#_confd.maapi.report_progress">report_progress</a></code></li>
+<li><code><a title="_confd.maapi.report_progress_start" href="#_confd.maapi.report_progress_start">report_progress_start</a></code></li>
+<li><code><a title="_confd.maapi.report_progress_stop" href="#_confd.maapi.report_progress_stop">report_progress_stop</a></code></li>
+<li><code><a title="_confd.maapi.request_action" href="#_confd.maapi.request_action">request_action</a></code></li>
+<li><code><a title="_confd.maapi.request_action_str_th" href="#_confd.maapi.request_action_str_th">request_action_str_th</a></code></li>
+<li><code><a title="_confd.maapi.request_action_th" href="#_confd.maapi.request_action_th">request_action_th</a></code></li>
+<li><code><a title="_confd.maapi.revert" href="#_confd.maapi.revert">revert</a></code></li>
+<li><code><a title="_confd.maapi.roll_config" href="#_confd.maapi.roll_config">roll_config</a></code></li>
+<li><code><a title="_confd.maapi.roll_config_result" href="#_confd.maapi.roll_config_result">roll_config_result</a></code></li>
+<li><code><a title="_confd.maapi.save_config" href="#_confd.maapi.save_config">save_config</a></code></li>
+<li><code><a title="_confd.maapi.save_config_result" href="#_confd.maapi.save_config_result">save_config_result</a></code></li>
+<li><code><a title="_confd.maapi.set_attr" href="#_confd.maapi.set_attr">set_attr</a></code></li>
+<li><code><a title="_confd.maapi.set_comment" href="#_confd.maapi.set_comment">set_comment</a></code></li>
+<li><code><a title="_confd.maapi.set_delayed_when" href="#_confd.maapi.set_delayed_when">set_delayed_when</a></code></li>
+<li><code><a title="_confd.maapi.set_elem" href="#_confd.maapi.set_elem">set_elem</a></code></li>
+<li><code><a title="_confd.maapi.set_elem2" href="#_confd.maapi.set_elem2">set_elem2</a></code></li>
+<li><code><a title="_confd.maapi.set_flags" href="#_confd.maapi.set_flags">set_flags</a></code></li>
+<li><code><a title="_confd.maapi.set_label" href="#_confd.maapi.set_label">set_label</a></code></li>
+<li><code><a title="_confd.maapi.set_namespace" href="#_confd.maapi.set_namespace">set_namespace</a></code></li>
+<li><code><a title="_confd.maapi.set_next_user_session_id" href="#_confd.maapi.set_next_user_session_id">set_next_user_session_id</a></code></li>
+<li><code><a title="_confd.maapi.set_object" href="#_confd.maapi.set_object">set_object</a></code></li>
+<li><code><a title="_confd.maapi.set_readonly_mode" href="#_confd.maapi.set_readonly_mode">set_readonly_mode</a></code></li>
+<li><code><a title="_confd.maapi.set_running_db_status" href="#_confd.maapi.set_running_db_status">set_running_db_status</a></code></li>
+<li><code><a title="_confd.maapi.set_user_session" href="#_confd.maapi.set_user_session">set_user_session</a></code></li>
+<li><code><a title="_confd.maapi.set_values" href="#_confd.maapi.set_values">set_values</a></code></li>
+<li><code><a title="_confd.maapi.snmpa_reload" href="#_confd.maapi.snmpa_reload">snmpa_reload</a></code></li>
+<li><code><a title="_confd.maapi.start_phase" href="#_confd.maapi.start_phase">start_phase</a></code></li>
+<li><code><a title="_confd.maapi.start_trans" href="#_confd.maapi.start_trans">start_trans</a></code></li>
+<li><code><a title="_confd.maapi.start_trans2" href="#_confd.maapi.start_trans2">start_trans2</a></code></li>
+<li><code><a title="_confd.maapi.start_trans_flags" href="#_confd.maapi.start_trans_flags">start_trans_flags</a></code></li>
+<li><code><a title="_confd.maapi.start_trans_flags2" href="#_confd.maapi.start_trans_flags2">start_trans_flags2</a></code></li>
+<li><code><a title="_confd.maapi.start_trans_in_trans" href="#_confd.maapi.start_trans_in_trans">start_trans_in_trans</a></code></li>
+<li><code><a title="_confd.maapi.start_user_session" href="#_confd.maapi.start_user_session">start_user_session</a></code></li>
+<li><code><a title="_confd.maapi.start_user_session2" href="#_confd.maapi.start_user_session2">start_user_session2</a></code></li>
+<li><code><a title="_confd.maapi.start_user_session3" href="#_confd.maapi.start_user_session3">start_user_session3</a></code></li>
+<li><code><a title="_confd.maapi.stop" href="#_confd.maapi.stop">stop</a></code></li>
+<li><code><a title="_confd.maapi.sys_message" href="#_confd.maapi.sys_message">sys_message</a></code></li>
+<li><code><a title="_confd.maapi.unlock" href="#_confd.maapi.unlock">unlock</a></code></li>
+<li><code><a title="_confd.maapi.unlock_partial" href="#_confd.maapi.unlock_partial">unlock_partial</a></code></li>
+<li><code><a title="_confd.maapi.user_message" href="#_confd.maapi.user_message">user_message</a></code></li>
+<li><code><a title="_confd.maapi.validate_trans" href="#_confd.maapi.validate_trans">validate_trans</a></code></li>
+<li><code><a title="_confd.maapi.wait_start" href="#_confd.maapi.wait_start">wait_start</a></code></li>
+<li><code><a title="_confd.maapi.xpath2kpath" href="#_confd.maapi.xpath2kpath">xpath2kpath</a></code></li>
+<li><code><a title="_confd.maapi.xpath2kpath_th" href="#_confd.maapi.xpath2kpath_th">xpath2kpath_th</a></code></li>
+<li><code><a title="_confd.maapi.xpath_eval" href="#_confd.maapi.xpath_eval">xpath_eval</a></code></li>
+<li><code><a title="_confd.maapi.xpath_eval_expr" href="#_confd.maapi.xpath_eval_expr">xpath_eval_expr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="_confd.maapi.Cursor" href="#_confd.maapi.Cursor">Cursor</a></code></h4>
+</li>
+<li>
+<h4><code><a title="_confd.maapi.MaapiRollback" href="#_confd.maapi.MaapiRollback">MaapiRollback</a></code></h4>
+<ul class="two-column">
+<li><code><a title="_confd.maapi.MaapiRollback.comment" href="#_confd.maapi.MaapiRollback.comment">comment</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.creator" href="#_confd.maapi.MaapiRollback.creator">creator</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.datestr" href="#_confd.maapi.MaapiRollback.datestr">datestr</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.fixed_nr" href="#_confd.maapi.MaapiRollback.fixed_nr">fixed_nr</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.label" href="#_confd.maapi.MaapiRollback.label">label</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.nr" href="#_confd.maapi.MaapiRollback.nr">nr</a></code></li>
+<li><code><a title="_confd.maapi.MaapiRollback.via" href="#_confd.maapi.MaapiRollback.via">via</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

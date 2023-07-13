@@ -1,0 +1,14 @@
+module base {
+  namespace "ba:se";
+  prefix "base";
+
+  import ietf-netconf-with-defaults {
+    prefix inwd;
+  }
+
+  container xbase-container {
+    container x {
+      uses inwd:with-defaults-parameters;
+    }
+  }
+}

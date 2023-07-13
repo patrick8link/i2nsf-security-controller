@@ -1,0 +1,75 @@
+module config {
+  namespace "http://tail-f.com/ns/example/config";
+  prefix cfg;
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Validation example
+     (C) 2005-2018 Tail-f Systems
+
+     This is a simple, incomplete data model, tailor-made for
+     demoing tailf-configuration-policy.  It is not useful for
+     other purposes.  Please see the README file for information
+     on how this data model can be used.
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-12-06 {
+    description "YANG header information updated";
+  }
+
+  revision 2010-10-26 {
+    description "Initial revision.";
+  }
+
+  list interface {
+    key name;
+
+    leaf name {
+      type string;
+    }
+
+    leaf disabled {
+      type empty;
+    }
+
+    leaf type {
+      type enumeration {
+        enum "ethernet";
+        enum "sonet";
+        enum "atm";
+      }
+      mandatory true;
+    }
+
+    leaf mtu {
+      type uint32;
+    }
+
+    list unit {
+      key id;
+      leaf id {
+        type int32;
+      }
+      leaf vlan-id {
+        type uint16 {
+          range "1..4094";
+        }
+      }
+    }
+  }
+
+  container protocols {
+    container bgp {
+      presence "enables bgp";
+    }
+
+  }
+
+}

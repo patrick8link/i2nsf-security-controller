@@ -1,0 +1,165 @@
+[doc]
+ENG-23170 - Origin list filters in econfd
+
+    Both NETCONF origin-filter and negated-origin-filter can be passed
+    as a list filter to the get_next callback in the data provider
+    so that data provider can return only the list entries that match
+    the filter instead of traversing the entire list.
+[enddoc]
+
+[config skip=TAILFSKIP_RELEASE]
+[config require=CONFD_DIR]
+[include $TEST_DIR/luxinc/conditional.luxinc]
+
+[shell confd]
+    [invoke start_system]
+
+[shell dp]
+    # DP returns always only eth0 regardless of the origin filter value
+    # being matched or not. ConfD does not re-evaluate the filter and
+    # emits eth0 as DP honors the filter.
+    !erl -pa ${CONFD_DIR}/erlang/econfd/ebin/ -run ENG-23170_dp
+    ???ENG-23170_dp: registered interfaceCP
+    ???ENG-23170_dp: started
+
+[shell origin-list-filter]
+    [progress "\nNETCONF XPath filtering with one origin list filter"]
+    !netconf-console --get-data --db=operational -x interfaces --with-origin --origin-filter=intended
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    ???Filter type: LF_ORIGIN - Filter value: intended
+
+[shell origin-list-filter]
+    [progress "\nNETCONF XPath filtering with two origin list filters"]
+    !netconf-console --get-data --db=operational -x interfaces --with-origin --origin-filter=default --origin-filter=intended
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_OR
+    expr1
+      Filter type: LF_ORIGIN - Filter value: intended
+    expr2
+      Filter type: LF_ORIGIN - Filter value: default
+    FilterEnd
+    """
+
+[shell origin-list-filter]
+    [progress "\nNETCONF subtree filtering with two origin list filters"]
+    !echo '<interfaces xmlns="urn:test:ENG-23170"></interfaces>' | netconf-console --get-data --db=operational --with-origin --origin-filter=default --origin-filter=intended --subtree-filter -
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_OR
+    expr1
+      Filter type: LF_ORIGIN - Filter value: intended
+    expr2
+      Filter type: LF_ORIGIN - Filter value: default
+    FilterEnd
+    """
+
+[shell negated-origin-list-filter]
+    [progress "\nNETCONF XPath filtering with one negated origin list filter"]
+    !netconf-console --get-data --db=operational -x interfaces --with-origin --negated-origin-filter=system
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_NOT
+    expr1
+      Filter type: LF_ORIGIN - Filter value: system
+    FilterEnd
+    """
+
+[shell negated-origin-list-filter]
+    [progress "\nNETCONF XPath filtering with two negated origin list filters"]
+    !netconf-console --get-data --db=operational -x interfaces --with-origin --negated-origin-filter=system --negated-origin-filter=default
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_AND
+    expr1
+      Filter type: LF_NOT
+      expr1
+        Filter type: LF_ORIGIN - Filter value: default
+    expr2
+      Filter type: LF_NOT
+      expr1
+        Filter type: LF_ORIGIN - Filter value: system
+    FilterEnd
+    """
+
+[shell negated-origin-list-filter]
+    [progress "\nNETCONF subtree filtering with two negated origin list filters"]
+    !echo '<interfaces xmlns="urn:test:ENG-23170"></interfaces>' | netconf-console --get-data --db=operational --with-origin --negated-origin-filter=system --negated-origin-filter=default --subtree-filter -
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_AND
+    expr1
+      Filter type: LF_NOT
+      expr1
+        Filter type: LF_ORIGIN - Filter value: default
+    expr2
+      Filter type: LF_NOT
+      expr1
+        Filter type: LF_ORIGIN - Filter value: system
+    FilterEnd
+    """
+
+[shell mixed-list-filters]
+    [progress "\nNETCONF subtree filtering with mixed of origin and cmp list filters"]
+    !echo '<interfaces xmlns="urn:test:ENG-23170"><interface><mtu>1500</mtu></interface></interfaces>' | netconf-console --get-data --db=operational --with-origin --origin-filter=intended --subtree-filter -
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_AND
+    expr1
+      Filter type: LF_ORIGIN - Filter value: intended
+    expr2
+      Filter type: LF_CMP
+    FilterEnd
+    """
+
+[shell mixed-list-filters]
+    [progress "\nNETCONF subtree filtering with mixed of negated origin and cmp list filters"]
+    !echo '<interfaces xmlns="urn:test:ENG-23170"><interface><mtu>1500</mtu></interface></interfaces>' | netconf-console --get-data --db=operational --with-origin --negated-origin-filter=system --subtree-filter -
+    ???<name>eth0</name>
+    [invoke ok]
+
+[shell dp]
+    """???
+    FilterBegin
+    Filter type: LF_AND
+    expr1
+      Filter type: LF_NOT
+      expr1
+        Filter type: LF_ORIGIN - Filter value: system
+    expr2
+      Filter type: LF_CMP
+    FilterEnd
+    """
+
+[shell confd]
+    [invoke end_test]
+
+[cleanup]
+    [invoke stop_system]

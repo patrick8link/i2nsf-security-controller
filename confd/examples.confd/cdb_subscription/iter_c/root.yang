@@ -1,0 +1,56 @@
+module root {
+  namespace "http://tail-f.com/ns/example/root";
+  prefix root;
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for CDB iteration example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-28 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-09-30 {
+    description "Initial revision.";
+  }
+
+  container root {
+    container node-b {
+      list rf-head {
+        key dn;
+        max-elements 3;
+        leaf dn {
+          type int64;
+        }
+        leaf sector-id {
+          type string;
+          default "N/A";
+        }
+        list child {
+          key cdn;
+          max-elements 2;
+          leaf cdn {
+            type int64;
+          }
+          leaf child-attr {
+            type string;
+            default "N/A";
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+Shell Tools Example
+~~~~~~~~~~~~~~~~~~~
+
+This example shows how shell tools can be used to interact with ConfD entirely
+from shell scripts. The example is a variant of "read-only data push"
+(introductory example 13). The shell script periodically pushes ARP stats data
+to ConfD; at the same time it listens to changes of the leaf
+/arpe-config/interval and changes the period length accordingly.
+
+See the data push example for more details.
+
+
+ConfD shell tools
+~~~~~~~~~~~~~~~~~
+
+The ConfD is distributed with several shell tools, each with somewhat different
+use-case:
+
+* netconf-console - command-line tool for interacting with a NETCONF server
+  (not just ConfD), used in many introductory examples;
+
+* maapi - tool allowing you to access and modify an ongoing transaction, see
+  maapi_cli example;
+
+* confd_load - useful for saving and loading whole configuration and/or
+  operational data subtrees;
+
+* confd_cmd - set of shell tools for changing configuration, subscribing to
+  configuration changes, and many other kinds of command-line interaction with
+  ConfD.
+
+
+This example makes use of the latter two - confd_cmd to react to configuration
+changes, confd_load to upload ARP statistics.
+
+
+Using confd_cmd
+~~~~~~~~~~~~~~~
+
+confd_cmd is not just one tool; it implements whole set of commands that can be
+used for many purposes, including:
+
+* interacting with CDB (reading the configuration, reading or modifying
+  operational CDB data)
+
+* subscribing to CDB configuration changes
+
+* dealing with ConfD HA API
+
+* starting new transactions towards candidate or running datastore,
+  reading/writing to the transaction and committing the changes
+
+and many others. See "man confd_cmd", "confd_cmd -h", and "confd_cmd -h
+commands" for more details, some less trivial examples follow.
+
+
+confd_cmd scripts
+~~~~~~~~~~~~~~~~~
+
+Typical use of the tool may look like what this example does:
+
+    $ confd_cmd -c "mget /arpe-config/interval"
+
+But the tool is willing to accept several commands at once; either in the form
+of a command sequence
+
+    $ confd_cmd -c "mcreate /root/foo{1}; mset /root/foo{1}/bar 42"
+
+or as a "script" file
+
+    $ cat commands.txt
+    mcreate /root/foo{1}
+    mset /root/foo{1}/bar 42
+    mset /root/foo{1}/baz false
+    $ confd_cmd commands.txt
+
+
+Using the command result
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A confd_cmd invocation may have two "results": the command return value and the
+command output. The return value is nonzero if it fails - ConfD is down, the
+path used in the command is invalid, and so on, so in more complex shell
+scripts it may be advisable to watch the return value. But the actual result,
+as is the standard in shell scripting, is printed to the standard output. So if
+the aim is to get a value from the configuration and use it further in the
+script, the standard approach might be similar to what is done in this example:
+
+   INTERVAL=$(confd_cmd -c "mget /arpe-config/interval")
+
+Similar option, also used in this example, is
+to pipe a command to a shell block (a function, subshell, ...)
+
+    confd_cmd -c 'get_cli 1 /arpe-config/interval 10 1000' |
+        grep --line-buffered 'arpe-config interval' |
+        stats_loop
+
+The command "get_cli" starts a subscriber for given path; output from this
+command may look like
+
+    SUBSCRIBED TO /arpe-config/interval
+    COMMIT (last)
+    CLI OUTPUT:
+    arpe-config interval 3
+    DONE
+    COMMIT (last)
+    CLI OUTPUT:
+    arpe-config interval 5
+    DONE
+
+The lines like "CLI OUTPUT:" or "DONE" are not interesting, so we are filtering
+them out using grep. Note also the "--line-buffered" options - many shell
+filters (including "grep" or "sed") buffer its output by default; this is not
+desirable here and buffering needs to be turned off.

@@ -1,0 +1,59 @@
+module arpe {
+  namespace "http://tail-f.com/ns/example/arpe";
+  prefix arpe;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Read-only Instrumentation example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2018-11-27 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-05-19 {
+    description "Initial revision.";
+  }
+
+  container arpentries {
+    config false;
+    tailf:callpoint arpe;
+    list arpe {
+      key "ip ifname";
+      max-elements 1024;
+      leaf ip {
+        type inet:ip-address;
+      }
+      leaf ifname {
+        type string;
+      }
+      leaf hwaddr {
+        type string;
+        mandatory true;
+      }
+      leaf permanent {
+        type boolean;
+        mandatory true;
+      }
+      leaf published {
+        type boolean;
+        mandatory true;
+      }
+    }
+  }
+}

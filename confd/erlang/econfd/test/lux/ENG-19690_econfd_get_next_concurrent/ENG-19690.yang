@@ -1,0 +1,59 @@
+module ENG-19690 {
+  namespace "urn:test:ENG-19690";
+  prefix E19690;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  container ENG-19690 {
+    container elements {
+      tailf:callpoint ENG-19690;
+
+      list element {
+        key name;
+
+        leaf name {
+          type string;
+        }
+      }
+    }
+
+    container objects {
+      tailf:callpoint ENG-19690-obj;
+
+      list object {
+        key name;
+
+        leaf name {
+          type string;
+        }
+        leaf extra {
+          type string;
+        }
+      }
+
+      list multi-object {
+        key name;
+
+        leaf name {
+          type string;
+        }
+        leaf extra {
+          type string;
+        }
+      }
+
+      list find-next-multi-object {
+        key name;
+
+        leaf name {
+          type string;
+        }
+        leaf extra {
+          type string;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,215 @@
+Security example
+================
+
+When running ConfD and ConfD applications in production, the security rules
+should be considered. E.g.:
+
+* only install ConfD components that you use - e.g. in production it is not
+  necessary to install ConfD examples, etc.
+* set logging levels applicable for production scenario (one should find
+  balance as excessive logging may have performance impact on performance,
+  no logging can may hard to troubleshoot possible errors)
+* only features that are used should be enabled (e.g. NETCONF, CLI),
+  features not used should be disabled (e.g. SNMP)
+* run only with privileges that are necessary (e.g. ConfD does not have to run
+  as `root` user)
+* etc.
+
+This example describes how ConfD can use privileged ports when running
+as non-privileged user. It also describes how to check ConfD configuration and
+report warnings which may indicate security issues. Example comes with
+`Makefile` and modified `confd.conf` file that can be used to test what is
+described.
+
+Binding to privileged ports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is not always desirable ConfD runs as privileged user (`root`). Often we want
+ConfD server to run as regular user (e.g. `confd`). On the other hand, the port
+numbers smaller than 1024 are desirable to be used by ConfD in production
+deployment. This usually represents problem, as described in the ConfD user
+guide, Chapter 3.Security issues.
+
+In this example we have modified `confd.conf` to use privileged port 222 for
+NETCONF and port 224 for CLI (SSH).
+
+We can start example (as regular user) and take a look into `confd.log` file, to
+see if startup succeeds.
+
+`make clean all start; cat ./confd.log`
+
+We can see NETCONF privileged port cannot be bound:
+
+```
+<CRIT> 5-Jun-2019::14:32:09.866 linux confd[21483]:
+                 - Cannot bind to NETCONF socket 0.0.0.0:222 : permission denied
+```
+
+NOTE: ConfD did not try CLI port, as NETCONF port already failed.
+
+
+1) CAP_NET_BIND_SERVICE solution
+--------------------------------
+
+One option to solve this we can use `setcap` command and set
+`CAP_NET_BIND_SERVICE` capability to `confd` binary. We have to be
+privileged user (`root`) to use `setcap` for this.
+
+The command:
+
+`sudo setcap CAP_NET_BIND_SERVICE=+eip ${CONFD_DIR}/lib/confd/erts/bin/confd`
+
+NOTE: The binary is not `${CONFD_DIR}/bin/confd`, as this is only a script used
+to launch the confd daemon.
+
+After that we can start ConfD and we can see (in `confd.log`) NETCONF and SSH
+ports are bound correctly:
+
+`make clean all start; cat ./confd.log`
+
+```
+<INFO> 5-Jun-2019::14:43:55.150 linux confd[23630]:
+                             - Starting to listen for NETCONF SSH on 0.0.0.0:222
+<INFO> 5-Jun-2019::14:43:55.190 linux confd[23630]:
+                                 - Starting to listen for CLI SSH on 0.0.0.0:224
+```
+
+Afterwards we can check NETCONF and CLI (SSH) access with commands:
+
+`netconf-console --hello --port 222`
+
+`ssh admin@localhost -p 224`
+
+NOTE: If for some reason we want to reset `CAP_NET_BIND_SERVICE` capability
+back, we can use command:
+
+`sudo setcap CAP_NET_BIND_SERVICE=-eip ${CONFD_DIR}/lib/confd/erts/bin/confd`
+
+2) authbind solution
+--------------------
+
+Other solution to use privileged ports is to use `authbind` (usually has to be
+installed with package manager, e.g. `sudo apt-get install authbind`).
+
+With `authbind` we can choose which privileged ports we want to use. To do this
+we create port file and change permissions to it, e.g. for port 222:
+
+```
+sudo touch /etc/authbind/byport/222
+sudo chmod 777 /etc/authbind/byport/222
+```
+
+To start ConfD we can use command (also present as `start_authbind` target in
+the example `Makefile`).
+
+`authbind --deep ${CONFD_DIR}/bin/confd -c confd.conf \
+                                          --addloadpath ${CONFD_DIR}/etc/confd`
+
+NOTE: This time we can specify the `confd` script in `${CONFD_DIR}/bin/confd`,
+not the binary in ${CONFD_DIR}/lib/confd/erts/bin/confd.
+
+When we run:
+
+`make clean all start_authbind; cat ./confd.log`
+
+we can see port 222 (NETCONF) was successfully bound, CLI port (224) still
+failed:
+
+```
+<INFO> 6-Jun-2019::10:08:03.252 linux confd[12030]:
+                             - Starting to listen for NETCONF SSH on 0.0.0.0:222
+<CRIT> 6-Jun-2019::10:08:03.306 linux confd[12030]:
+              - Failed to start (not owner) to listen for CLI SSH on 0.0.0.0:224
+```
+
+CLI port (224) failed, as it does not have `authbind` file in the
+`/etc/authbind/byport` directory yet. To fix CLI port we create corresponding
+ port file and permissions:
+
+```
+sudo touch /etc/authbind/byport/224
+sudo chmod 777 /etc/authbind/byport/224
+```
+
+After that ConfD starts correctly:
+
+`make clean all start_authbind; cat ./confd.log`
+
+```
+<INFO> 6-Jun-2019::10:10:47.586 linux confd[12729]:
+                             - Starting to listen for NETCONF SSH on 0.0.0.0:222
+<INFO> 6-Jun-2019::10:10:47.629 linux confd[12729]:
+                                 - Starting to listen for CLI SSH on 0.0.0.0:224
+```
+
+We can test NETCONF and CLI:
+
+`netconf-console --hello --port 222` and `ssh admin@localhost -p 224`
+
+NOTE: If for some reason we want to remove port settings, we can use commands:
+
+```
+sudo rm /etc/authbind/byport/222
+sudo rm /etc/authbind/byport/224
+```
+
+Check for potential issues in ConfD configuration (`--preflight-checks`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since version 7.2, ConfD has new command line option `--preflight-checks`.
+
+This option performs set of checks on ConfD config file without starting ConfD.
+The check produces warnings if there is possible security risk and also some
+informative printouts.
+
+The usage:
+
+`confd [--preflight-checks ConfFile] [--exclude-checks Checks] |
+       [--print-checks]`
+
+To get a list of check types, issue command:
+
+`confd --print-checks`
+
+```
+WARNING CHECKS:
+If a warning check fails, command returns an exit status of 1.
+
+auth-order                  Check if all enabled authentication mechanisms
+                            are configured for confdConfig/aaa/authOrder
+cli-over-ssh                Check if sshServerKeyDir is set for cli-over-ssh
+default-ssh-config          Check if default RSA key is used
+default-ssl-config          Check if default private host key is used
+encrypted-strings           Check if the default encryption keys are used
+implicitly-enabled-agents   Check if any agent is enabled implicitly
+ipc-address                 Check if confdIpcAddress ip and port are changed
+netconf-over-ssh            Check if sshServerKeyDir is set for netconf-over-ssh
+netconf-over-tcp            Check if NETCONF over TCP is enabled
+restconf-over-http          Check if RESTCONF over HTTP listens to an IP
+                            other than localhost
+ssh-private-key-permissions Check if RSA key has correct file permissions
+ssl-private-key-permissions Check if host key has correct file permissions
+webui-over-http             Check if WEBUI over HTTP listens to an IP
+                            other than localhost
+
+INFORMATIVE CHECKS:
+If an informative check fails, command returns an exit status of 0.
+
+confd-dyncfg                Check if runtime configuration of ConfD is enabled
+explicitly-enabled-agents   Check if any agent is enabled explicitly
+subagents                   Check if subagents is enabled
+```
+
+The configuration can be checked with command:
+
+`confd --preflight-checks ./confd.conf`
+
+The failed warning and informative checks are printed and at the end of the
+printout there is a summary message.
+A report file `./configcheckResult.<date-time>` is created.
+
+If we want to disable check for example for `explicitly-enabled-agents`, we can
+run command like this:
+
+`confd --preflight-checks ./confd.conf \
+                            --exclude-checks explicitly-enabled-agents`

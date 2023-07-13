@@ -47,6 +47,17 @@ def convertMongo(highData):
             if userGroup['range-ipv6-address']['start'] and userGroup['range-ipv6-address']['end']:
                 ip = "ipv6"
                 lowData[lowAttr['map'][4]['nfiPath']] = userGroup['range-ipv6-address']['start'] + " " + userGroup['range-ipv6-address']['end']
+        if (i2nsfMongoDB.getDeviceGroup(value)):
+            userGroup = i2nsfMongoDB.getDeviceGroup(value)
+            if userGroup['mac-address']:
+                #print(lowAttr['map'][0]['nfiPath'])
+                lowData[lowAttr['map'][0]['nfiPath']] = userGroup['mac-address']
+            if userGroup['range-ipv4-address']['start'] and userGroup['range-ipv4-address']['end']:
+                ip = "ipv4"
+                lowData[lowAttr['map'][2]['nfiPath']] = userGroup['range-ipv4-address']['start'] + " " + userGroup['range-ipv4-address']['end']
+            if userGroup['range-ipv6-address']['start'] and userGroup['range-ipv6-address']['end']:
+                ip = "ipv6"
+                lowData[lowAttr['map'][4]['nfiPath']] = userGroup['range-ipv6-address']['start'] + " " + userGroup['range-ipv6-address']['end']
         elif (keys == 60 or keys == 61 or keys == 62):
             locationGroup = i2nsfMongoDB.getLocationGroup(highData[60],highData[61],highData[62])
             if locationGroup["geo-ipv4-address"]["start"] and locationGroup["geo-ipv4-address"]["end"]:

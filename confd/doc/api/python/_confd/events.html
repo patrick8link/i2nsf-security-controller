@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>_confd.events API documentation</title>
+<meta name="description" content="Low level module for subscribing to ConfD event notifications …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>
+#pubhub-container .pubhub-doc-container article#content,
+#pubhub-container .pubhub-doc-container nav#sidebar {
+width: inherit;
+height: inherit;
+}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>_confd.events</code></h1>
+</header>
+<section id="section-intro">
+<p>Low level module for subscribing to ConfD event notifications.</p>
+<p>This module is used to connect to ConfD and subscribe to certain
+events generated by ConfD. The API to receive events from ConfD is a
+socket based API whereby the application connects to ConfD and receives
+events on a socket. See also the Notifications chapter in the User Guide.
+The program misc/notifications/confd_notifications.c in the examples
+collection illustrates subscription and processing for all these events,
+and can also be used standalone in a development environment to monitor
+ConfD events.</p>
+<p>This documentation should be read together with the confd_lib_events(3) man page.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="_confd.events.diff_notification_done"><code class="name flex">
+<span>def <span class="ident">diff_notification_done</span></span>(<span>sock, tctx)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the received event was NOTIF_COMMIT_DIFF it is important that we call
+this function when we are done reading the transaction diffs over MAAPI.
+The transaction is hanging until this function gets called. This function
+also releases memory associated to the transaction in the library.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected notification socket</li>
+<li>tctx &ndash; a transaction context</li>
+</ul></div>
+</dd>
+<dt id="_confd.events.notifications_connect"><code class="name flex">
+<span>def <span class="ident">notifications_connect</span></span>(<span>sock, mask, ip, port, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function creates a notification socket.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a Python socket instance</li>
+<li>mask &ndash; a bitmask of one or several notification type values</li>
+<li>ip &ndash; the ip address if socket is AF_INET (optional)</li>
+<li>port &ndash; the port if socket is AF_INET (optional)</li>
+<li>path &ndash; a filename if socket is AF_UNIX (optional).</li>
+</ul></div>
+</dd>
+<dt id="_confd.events.notifications_connect2"><code class="name flex">
+<span>def <span class="ident">notifications_connect2</span></span>(<span>sock, mask, data, ip, port, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This variant of notifications_connect is required if we wish to subscribe
+to NOTIF_HEARTBEAT, NOTIF_HEALTH_CHECK, or NOTIF_STREAM_EVENT events.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a Python socket instance</li>
+<li>mask &ndash; a bitmask of one or several notification type values</li>
+<li>data &ndash; a _events.NotificationsData instance</li>
+<li>ip &ndash; the ip address if socket is AF_INET (optional)</li>
+<li>port &ndash; the port if socket is AF_INET (optional)</li>
+<li>path &ndash; a filename if socket is AF_UNIX (optional)</li>
+</ul></div>
+</dd>
+<dt id="_confd.events.read_notification"><code class="name flex">
+<span>def <span class="ident">read_notification</span></span>(<span>sock) ‑> <a title="dict" href="https://docs.python.org/3/library/typing.html#typing.dict">dict</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>The application is responsible for polling the notification socket. Once
+data is available to be read on the socket the application must call
+read_notification() to read the data from the socket. On success a
+dictionary containing notification information will be returned (see below).</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected notification socket</li>
+</ul>
+<p>On success the returned dict will contain information corresponding to the
+c struct confd_notification. The notification type is accessible through
+the 'type' key. The remaining information will be different depending on
+which type of notification this is (described below).</p>
+<p>Keys for type NOTIF_AUDIT (struct confd_audit_notification):</p>
+<ul>
+<li>logno</li>
+<li>user</li>
+<li>msg</li>
+<li>usid</li>
+</ul>
+<p>Keys for type NOTIF_DAEMON, NOTIF_NETCONF, NOTIF_DEVEL, NOTIF_JSONRPC,
+NOTIF_WEBUI, or NOTIF_TAKEOVER_SYSLOG (struct confd_syslog_notification):</p>
+<ul>
+<li>prio</li>
+<li>logno</li>
+<li>msg</li>
+</ul>
+<p>Keys for type NOTIF_COMMIT_SIMPLE (struct confd_commit_notification):</p>
+<ul>
+<li>database</li>
+<li>diff_available</li>
+<li>flags</li>
+<li>uinfo</li>
+</ul>
+<p>Keys for type NOTIF_COMMIT_DIFF (struct confd_commit_diff_notification):</p>
+<ul>
+<li>database</li>
+<li>flags</li>
+<li>uinfo</li>
+<li>tctx</li>
+<li>label (optional)</li>
+<li>comment (optional)</li>
+</ul>
+<p>Keys for type NOTIF_USER_SESSION (struct confd_user_sess_notification):</p>
+<ul>
+<li>type</li>
+<li>uinfo</li>
+<li>database</li>
+</ul>
+<p>Keys for type NOTIF_HA_INFO (struct confd_ha_notification):</p>
+<ul>
+<li>type (1)</li>
+<li>noprimary - if (1) is HA_INFO_NOPRIMARY</li>
+<li>secondary_died - if (1) is HA_INFO_SECONDARY_DIED (see below)</li>
+<li>secondary_arrived - if (1) is HA_INFO_SECONDARY_ARRIVED (see below)</li>
+<li>cdb_initialized_by_copy - if (1) is HA_INFO_SECONDARY_INITIALIZED</li>
+<li>besecondary_result - if (1) is HA_INFO_BESECONDARY_RESULT</li>
+</ul>
+<p>If secondary_died or secondary_arrived is present they will in turn contain
+a dictionary with the following keys:</p>
+<ul>
+<li>nodeid</li>
+<li>af (1)</li>
+<li>ip4 - if (1) is AF_INET</li>
+<li>ip6 - if (1) is AF_INET6</li>
+<li>str - if (1) if AF_UNSPEC</li>
+</ul>
+<p>Keys for type NOTIF_SUBAGENT_INFO (struct confd_subagent_notification):</p>
+<ul>
+<li>type</li>
+<li>name</li>
+</ul>
+<p>Keys for type NOTIF_COMMIT_FAILED (struct confd_commit_failed_notification):</p>
+<ul>
+<li>provider (1)</li>
+<li>dbname</li>
+<li>port - if (1) is DP_NETCONF</li>
+<li>af (2) - if (1) is DP_NETCONF</li>
+<li>ip4 - if (2) is AF_INET</li>
+<li>ip6 - if (2) is AF_INET6</li>
+<li>daemon_name - if (1) is DP_EXTERNAL</li>
+</ul>
+<p>Keys for type NOTIF_SNMPA (struct confd_snmpa_notification):</p>
+<ul>
+<li>pdu_type (1)</li>
+<li>request_id</li>
+<li>error_status</li>
+<li>error_index</li>
+<li>port</li>
+<li>af (2)</li>
+<li>ip4 - if (3) is AF_INET</li>
+<li>ip6 - if (3) is AF_INET6</li>
+<li>vb (optional)</li>
+<li>generic_trap - if (1) is SNMPA_PDU_V1TRAP</li>
+<li>specific_trap - if (1) is SNMPA_PDU_V1TRAP</li>
+<li>time_stamp - if (1) is SNMPA_PDU_V1TRAP</li>
+<li>enterprise - if (1) is SNMPA_PDU_V1TRAP (optional)</li>
+</ul>
+<p>Keys for type NOTIF_FORWARD_INFO (struct confd_forward_notification):</p>
+<ul>
+<li>type</li>
+<li>target</li>
+<li>uinfo</li>
+</ul>
+<p>Keys for type NOTIF_CONFIRMED_COMMIT
+(struct confd_confirmed_commit_notification):</p>
+<ul>
+<li>type</li>
+<li>timeout</li>
+<li>uinfo</li>
+</ul>
+<p>Keys for type NOTIF_UPGRADE_EVENT (struct confd_upgrade_notification):</p>
+<ul>
+<li>event</li>
+</ul>
+<p>Keys for type NOTIF_COMMIT_PROGRESS and NOTIF_PROGRESS
+(struct confd_progress_notification):</p>
+<ul>
+<li>type (1)</li>
+<li>timestamp</li>
+<li>duration if (1) is CONFD_PROGRESS_STOP</li>
+<li>usid</li>
+<li>tid</li>
+<li>datastore</li>
+<li>context</li>
+<li>phase (optional)</li>
+<li>msg</li>
+<li>annotation (optional)</li>
+</ul></div>
+</dd>
+<dt id="_confd.events.sync_audit_notification"><code class="name flex">
+<span>def <span class="ident">sync_audit_notification</span></span>(<span>sock, usid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the received event was NOTIF_AUDIT, and we are subscribing to
+notifications with the flag NOTIF_AUDIT_SYNC, this function must be called
+when we are done processing the notification. The user session is hanging
+until this function gets called.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected notification socket</li>
+<li>usid &ndash; the user session id</li>
+</ul></div>
+</dd>
+<dt id="_confd.events.sync_ha_notification"><code class="name flex">
+<span>def <span class="ident">sync_ha_notification</span></span>(<span>sock)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the received event was NOTIF_HA_INFO, and we are subscribing to
+notifications with the flag NOTIF_HA_INFO_SYNC, this function must be
+called when we are done processing the notification. All HA processing is
+blocked until this function gets called.</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>sock &ndash; a previously connected notification socket</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="_confd.events.Notification"><code class="flex name class">
+<span>class <span class="ident">Notification</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This is a placeholder for the c-type struct confd_notification.</p>
+<p>Notification cannot be directly instantiated from Python.</p></div>
+</dd>
+<dt id="_confd.events.NotificationsData"><code class="flex name class">
+<span>class <span class="ident">NotificationsData</span></span>
+<span>(</span><span>hearbeat_interval, health_check_interval, stream_name, start_time, stop_time, xpath_filter, usid, verbosity)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This type represents the c-type struct confd_notifications_data.</p>
+<p>The contructor for this type has the following signature:</p>
+<p>NotificationsData(hearbeat_interval, health_check_interval, stream_name,
+start_time, stop_time, xpath_filter, usid,
+verbosity) -&gt; object</p>
+<p>Keyword arguments:</p>
+<ul>
+<li>heartbeat_interval &ndash; time in milli seconds (int)</li>
+<li>health_check_interval &ndash; time in milli seconds (int)</li>
+<li>stream_name &ndash; name of the notification stream (string)</li>
+<li>start_time &ndash; the start time (Value)</li>
+<li>stop_time &ndash; the stop time (Value)</li>
+<li>xpath_filter &ndash; XPath filter for the stream (string) - optional</li>
+<li>usid &ndash; user session id for AAA restriction (int) - optional</li>
+<li>verbosity &ndash; progress verbosity level (int) - optional</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="_confd" href="index.html">_confd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="_confd.events.diff_notification_done" href="#_confd.events.diff_notification_done">diff_notification_done</a></code></li>
+<li><code><a title="_confd.events.notifications_connect" href="#_confd.events.notifications_connect">notifications_connect</a></code></li>
+<li><code><a title="_confd.events.notifications_connect2" href="#_confd.events.notifications_connect2">notifications_connect2</a></code></li>
+<li><code><a title="_confd.events.read_notification" href="#_confd.events.read_notification">read_notification</a></code></li>
+<li><code><a title="_confd.events.sync_audit_notification" href="#_confd.events.sync_audit_notification">sync_audit_notification</a></code></li>
+<li><code><a title="_confd.events.sync_ha_notification" href="#_confd.events.sync_ha_notification">sync_ha_notification</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="_confd.events.Notification" href="#_confd.events.Notification">Notification</a></code></h4>
+</li>
+<li>
+<h4><code><a title="_confd.events.NotificationsData" href="#_confd.events.NotificationsData">NotificationsData</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

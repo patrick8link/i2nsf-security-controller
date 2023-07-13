@@ -1,0 +1,56 @@
+Simple External Authentication Example
+--------------------------------------
+
+This examples demonstrates how implement and how to configure ConfD to
+use external authentication.
+
+To use external authentication with ConfD we have to supply an
+executable that ConfD can invoke when it needs to authenticate a new
+user.  ConfD will supply username and clear text password as a string
+of the form "[user;password;]\n" to stdin of the executable and
+expects a string containing the word "accept " followed by a space
+separated list of groups the user belongs to on stdout before the
+executable exits.  If authentication failed, the program should write
+"reject" or "abort", possibly followed by a reason for the rejection,
+and a trailing newline.
+
+The example only authenticates users by comparing username/password to
+a few know users hard coded in the authentication agent but it's
+trivial to extent to use e.g. radius using the radclient command.
+
+Enabling external authentication is simple, just tell ConfD about the
+auth executable using the
+"/confdConfig/aaa/externalAuthentication/executable" property in
+confd.conf:
+
+  <aaa>
+    <sshPubkeyAuthentication>none</sshPubkeyAuthentication>
+    <sshServerKeyDir>./ssh-keydir</sshServerKeyDir>
+>   <authOrder>externalAuthentication</authOrder>
+>   <externalAuthentication>
+>     <enabled>true</enabled>
+>     <executable>aaa/ext-auth.sh</executable>
+>   </externalAuthentication>
+  </aaa>
+
+
+
+Running the example
+-------------------
+
+make all start-client
+
+Log in using external authentication (password alice):
+
+ssh -p 2024 alice@localhost
+
+Try a user that doesn't exist:
+
+ssh -p 2024 eve@localhost
+
+Further Reading
+~~~~~~~~~~~~~~~
+
++ ConfD User Guide: Section 14.4.4. External authentication
++ man 3 confd_lib_maapi maapi_authenticate and maapi_authenticate2 API
+        calls

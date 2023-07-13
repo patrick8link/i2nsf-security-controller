@@ -11,10 +11,20 @@ from bson.json_util import dumps
 from flask_cors import CORS
 from dict2xml import dict2xml
 import generatorv2
+import configparser
 from flask import Response
 
+from ncclient import manager
 
-companies = [{"id":1, "name": "Company One"}, {"id": 2, "name": "Company Two"}]
+
+config = configparser.ConfigParser()
+config.sections()
+
+config.read('../controller.ini')
+config.sections()
+
+#print(f"mongodb://127.0.0.1:27017/")
+
 
 api = Flask(__name__)
 CORS(api)
@@ -22,7 +32,7 @@ CORS(api)
 @api.route('/url/get', methods = ['GET'])
 def restGetURLGroup():
     query = request.json
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["url"]
     
@@ -36,7 +46,7 @@ def restInsertURLGroup():
     try:
         data = request.json
         print(data)
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["url"]
         
@@ -47,7 +57,7 @@ def restInsertURLGroup():
 
 @api.route('/nsfDB/get', methods = ['GET'])
 def restGetAllCapability(query={}):
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["nsfDB"]
     col = db["capabilities"]
     result = {}
@@ -60,9 +70,32 @@ def restGetAllCapability(query={}):
 def restInsertUserGroup():
     try:
         data = request.json
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["user"]
+        
+        res = col.insert_one(data)
+        return "Success"
+    except pymongo.errors.DuplicateKeyError:
+        return "Duplicate Key for ",data["name"]
+        
+
+@api.route('/device/get', methods = ['GET'])
+def restGetDeviceGroup():
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+    db = client["endpoint"]
+    col = db["device"]
+    query = request.json
+    res = col.find_one(query)
+    return res
+
+@api.route('/device/put', methods = ['PUT'])
+def restInsertDeviceGroup():
+    try:
+        data = request.json
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+        db = client["endpoint"]
+        col = db["device"]
         
         res = col.insert_one(data)
         return "Success"
@@ -73,7 +106,7 @@ def restInsertUserGroup():
 @api.route('/user/get', methods = ['GET'])
 def restGetUserGroup():
     
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["user"]
     query = request.json
@@ -84,7 +117,7 @@ def restGetUserGroup():
 def restInsertLocationGroup():
     try:
         data = request.json
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["location"]
         
@@ -95,7 +128,7 @@ def restInsertLocationGroup():
 
 @api.route('/location/get', methods = ['GET'])
 def restGetLocationGroup():
-    client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["location"]
     query = request.json
@@ -108,7 +141,7 @@ def restGetLocationGroup():
 def restInsertCapability():
     try:
         data = request.json
-        client = pymongo.MongoClient("mongodb://172.17.20.250:27017/")
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
         db = client["nsfDB"]
         col = db["capabilities"]
         print(data)
@@ -136,6 +169,35 @@ def restInsertConfiguration():
     # for x,y in result.items():
     #     print(x)
     #     print(y)
+
+    #GET IP ADDRESS OF NSF
+    for key,value in result.items():
+      client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+      db = client["nsfDB"]
+      col = db["capabilities"]
+
+      query = {"nsf-name":key}
+      res = col.find_one(query)
+      confd = {'address': res["nsf-access-info"]["ip"],
+          'netconf_port': 2022,
+          'username': 'admin',
+          'password': 'admin'}
+
+      confd_manager = manager.connect(
+          host = confd["address"],
+          port = confd["netconf_port"],
+          username = confd["username"],
+          password = confd["password"],
+          hostkey_verify = False)
+      
+      configuration = f"""
+<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+    {value}
+</nc:config>
+"""
+      confd_configuration = confd_manager.edit_config(target="running",config = configuration)
+      confd_manager.close_session()
+
     return result
 
 def cleanNullTerms(d):

@@ -1,0 +1,293 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;24.&nbsp;The web server</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch23.html" title="Chapter&nbsp;23.&nbsp;The JSON-RPC API"><link rel="next" href="ch25.html" title="Chapter&nbsp;25.&nbsp;The RESTCONF API"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;24.&nbsp;The web server</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch23.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch25.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="d5e12549"></a>Chapter&nbsp;24.&nbsp;The web server</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch24.html#d5e12551">24.1. Introduction</a></span></dt><dt><span class="sect1"><a href="ch24.html#d5e12554">24.2. Web server capabilities</a></span></dt><dt><span class="sect1"><a href="ch24.html#d5e12587">24.3. CGI support</a></span></dt><dt><span class="sect1"><a href="ch24.html#ug.webserver.tls_data_in_db">24.4. Storing TLS data in database</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12551"></a>24.1.&nbsp;Introduction</h2></div></div></div><p>
+      This document describes an embedded basic web server that can deliver
+      static and Common Gateway Interface (CGI) dynamic content to a web client,
+      commonly a browser. Due to the limitations of this web server, and/or of
+      its configuration capabilities, a proxy server such as Nginx is
+      recommended to address special requirements.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12554"></a>24.2.&nbsp;Web server capabilities</h2></div></div></div><p>
+      The web server can be configured through settings in
+      <span class="phrase">confd.conf</span>
+       - see the manual pages of
+      <span class="phrase">
+        <a class="xref" href="rn03re17.html" title="confd.conf"><span class="refentrytitle">confd.conf</span>(5)</a>
+      </span>
+      .
+    </p><p>
+      Here is a brief overview of what you can configure on the web server:
+    </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          "toggle web server": the web server can be turned on or off
+        </p></li><li class="listitem"><p>
+          "toggle transport": enable HTTP and/or HTTPS, set IPs,
+          ports, redirects, certificates, etc.
+        </p></li><li class="listitem"><p>
+          "hostname": set the hostname of the web server and decide
+          whether to block requests for other hostnames
+        </p></li><li class="listitem"><p>
+          "/": set the docroot from where all static content is served
+        </p></li><li class="listitem"><p>
+          "/login": set the docroot from where static content is
+          served for URL paths starting with /login
+        </p></li><li class="listitem"><p>
+          "/custom": set the docroot from where static content is
+          served for URL paths starting with /custom
+        </p></li><li class="listitem"><p>
+          "/cgi": toggle CGI support and set the docroot from where
+          dynamic content is served for URL paths starting with /cgi
+        </p></li><li class="listitem"><p>
+          "non-authenticated paths": by default all URL paths, except
+          those needed for the login page are hidden from non-authenticated
+          users; authentication is done by calling the JSONRPC "login" method
+        </p></li><li class="listitem"><p>
+          "allow symlinks": allow symlinks from under the docroot
+        </p></li><li class="listitem"><p>
+          "cache": set the cache time window for static content
+        </p></li><li class="listitem"><p>
+          "log": several logs are available to configure in terms
+          of file paths - an access log, a full HTTP traffic/trace log and
+          a browser/JavaScript log
+        </p></li><li class="listitem"><p>
+          "custom headers": set custom headers across all static and
+          dynamic content, including requests to "/jsonrpc".
+        </p></li></ul></div><p>
+      In addition to what is configurable, the web server also GZip-compresses
+      responses automatically if the browser handles such responses, either by
+      compressing the response on the fly, or, if requesting a static file,
+      like "/bigfile.txt", by responding with the contents of "/bigfile.txt.gz",
+      if there is such a file.
+    </p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e12587"></a>24.3.&nbsp;CGI support</h2></div></div></div><p>
+      The web server includes CGI functionality, disabled by default.
+      Once you enable it in
+      <span class="phrase">confd.conf</span>
+       - see the manual pages of
+      <span class="phrase">
+        <a class="xref" href="rn03re17.html" title="confd.conf"><span class="refentrytitle">confd.conf</span>(5)</a>
+      </span>
+      ,
+      you can write CGI scripts, that will be called with the following
+      ConfD environment variables prefixed with
+      <span class="phrase">CONFD_</span>
+       when a user has logged-in
+      via JSON-RPC:
+    </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          "JSONRPC_SESSIONID": the JSON-RPC session id (cookie)
+        </p></li><li class="listitem"><p>
+          "JSONRPC_START_TIME": the start time of the JSON-RPC session
+        </p></li><li class="listitem"><p>
+          "JSONRPC_END_TIME": the end time of the JSON-RPC session
+        </p></li><li class="listitem"><p>
+          "JSONRPC_READ": the latest JSON-RPC read transaction
+        </p></li><li class="listitem"><p>
+          "JSONRPC_READS": a comma-separated list of JSON-RPC read
+          transactions
+        </p></li><li class="listitem"><p>
+          "JSONRPC_WRITE": the latest JSON-RPC write transaction
+        </p></li><li class="listitem"><p>
+          "JSONRPC_WRITES": a comma-separated of JSON-RPC write
+          transactions
+        </p></li><li class="listitem"><p>
+          "MAAPI_USER": the MAAPI username
+        </p></li><li class="listitem"><p>
+          "MAAPI_GROUPS": a comma-separated list of MAAPI groups
+        </p></li><li class="listitem"><p>
+          "MAAPI_UID": the MAAPI UID
+        </p></li><li class="listitem"><p>
+          "MAAPI_GID": the MAAPI GID
+        </p></li><li class="listitem"><p>
+          "MAAPI_SRC_IP": the MAAPI source IP address
+        </p></li><li class="listitem"><p>
+          "MAAPI_SRC_PORT": the MAAPI source port
+        </p></li><li class="listitem"><p>
+          "MAAPI_USID": the MAAPI USID
+        </p></li><li class="listitem"><p>
+          "MAAPI_READ": the latest MAAPI read transaction
+        </p></li><li class="listitem"><p>
+          "MAAPI_READS": a comma-separated list of MAAPI read
+          transactions
+        </p></li><li class="listitem"><p>
+          "MAAPI_WRITE": the latest MAAPI write transaction
+        </p></li><li class="listitem"><p>
+          "MAAPI_WRITES": a comma-separated of MAAPI write
+          transactions
+        </p></li></ul></div><p>Server or HTTP specific information is also exported as environment variables:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          "SERVER_SOFTWARE":
+        </p></li><li class="listitem"><p>
+          "SERVER_NAME":
+        </p></li><li class="listitem"><p>
+          "GATEWAY_INTERFACE":
+        </p></li><li class="listitem"><p>
+          "SERVER_PROTOCOL":
+        </p></li><li class="listitem"><p>
+          "SERVER_PORT":
+        </p></li><li class="listitem"><p>
+          "REQUEST_METHOD":
+        </p></li><li class="listitem"><p>
+          "REQUEST_URI":
+        </p></li><li class="listitem"><p>
+          "DOCUMENT_ROOT":
+        </p></li><li class="listitem"><p>
+          "DOCUMENT_ROOT_MOUNT":
+        </p></li><li class="listitem"><p>
+          "SCRIPT_FILENAME":
+        </p></li><li class="listitem"><p>
+          "SCRIPT_TRANSLATED":
+        </p></li><li class="listitem"><p>
+          "PATH_INTO":
+        </p></li><li class="listitem"><p>
+          "PATH_TRANSLATED":
+        </p></li><li class="listitem"><p>
+          "SCRIPT_NAME":
+        </p></li><li class="listitem"><p>
+          "REMOTE_ADDR":
+        </p></li><li class="listitem"><p>
+          "REMOTE_HOST":
+        </p></li><li class="listitem"><p>
+          "SERVER_ADDR":
+        </p></li><li class="listitem"><p>
+          "LOCAL_ADDR":
+        </p></li><li class="listitem"><p>
+          "QUERY_STRING":
+        </p></li><li class="listitem"><p>
+          "CONTENT_TYPE":
+        </p></li><li class="listitem"><p>
+          "CONTENT_LENGTH":
+        </p></li><li class="listitem"><p>
+          "HTTP_*": HTTP headers e.g. "Accept" value is exported as HTTP_ACCEPT
+        </p></li></ul></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.webserver.tls_data_in_db"></a>24.4.&nbsp;Storing TLS data in database</h2></div></div></div><p>
+      The <code class="filename"> tailf-tls.yang </code> YANG module defines a
+      structure to store TLS data in the database. It is possible to store
+      the private key, the private key's passphrase, the public key
+      certificate, and CA certificates.
+    </p><p>
+      In order to enable the web server to fetch TLS data from the database,
+      <code class="filename">confd.conf</code>
+      
+      needs to be configured
+      </p><div class="example"><a name="d5e12683"></a><p class="title"><b>Example&nbsp;24.1.&nbsp;Configuring ConfD to read TLS data from database</b></p><div class="example-contents"><pre class="screen">
+          
+&lt;webui&gt;
+  &lt;transport&gt;
+    &lt;ssl&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;ip&gt;0.0.0.0&lt;/ip&gt;
+      &lt;port&gt;8889&lt;/port&gt;
+      &lt;readFromDb&gt;true&lt;/readFromDb&gt;
+    &lt;/ssl&gt;
+  &lt;/transport&gt;
+&lt;/webui&gt;
+        </pre></div></div><p><br class="example-break">
+      
+      <span class="phrase">
+        Note that the options <span class="emphasis"><em>keyFile</em></span>,
+        <span class="emphasis"><em>certFile</em></span>, and <span class="emphasis"><em>caCertFile</em></span>,
+        are ignored when <span class="emphasis"><em>readFromDb</em></span> is set to true. See
+        the confd.conf.5 man page for more details.
+      </span>
+      
+    </p><p>
+      The database is populated with TLS data by configuring the
+      <span class="emphasis"><em>/tailf-tls:tls/private-key</em></span>,
+      <span class="emphasis"><em>/tailf-tls:tls/certificate</em></span>, and, optionally,
+      <span class="emphasis"><em>/tailf-tls/ca-certificates</em></span>. It is possible to use
+      password protected private keys, then the
+      <span class="emphasis"><em>passphrase</em></span> leaf in the
+      <span class="emphasis"><em>private-key</em></span> container needs to be set to the
+      password of the encrypted private key. Unencrypted private key data
+      can be supplied in both PKCS#8 and PKCS#1 format, while encrypted
+      private key data needs to be supplied in PKCS#1 format.
+    </p><p>
+      In the following example a password protected private key, the
+      passphrase, a public key certificate, and two CA certificates are
+      configured with the CLI.
+      </p><div class="example"><a name="d5e12698"></a><p class="title"><b>Example&nbsp;24.2.&nbsp;Populating the database with TLS data</b></p><div class="example-contents"><pre class="screen">
+          
+admin@io&gt; configure
+Entering configuration mode private
+[ok][2019-06-10 19:54:21]
+
+[edit]
+admin@io% set tls certificate cert-data
+(&lt;unknown&gt;):
+[Multiline mode, exit with ctrl-D.]
+&gt; -----BEGIN CERTIFICATE-----
+&gt; MIICrzCCAZcCFBh0ETLcNAFCCEcjSrrd5U4/a6vuMA0GCSqGSIb3DQEBCwUAMBQx
+&gt; ...
+&gt; -----END CERTIFICATE-----
+&gt;
+[ok][2019-06-10 19:59:36]
+
+[edit]
+admin@confd% set tls private-key key-data
+(&lt;unknown&gt;):
+[Multiline mode, exit with ctrl-D.]
+&gt; -----BEGIN RSA PRIVATE KEY-----
+&gt; Proc-Type: 4,ENCRYPTED
+&gt; DEK-Info: AES-128-CBC,6E816829A93AAD3E0C283A6C8550B255
+&gt; ...
+&gt; -----END RSA PRIVATE KEY-----
+[ok][2019-06-10 20:00:27]
+
+[edit]
+admin@confd% set tls private-key passphrase
+(&lt;AES encrypted string&gt;): ********
+[ok][2019-06-10 20:00:39]
+
+[edit]
+admin@confd% set tls ca-certificates ca-cert-1 cert-data
+(&lt;unknown&gt;):
+[Multiline mode, exit with ctrl-D.]
+&gt; -----BEGIN CERTIFICATE-----
+&gt; MIIDCTCCAfGgAwIBAgIUbzrNvBdM7p2rxwDBaqF5xN1gfmEwDQYJKoZIhvcNAQEL
+&gt; ...
+&gt; -----END CERTIFICATE-----
+[ok][2019-06-10 20:02:22]
+
+[edit]
+admin@confd% set tls ca-certificates ca-cert-2 cert-data
+(&lt;unknown&gt;):
+[Multiline mode, exit with ctrl-D.]
+&gt; -----BEGIN CERTIFICATE-----
+&gt; MIIDCTCCAfGgAwIBAgIUZ2GcDzHg44c2g7Q0Xlu3H8/4wnwwDQYJKoZIhvcNAQEL
+&gt; ...
+&gt; -----END CERTIFICATE-----
+[ok][2019-06-10 20:03:07]
+
+[edit]
+admin@confd% commit
+Commit complete.
+[ok][2019-06-10 20:03:11]
+
+[edit]
+        </pre></div></div><p><br class="example-break">
+      The SHA256 fingerprints of the public key certificate and the
+      CA certificates can be accessed as operational data. The fingerprint
+      is shown as a hex string. The first octet identifies what hashing
+      algorithm is used, <span class="emphasis"><em>04</em></span> is SHA256, and the
+      following octets is the actual fingerprint.
+      </p><div class="example"><a name="d5e12702"></a><p class="title"><b>Example&nbsp;24.3.&nbsp;Show TLS certificate fingerprints</b></p><div class="example-contents"><pre class="screen">
+          
+admin@io&gt; show tls
+tls certificate fingerprint 04:65:8a:9e:36:2c:a7:42:8d:93:50:af:97:08:ff:e6:1b:c5:43:a8:2c:b5:bf:79:eb:be:b4:70:88:96:40:22:fd
+NAME      FINGERPRINT
+--------------------------------------------------------------------------------------------------------------
+cacert-1  04:00:5e:22:f8:4b:b7:3a:47:e7:23:11:80:03:d3:9a:74:8d:09:c0:fa:cc:15:2b:7f:81:1a:e6:80:aa:a1:6d:1b
+cacert-2  04:2d:93:9b:37:21:d2:22:74:ad:d9:99:ae:76:b6:6a:f2:3b:e3:4e:07:32:f2:8b:f0:63:ad:21:7d:5e:db:92:0a
+
+[ok][2019-06-10 20:43:31]
+        </pre></div></div><p><br class="example-break">
+      When the database is populated ConfD needs to be reloaded.
+      </p><div class="informalexample"><pre class="programlisting">
+          
+$ confd --reload
+        </pre></div><p>
+      
+      After configuring ConfD, populating the database, and reloading, the
+      TLS transport is usable.
+      </p><div class="informalexample"><pre class="programlisting">
+          
+$ curl -kisu admin:admin https://localhost:8889
+HTTP/1.1 302 Found
+...
+        </pre></div><p>
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch23.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch25.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;23.&nbsp;The JSON-RPC API&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;25.&nbsp;The RESTCONF API</td></tr></table></div></body></html>

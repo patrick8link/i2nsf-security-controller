@@ -1,0 +1,1025 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;27.&nbsp;High Availability</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch26.html" title="Chapter&nbsp;26.&nbsp;The Management Agent API"><link rel="next" href="ch28.html" title="Chapter&nbsp;28.&nbsp;The SNMP Gateway"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;27.&nbsp;High Availability</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch26.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch28.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.ha"></a>Chapter&nbsp;27.&nbsp;High Availability</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch27.html#d5e13845">27.1. Introduction to ConfD High Availability</a></span></dt><dt><span class="sect1"><a href="ch27.html#ug.ha.hcc">27.2. Tail-f HCC Package</a></span></dt><dt><span class="sect1"><a href="ch27.html#ferret">27.3. HA framework requirements</a></span></dt><dt><span class="sect1"><a href="ch27.html#ha.moo">27.4. Mode of operation</a></span></dt><dt><span class="sect1"><a href="ch27.html#d5e14325">27.5. Security aspects</a></span></dt><dt><span class="sect1"><a href="ch27.html#d5e14340">27.6. API</a></span></dt><dt><span class="sect1"><a href="ch27.html#d5e14444">27.7. Ticks</a></span></dt><dt><span class="sect1"><a href="ch27.html#d5e14454">27.8. Joining a cluster</a></span></dt><dt><span class="sect1"><a href="ch27.html#ug.ha.relay_secondaries">27.9. Relay secondaries</a></span></dt><dt><span class="sect1"><a href="ch27.html#d5e14516">27.10. CDB replication</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e13845"></a>27.1.&nbsp;Introduction to ConfD High Availability</h2></div></div></div><p>
+      ConfD
+    supports replication of the CDB configuration as well
+    as of the operational data kept in CDB. The replication
+    architecture is that of one active primary and a number of passive
+    secondaries.
+    </p><p>All configuration write operations must occur at the primary and
+    ConfD
+    will automatically distribute the configuration updates to the set
+    of live secondaries. Operational data in CDB may be replicated or not
+    based on the <code class="code">tailf:persistent</code> statement in the data
+    model<span class="phrase"> and the ConfD configuration</span>.
+    All write operations for replicated operational data must also occur
+    at the primary, with the updates distributed to the live secondaries,
+    whereas non-replicated operational data can also be written on the
+    secondaries.</p><p>The <span class="emphasis"><em>only</em></span> thing
+    ConfD
+    does is to
+    replicate the CDB data amongst the members in the HA group. It
+    doesn't perform any of the otherwise High-Availability related
+    tasks such as running election protocols in order to elect a new
+    primary. This is the task of a High-Availability Framework (HAFW)
+    which must be in place.  The HAFW must instruct
+    ConfD
+    which nodes
+    are up and down using
+    <span class="phrase">
+      API functions from <a class="xref" href="rn02re12.html" title="confd_lib_ha"><span class="refentrytitle">confd_lib_ha</span>(3)</a>. Thus in order to use ConfD
+    configuration replication we must first have a HAFW.
+    </span>
+    
+    </p><p>Replication is supported in several different
+    architectural setups. For example two-node active/standby designs
+    as well as multi-node clusters with runtime software upgrade.</p><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="461"><tr><td align="center"><img src="pics/primary_secondary.png" align="middle" width="461"></td></tr></table><div class="caption"><p>Primary - secondary configuration</p></div></div><p>
+      <span class="phrase">
+        In a chassis solution there are (at least two) but a fixed
+        number of management blades. We wish that all configuration data
+        is replicated and if the active dies the standby will takeover and
+        the configuration data is not lost.
+      </span>
+    </p><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="461"><tr><td align="center"><img src="pics/host_n.png" align="middle" width="461"></td></tr></table><div class="caption"><p>One primary - several secondaries</p></div></div><p>Furthermore it is assumed that the entire cluster
+    configuration is equal on all hosts in the cluster. This means
+    that node specific configuration must be kept in different node
+    specific subtrees, for example as in <a class="xref" href="ch27.html#ug.ha.ex.cfg_yang" title="Example&nbsp;27.1.&nbsp;A data model divided into common and node specific subtrees">Example&nbsp;27.1, &#8220;A data model divided into common and node specific
+      subtrees&#8221;</a>.</p><div class="example"><a name="ug.ha.ex.cfg_yang"></a><p class="title"><b>Example&nbsp;27.1.&nbsp;A data model divided into common and node specific
+      subtrees</b></p><div class="example-contents"><pre class="programlisting">container cfg {
+  container shared {
+    leaf dnsserver {
+      type inet:ipv4-address;
+    }
+    leaf defgw {
+      type inet:ipv4-address;
+    }
+    leaf token {
+      type AESCFB128EncryptedString;
+    }
+    ...
+  }
+  container cluster {
+    list host {
+      key ip;
+      max-elements 8;
+      leaf ip {
+        type inet:ipv4-address;
+      }
+     ...
+    }
+  }
+}</pre></div></div><br class="example-break"></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.ha.hcc"></a>27.2.&nbsp;Tail-f HCC Package</h2></div></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.intro"></a>27.2.1.&nbsp;Overview</h3></div></div></div><p>
+      The Tail-f HCC package extends the built-in HA functionality by providing
+      virtual IP addresses (VIPs) that can be used to connect to the NSO
+      HA group primary node. HCC ensures that the VIP addresses are always
+      bound by the HA group primary and never bound by a secondary. Each time a
+      node transitions between primary and secondary states HCC reacts by
+      binding (primary) or unbinding (secondary) the VIP addresses.
+    </p><p>
+      HCC manages IP addresses at link-layer (OSI layer 2) for Ethernet
+      interfaces, and optionally, also at network-layer (OSI layer 3) using
+      BGP router advertisements. The layer-2 and layer-3 functions are mostly
+      independent and this document describes the details of each one
+      separately. However, the layer-3 function builds on top of the layer-2
+      function. The layer-2 function is always necessary, otherwise, the Linux
+      kernel on the primary node would not recognize the VIP address
+      or accept traffic directed to it.
+    </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+        Tail-f HCC version 5.x is non-backwards compatible
+        with previous versions of Tail-f HCC and requires functionality provided
+        by NSO version 5.4 and greater. For more details see
+        <a class="link" href="ch27.html#ug.ha.hcc.compared" title="27.2.4.&nbsp;Tail-f HCC Compared with HCC Version 4.x and Older">the following chapter</a>.
+      </p></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.deps"></a>27.2.2.&nbsp;Dependencies</h3></div></div></div><p>
+      Both the HCC layer-2 VIP and layer-3 BGP functionality depend on
+      <span class="command"><strong>iproute2</strong></span> utilities and <span class="command"><strong>awk</strong></span>.
+      An optional dependency is <span class="command"><strong>arping</strong></span> (either from
+      <code class="filename">iputils</code> or Thomas Habets <code class="filename">arping</code>
+      implementation) which allows HCC to announce the VIP to MAC mapping to
+      all nodes in the network by sending gratuitous ARP requests.
+    </p><p>
+      The HCC layer-3 BGP functionality depends on the <code class="sgmltag-element"><a class="tag" href="https://osrg.github.io/gobgp/" target="_top">GoBGP</a></code> daemon
+      version 2.x being installed on each NSO host that is configured
+      to run HCC in BGP mode.
+    </p><p>
+      GoBGP is open source software
+      originally developed by NTT Communications and released under
+      the Apache License 2.0. GoBGP can be obtained directly from
+      https://osrg.github.io/gobgp/ and is also packaged for
+      mainstream Linux distributions.
+    </p><div class="table"><a name="d5e13893"></a><p class="title"><b>Table&nbsp;27.1.&nbsp;Tools Dependencies</b></p><div class="table-contents"><table summary="Tools Dependencies" border="0"><colgroup><col width="20%" class="tools"><col width="20%" class="pkg"><col width="20%" class="req"><col width="40%" class="desc"></colgroup><thead><tr><th>Tool</th><th>Package</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>ip</td><td>iproute2</td><td>yes</td><td>
+              Adds and deletes the virtual IP from the network interface.
+            </td></tr><tr><td>awk</td><td>mawk or gawk</td><td>yes</td><td>
+             Installed with most Linux distributions.
+            </td></tr><tr><td>sed</td><td>sed</td><td>yes</td><td>
+             Installed with most Linux distributions.
+            </td></tr><tr><td>arping</td><td>iputils or arping</td><td>optional</td><td>
+             Installation recommended. Will reduce the propagation of changes to the
+             virtual IP for layer-2 configurations.
+            </td></tr><tr><td>gobgpd and gobgp</td><td>GoBGP 2.x</td><td>optional</td><td>
+             Required for layer-3 configurations. gobgpd is started by the HCC
+             package and advertises the virtual IP using BGP. gobgp is used to
+             get advertised routes.
+            </td></tr></tbody></table></div></div><br class="table-break"><p>
+      Same as with built-in HA functionality, all NSO instances must
+      be configured to run in HA mode. See <a class="link" href="ch27.html#ha.moo" title="27.4.&nbsp;Mode of operation">
+      the following instructions</a> on how to enable HA on NSO
+      instances.
+    </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.nonroot"></a>27.2.3.&nbsp;Running the HCC Package with NSO as a Non-Root User</h3></div></div></div><p>
+      GoBGP uses TCP port 179 for its communications and binds to it at startup.
+      As port 179 is considered a privileged port it is normally required to
+      run gobgpd as root.
+    </p><p>
+     When NSO is running as a non-root user the gobgpd command will be executed
+     as the same user as NSO and will prevent gobgpd from binding to port 179.
+    </p><p>
+     There a multiple ways of handle this and two are listed here.
+    </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+          Set owner to root and the setuid bit of the gobgpd file. Works on all
+          Linux distributions.
+        </p><div class="informalexample"><pre class="screen">
+$ sudo chown root /usr/bin/gobgpd
+$ sudo chmod u+s /usr/bin/gobgpd
+        </pre></div></li><li class="listitem"><p>
+          Set capability CAP_NET_BIND_SERVICE on the gobgpd file. May not be
+          supported by all Linux distributions.
+        </p><div class="informalexample"><pre class="screen">
+$ sudo setcap 'cap_net_bind_service=+ep' /usr/bin/gobgpd
+        </pre></div></li></ol></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.compared"></a>27.2.4.&nbsp;Tail-f HCC Compared with HCC Version 4.x and Older</h3></div></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13950"></a>HA Group Management Decisions</h4></div></div></div><p>
+        Tail-f HCC 5.x or later does not participate in decisions on
+        which NSO node is primary or secondary. These decisions
+        are taken by NSO's built-in HA and then pushed as notifications
+        to HCC. The NSO built-in HA functionality is available in
+        NSO starting with version 5.4, where older NSO versions
+        are not compatible with the HCC 5.x or later.
+      </p></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13953"></a>Embedded BGP Daemon</h4></div></div></div><p>
+        HCC 5.x or later operates a GoBGP daemon as a subprocess
+        completely managed by NSO. The old HCC function pack interacted
+        with an external Quagga BGP daemon using a NED interface.
+      </p></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13956"></a>Automatic Interface Assignment</h4></div></div></div><p>
+        HCC 5.x or later automatically associates VIP addresses
+        with Linux network interfaces using the <code class="code">ip</code> utility from
+        the iproute2 package. VIP addresses are also treated as
+        <code class="code">/32</code> without defining a new subnet. The old HCC function
+        pack used explicit configuration to associate VIPs with existing
+        addresses on each NSO host and define IP subnets for VIP
+        addresses.
+      </p></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.upgrade"></a>27.2.5.&nbsp;Upgrading</h3></div></div></div><p>
+      Since version 5.0, HCC relies on the NSO built-in HA for
+      cluster management and only performs address or route management
+      in reaction to cluster changes.
+      Therefore, no special measures are necessary if using HCC when
+      performing an NSO version upgrade or a package upgrade.
+      Instead, you should follow the standard best practice HA upgrade
+      procedure from ???.
+    </p></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.layer2"></a>27.2.6.&nbsp;Layer-2</h3></div></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13967"></a>Overview</h4></div></div></div><p>
+        The purpose of the HCC layer-2 functionality is to ensure that
+        the configured VIP addresses are bound in the Linux kernel of
+        the NSO primary node only. This ensures that the primary node (and
+        only the primary node) will accept traffic directed toward the
+        VIP addresses.
+      </p><p>
+        HCC also notifies the local layer-2 network when VIP addresses
+        are bound by sending Gratuitous ARP (GARP) packets. Upon receiving the
+        Gratuitous ARP, all the nodes in the network update their ARP tables
+        with the new mapping so they can continue to send traffic to the
+        non-failed, now primary node.
+      </p></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13971"></a>Operational Details</h4></div></div></div><p>
+        HCC binds the VIP addresses as additional (alias) addresses on
+        existing Linux network interfaces (e.g. <code class="code">eth0</code>). The
+        network interface for each VIP is chosen automatically by
+        performing a kernel routing lookup on the VIP address. That is,
+        the VIP will automatically be associated with the same network
+        interface that the Linux kernel chooses to send traffic to the
+        VIP.
+      </p><p>
+        This means that you can map each VIP onto a particular interface
+        by defining a route for a subnet that includes the VIP. If no
+        such specific route exists the VIP will automatically be
+        mapped onto the interface of the default gateway.
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+        To check which interface HCC will choose for a particular VIP
+        address simply run for example
+        </p><pre class="screen">
+admin@paris:~$ <strong class="userinput"><code>ip route get 192.168.123.22</code></strong>
+        </pre><p>
+        and look at the device <code class="code">dev</code> in the output, for example <code class="code">eth0</code>.
+      </p></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e13982"></a>Configuration</h4></div></div></div><p>
+        The layer-2 functionality is configured by providing a list of IPv4
+        and/or IPv6 VIP addresses and enabling HCC. The VIP configuration
+        parameters are found under <code class="code">/hcc:hcc</code>.
+      </p><div class="table"><a name="d5e13986"></a><p class="title"><b>Table&nbsp;27.2.&nbsp;Global Layer-2 Configuration</b></p><div class="table-contents"><table summary="Global Layer-2 Configuration" border="0"><colgroup><col width="33%" class="params"><col width="33%" class="type"><col width="34%" class="desc"></colgroup><thead><tr><th>Parameters</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>enabled</td><td>boolean</td><td>
+                If set to 'true', the primary node in an HA group
+                automatically binds the set of Virtual IPv[46] addresses.
+              </td></tr><tr><td>vip-address</td><td>list of inet:ip-address</td><td>
+                The list of virtual IPv[46] addresses to bind on the
+                primary node. The addresses are automatically unbound when
+                a node becomes secondary. The addresses can therefore be used
+                externally to reliably connect to the HA group primary node.
+              </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14006"></a>Example Configuration</h4></div></div></div><p>
+      </p><pre class="screen">
+admin@ncs(config)# <strong class="userinput"><code>hcc enabled</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc vip 192.168.123.22</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc vip 2001:db8::10</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>commit</code></strong>
+      </pre><p>
+      </p></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.layer3"></a>27.2.7.&nbsp;Layer-3 BGP</h3></div></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14016"></a>Overview</h4></div></div></div><p>
+        The purpose of the HCC layer-3 BGP functionality is to operate a
+        BGP daemon on each NSO node and to ensure that routes for the
+        VIP addresses are advertised by the BGP daemon on the primary
+        node only.
+      </p><p>
+        The layer-3 functionality is an optional add-on to the layer-2
+        functionality. When enabled, the set of BGP
+        neighbors must be configured separately for each NSO node. Each
+        NSO node operates an embedded BGP daemon and maintains
+        connections to peers but only the primary node announces the VIP
+        addresses.
+      </p><p>
+        The layer-3 functionality relies on the layer-2 functionality to
+        assign the virtual IP addresses to one of the host's interfaces. One
+        notable difference in assigning virtual IP addresses when operating
+        in Layer-3 mode is that the virtual IP addresses are assigned to the
+        loopback interface <code class="code">lo</code> rather than to a specific
+        physical interface.
+      </p></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14022"></a>Operational Details</h4></div></div></div><p>
+        HCC operates a <code class="sgmltag-element"><a class="tag" href="https://osrg.github.io/gobgp/" target="_top">GoBGP</a></code>
+        subprocess as an embedded BGP daemon. The BGP daemon is started,
+        configured, and monitored by HCC. The HCC YANG model includes basic BGP
+        configuration data and state data.
+      </p><p>
+        Operational data in the YANG model includes the state of the BGP
+        daemon subprocess and the state of each BGP neighbor connection.
+        The BGP daemon writes log messages directly to NSO where the HCC
+        module extracts updated operational data and then repeats the
+        BGP daemon log messages into the HCC log verbatim. You can find these
+        log messages in the developer log (<code class="code">devel.log</code>).
+      </p><p>
+      </p><pre class="screen">
+admin@ncs# <strong class="userinput"><code>show hcc</code></strong>
+NODE    BGPD  BGPD
+ID      PID   STATUS   ADDRESS       STATE        CONNECTED
+-------------------------------------------------------------
+london  -     -        192.168.30.2  -            -
+paris   827   running  192.168.31.2  ESTABLISHED  true
+      </pre><p>
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+          GoBGP must be installed separately and its location provided to
+          HCC as configuration data.
+        </p></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14033"></a>Configuration</h4></div></div></div><p>
+        The layer-3 BGP functionality is configured as a list of BGP
+        configurations with one list entry per node. Configurations are
+        separate because each NSO node usually has different BGP
+        neighbors with their own IP addresses, authentication parameters,
+        etc.
+      </p><p>
+        The BGP configuration parameters are found under
+        <code class="code">/hcc:hcc/bgp/node{id}</code>.
+      </p><div class="table"><a name="d5e14038"></a><p class="title"><b>Table&nbsp;27.3.&nbsp;Per-Node Layer-3 Configuration</b></p><div class="table-contents"><table summary="Per-Node Layer-3 Configuration" border="0"><colgroup><col width="33%" class="params"><col width="33%" class="type"><col width="34%" class="desc"></colgroup><thead><tr><th>Parameters</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>node-id</td><td>string</td><td>
+                Unique node ID. A reference to
+                <code class="code">/ncs:high-availability/ha-node/id</code>.
+              </td></tr><tr><td>enabled</td><td>boolean</td><td>
+                If set to <code class="code">true</code> this node uses BGP to announce VIP
+                addresses when in the HA primary state.
+              </td></tr><tr><td>gobgp-bin-dir</td><td>string</td><td>
+                Directory containing <code class="code">gobgp</code> and <code class="code">gobgpd</code> binaries.
+              </td></tr><tr><td>as</td><td>inet:as-number</td><td>
+                The BGP Autonomous System Number for the local BGP daemon.
+              </td></tr><tr><td>router-id</td><td>inet:ip-address</td><td>
+                The router-id for the local BGP daemon.
+              </td></tr></tbody></table></div></div><br class="table-break"><p>
+        Each NSO node can connect to a different set of BGP neighbors. For each
+        node, the BGP neighbor list configuration parameters are found under
+        <code class="code">/hcc:hcc/bgp/node{id}/neighbor{address}</code>.
+      </p><div class="table"><a name="d5e14076"></a><p class="title"><b>Table&nbsp;27.4.&nbsp;Per-Neighbor BGP Configuration</b></p><div class="table-contents"><table summary="Per-Neighbor BGP Configuration" border="0"><colgroup><col width="33%" class="params"><col width="33%" class="type"><col width="34%" class="desc"></colgroup><thead><tr><th>Parameters</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>address</td><td>inet:ip-address</td><td>
+                  BGP neighbor IP address.
+                </td></tr><tr><td>as</td><td>inet:as-number</td><td>
+                  BGP neighbor Autonomous System Number.
+                </td></tr><tr><td>ttl-min</td><td>uint8</td><td>
+                  Optional minimum TTL value for BGP packets. When
+                  configured enables BGP Generalized TTL Security
+                  Mechanism (GTSM).
+                </td></tr><tr><td>password</td><td>string</td><td>
+                  Optional password to use for BGP authentication with
+                  this neighbor.
+                </td></tr><tr><td>enabled</td><td>boolean</td><td>
+                  If set to <code class="code">true</code> then an outgoing BGP
+                  connection to this neighbor is established by the
+                  HA group primary node.
+                </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14109"></a>Example</h4></div></div></div><p>
+      </p><pre class="screen">
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris enabled</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris as 64512</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris router-id 192.168.31.99</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris gobgp-bindir /usr/bin</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris neighbor 192.168.31.2 as 64514</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>... repeated for each neighbor if more than one ...</code></strong>
+            ... repeated for each node ...
+admin@ncs(config)# <strong class="userinput"><code>commit</code></strong>
+      </pre><p>
+      </p></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.deployment"></a>27.2.8.&nbsp;Usage</h3></div></div></div><p>
+      This chapter describes basic deployment scenarios for HCC.
+      Layer-2 mode is demonstrated first and then the layer-3 BGP
+      functionality is configured in addition. A reference to
+      container-based examples for the layer-2 and layer-3 deployment
+      scenarios described here can be found in the NSO example set under
+      <code class="filename">examples.ncs/development-guide/high-availability/hcc</code>
+    </p><p>
+      Both scenarios consist of two test nodes: <code class="code">london</code> and
+      <code class="code">paris</code> with a single IPv4 VIP address. For the layer-2
+      scenario, the nodes are on the same network. The layer-3 scenario
+      also involves a BGP-enabled <code class="code">router</code> node as the
+      <code class="code">london</code> and <code class="code">paris</code> nodes are on two different
+      networks.
+    </p><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14130"></a>Layer-2 Deployment</h4></div></div></div><p>
+        The layer-2 operation is configured by simply defining the VIP
+        addresses and enabling HCC. The HCC configuration on both nodes
+        should match, otherwise, the primary node's configuration will
+        overwrite the secondary node configuration when the secondary
+        connects to the primary node.
+      </p><div class="table"><a name="d5e14133"></a><p class="title"><b>Table&nbsp;27.5.&nbsp;Addresses</b></p><div class="table-contents"><table summary="Addresses" border="0"><colgroup><col width="33%" class="hostname"><col width="33%" class="address"><col width="34%" class="role"></colgroup><thead><tr><th>Hostname</th><th>Address</th><th>Role</th></tr></thead><tbody><tr><td>paris</td><td>192.168.23.99</td><td>
+                Paris service node.
+              </td></tr><tr><td>london</td><td>192.168.23.98</td><td>
+                London service node.
+              </td></tr><tr><td>vip4</td><td>192.168.23.122</td><td>
+                NSO primary node IPv4 VIP address.
+              </td></tr></tbody></table></div></div><br class="table-break"><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14157"></a>Configuring VIPs</h5></div></div></div><p>
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs(config)# <strong class="userinput"><code>hcc enabled</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc vip 192.168.23.122</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>commit</code></strong>
+            </pre></div><p>
+        </p></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14165"></a>Verifying VIP Availability</h5></div></div></div><p>
+          Once enabled, HCC on the HA group primary node will
+          automatically assign the VIP addresses to corresponding Linux
+          network interfaces.
+        </p><div class="informalexample"><pre class="screen">
+root@paris:/var/log/ncs# <strong class="userinput"><code>ip address list</code></strong>
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+    valid_lft forever preferred_lft forever
+2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 52:54:00:fa:61:99 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.23.99/24 brd 192.168.23.255 scope global enp0s3
+    valid_lft forever preferred_lft forever
+    inet <span class="strong"><strong>192.168.23.122/32</strong></span> scope global enp0s3
+    valid_lft forever preferred_lft forever
+    inet6 fe80::5054:ff:fefa:6199/64 scope link
+    valid_lft forever preferred_lft forever
+          </pre></div><p>
+          On the secondary node HCC will not configure these addresses.
+        </p><div class="informalexample"><pre class="screen">
+root@london:~# <strong class="userinput"><code>ip address list</code></strong>
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 ...
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+    valid_lft forever preferred_lft forever
+2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 ...
+    link/ether 52:54:00:fa:61:98 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.23.98/24 brd 192.168.23.255 scope global enp0s3
+    valid_lft forever preferred_lft forever
+    inet6 fe80::5054:ff:fefa:6198/64 scope link
+    valid_lft forever preferred_lft forever
+          </pre></div></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14176"></a>Layer-2 Example Implementation</h5></div></div></div><p>
+          A reference to a container-based example of the layer-2
+          scenario can be found in the NSO example set. See the
+          <code class="filename">examples.ncs/development-guide/high-availability/hcc/README</code>
+        </p></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14180"></a>Enabling Layer-3 BGP</h4></div></div></div><p>
+          Layer-3 operation is configured for each NSO HA group node
+          separately. The HCC configuration on both nodes should match,
+          otherwise, the primary node's configuration will overwrite the
+          configuration on the secondary node.
+      </p><div class="table"><a name="d5e14183"></a><p class="title"><b>Table&nbsp;27.6.&nbsp;Addresses</b></p><div class="table-contents"><table summary="Addresses" border="0"><colgroup><col width="25%" class="hostname"><col width="25%" class="address"><col width="25%" class="as"><col width="25%" class="role"></colgroup><thead><tr><th>Hostname</th><th>Address</th><th>AS</th><th>Role</th></tr></thead><tbody><tr><td>paris</td><td>192.168.31.99</td><td>64512</td><td>Paris node</td></tr><tr><td>london</td><td>192.168.30.98</td><td>64513</td><td>London node</td></tr><tr><td>router</td><td>
+                <p>192.168.30.2</p>
+                <p>192.168.31.2</p>
+              </td><td>64514</td><td>BGP-enabled router</td></tr><tr><td>vip4</td><td>192.168.23.122</td><td>&nbsp;</td><td>Primary node IPv4 VIP address</td></tr></tbody></table></div></div><br class="table-break"><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14219"></a>Configuring BGP for Paris Node</h5></div></div></div><p>
+          </p><div class="informalexample"><pre class="screen">
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris enabled</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris as 64512</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris router-id 192.168.31.99</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris gobgp-bindir /usr/bin</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node paris neighbor 192.168.31.2 as 64514</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>commit</code></strong>
+            </pre></div><p>
+        </p></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14230"></a>Configuring BGP for London Node</h5></div></div></div><p>
+          </p><div class="informalexample"><pre class="screen">
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node london enabled</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node london as 64513</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node london router-id 192.168.30.98</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node london gobgp-bindir /usr/bin</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>hcc bgp node london neighbor 192.168.30.2 as 64514</code></strong>
+admin@ncs(config)# <strong class="userinput"><code>commit</code></strong>
+            </pre></div><p>
+        </p></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14241"></a>Check BGP Neighbor Connectivity</h5></div></div></div><p>
+          Check neighbor connectivity on the <code class="code">paris</code>
+          primary node. Note that its connection to neighbor
+          192.168.31.2 (<code class="code">router</code>) is <code class="code">ESTABLISHED</code>.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs# <strong class="userinput"><code>show hcc</code></strong>
+      BGPD  BGPD
+NODE ID PID   STATUS   ADDRESS       STATE        CONNECTED
+----------------------------------------------------------------
+london  -     -        192.168.30.2  -            -
+paris   2486  running  192.168.31.2  ESTABLISHED  true
+          </pre></div><p>
+          Check neighbor connectivity on the <code class="code">london</code> secondary
+          node. Note that the primary node also has an
+          <code class="code">ESTABLISHED</code> connection to its neighbor
+          192.168.30.2 (<code class="code">router</code>). The primary and
+          secondary nodes both maintain their BGP neighbor connections at all
+          times when BGP is enabled, but only the primary node announces
+          routes for the VIPs.
+        </p><div class="informalexample"><pre class="screen">
+admin@ncs# <strong class="userinput"><code>show hcc</code></strong>
+      BGPD  BGPD
+NODE ID PID   STATUS   ADDRESS       STATE        CONNECTED
+----------------------------------------------------------------
+london  494   running  192.168.30.2  ESTABLISHED  true
+paris   -     -        192.168.31.2  -            -
+          </pre></div></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14257"></a>Check Advertised BGP Routes Neighbors</h5></div></div></div><p>
+          Check the BGP routes received by the <code class="code">router</code>.
+        </p><p>
+          </p><div class="informalexample"><pre class="screen">
+admin@ncs# <strong class="userinput"><code>show ip bgp</code></strong>
+...
+Network          Next Hop            Metric LocPrf Weight Path
+*&gt; 192.168.23.122/32
+                  <span class="emphasis"><em>192.168.31.99</em></span>                          0 64513 ?
+            </pre></div><p>
+        </p><p>
+          The VIP subnet is routed to the <code class="code">paris</code> host,
+          which is the primary node.
+        </p></div><div class="sect4"><div class="titlepage"><div><div><h5 class="title"><a name="d5e14268"></a>Layer-3 BGP Example Implementation</h5></div></div></div><p>
+          A reference to a container-based example of the combined layer-2 and
+          layer-3 BGP scenario can be found in the NSO example set. See the
+          <code class="filename">examples.ncs/development-guide/high-availability/hcc/README</code>
+        </p></div></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="ug.ha.hcc.data_models"></a>27.2.9.&nbsp;Data Model</h3></div></div></div><div class="sect3"><div class="titlepage"><div><div><h4 class="title"><a name="d5e14274"></a>Tail-f HCC Model</h4></div></div></div><p>
+        </p><div class="informalexample"><pre class="programlisting"><strong class="hl-keyword">module</strong> tailf-hcc {
+  yang-version <span class="hl-number">1.1</span>;
+  <strong class="hl-keyword">namespace</strong> <strong class="hl-string"><em style="color:red">"http://cisco.com/pkg/tailf-hcc"</em></strong>;
+  <strong class="hl-keyword">prefix</strong> hcc;
+
+  <strong class="hl-keyword">import</strong> ietf-inet-types {
+    <strong class="hl-keyword">prefix</strong> inet;
+  }
+  <strong class="hl-keyword">import</strong> tailf-common {
+    <strong class="hl-keyword">prefix</strong> tailf;
+  }
+  <strong class="hl-keyword">import</strong> tailf-ncs {
+    <strong class="hl-keyword">prefix</strong> ncs;
+  }
+
+  <strong class="hl-keyword">organization</strong> <strong class="hl-string"><em style="color:red">"Cisco Systems"</em></strong>;
+  <strong class="hl-keyword">description</strong>
+    <strong class="hl-string"><em style="color:red">"This module defines Layer-2 and Layer-3 virtual IPv4 and IPv6 address
+</em></strong>     (VIP) management for clustered operation.<strong class="hl-string"><em style="color:red">";
+</em></strong>
+  <strong class="hl-keyword">revision</strong> <span class="hl-number">2022</span>-<span class="hl-number">05</span>-<span class="hl-number">20</span> {
+    <strong class="hl-keyword">description</strong>
+      <strong class="hl-string"><em style="color:red">"Use bias-free language."</em></strong>;
+  }
+
+  <strong class="hl-keyword">revision</strong> <span class="hl-number">2020</span>-<span class="hl-number">06</span>-<span class="hl-number">29</span> {
+    <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"Released as part of tailf-hcc 5.0."</em></strong>;
+  }
+
+  <strong class="hl-keyword">container</strong> hcc {
+    <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"Tail-f HCC package configuration."</em></strong>;
+    <strong class="hl-keyword">leaf</strong> enabled {
+      <strong class="hl-keyword">type</strong> boolean;
+      <strong class="hl-keyword">default</strong> <strong class="hl-string"><em style="color:red">"false"</em></strong>;
+      <strong class="hl-keyword">description</strong>
+        <strong class="hl-string"><em style="color:red">"If set to 'true', the primary node in a cluster automatically
+</em></strong>         binds the set of Virtual IPv4 and IPv6 addresses.<strong class="hl-string"><em style="color:red">";
+</em></strong>    }
+
+    <strong class="hl-keyword">leaf</strong>-<strong class="hl-keyword">list</strong> vip-address {
+      <strong class="hl-keyword">type</strong> inet:ip-address;
+      tailf:info <strong class="hl-string"><em style="color:red">"IPv4/IPv6 VIP address list"</em></strong>;
+      <strong class="hl-keyword">description</strong>
+        <strong class="hl-string"><em style="color:red">"The list of virtual IPv4 and IPv6 addresses to bind on the primary
+</em></strong>         node. The addresses are automatically unbound <strong class="hl-keyword">when</strong> a node
+         becomes secondary. The addresses can therefore be used externally
+         to reliably connect to the primary node in the cluster.<strong class="hl-string"><em style="color:red">";
+</em></strong>    }
+
+    action update {
+      tailf:actionpoint hcc-action;
+      tailf:info <strong class="hl-string"><em style="color:red">"Update VIP routes"</em></strong>;
+      <strong class="hl-keyword">description</strong>
+        <strong class="hl-string"><em style="color:red">"Update VIP address configuration in the Linux kernel.
+</em></strong>         Generally this is not necessary but can be useful if the VIP
+         addresses have been disturbed in some way e.g. if network
+         configuration on the host has been completely reset.<strong class="hl-string"><em style="color:red">";
+</em></strong>      <strong class="hl-keyword">output</strong> {
+        <strong class="hl-keyword">leaf</strong> <strong class="hl-keyword">status</strong> {
+          <strong class="hl-keyword">type</strong> string;
+        }
+      }
+    }
+
+    <strong class="hl-keyword">container</strong> bgp {
+      tailf:info <strong class="hl-string"><em style="color:red">"VIP announcement over BGP"</em></strong>;
+      <strong class="hl-keyword">description</strong>
+        <strong class="hl-string"><em style="color:red">"Run a local BGP daemon and advertise VIP routes to neighbors."</em></strong>;
+
+      <strong class="hl-keyword">list</strong> node {
+        <strong class="hl-keyword">key</strong> node-id;
+
+        <strong class="hl-keyword">leaf</strong> node-id {
+          <strong class="hl-keyword">type</strong> leafref {
+            <strong class="hl-keyword">path</strong> <strong class="hl-string"><em style="color:red">"/ncs:high-availability/ncs:ha-node/ncs:id"</em></strong>;
+          }
+          <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"Unique NCS node ID"</em></strong>;
+          <strong class="hl-keyword">mandatory</strong> true;
+        }
+
+        <strong class="hl-keyword">leaf</strong> enabled {
+          <strong class="hl-keyword">type</strong> boolean;
+          <strong class="hl-keyword">default</strong> true;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"If set to 'true' this node uses BGP to announce VIP
+</em></strong>             addresses in the primary state.<strong class="hl-string"><em style="color:red">";
+</em></strong>        }
+
+        <strong class="hl-keyword">leaf</strong> gobgp-bin-dir {
+          <strong class="hl-keyword">type</strong> string;
+          tailf:info <strong class="hl-string"><em style="color:red">"Directory containing gobgp/gobgpd binaries"</em></strong>;
+          <strong class="hl-keyword">mandatory</strong> true;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"The directory where 'gobgp' and 'gobgpd' binary executables
+</em></strong>             have been installed separately.<strong class="hl-string"><em style="color:red">";
+</em></strong>        }
+
+        <strong class="hl-keyword">leaf</strong> as {
+          <strong class="hl-keyword">type</strong> inet:as-number;
+          <strong class="hl-keyword">mandatory</strong> true;
+          tailf:info <strong class="hl-string"><em style="color:red">"BGP Autonomous System Number"</em></strong>;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"The BGP Autonomous System Number for the local BGP daemon."</em></strong>;
+        }
+
+        <strong class="hl-keyword">leaf</strong> router-id {
+          <strong class="hl-keyword">type</strong> inet:ip-address;
+          <strong class="hl-keyword">mandatory</strong> true;
+          tailf:info <strong class="hl-string"><em style="color:red">"Local BGP router ID"</em></strong>;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"The router-id for the local BGP daemon."</em></strong>;
+        }
+
+        <strong class="hl-keyword">leaf</strong> bgpd-pid {
+          <strong class="hl-keyword">type</strong> uint32;
+          <strong class="hl-keyword">config</strong> false;
+          tailf:callpoint hcc-data;
+          tailf:info <strong class="hl-string"><em style="color:red">"PID of BGP daemon process"</em></strong>;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"Unix PID of the local BGP daemon process (when running)."</em></strong>;
+        }
+
+        <strong class="hl-keyword">leaf</strong> bgpd-<strong class="hl-keyword">status</strong> {
+          <strong class="hl-keyword">type</strong> string;
+          <strong class="hl-keyword">config</strong> false;
+          tailf:callpoint hcc-data;
+          tailf:info <strong class="hl-string"><em style="color:red">"Status of BGP daemon process"</em></strong>;
+          <strong class="hl-keyword">description</strong>
+            <strong class="hl-string"><em style="color:red">"String describing the current status of the local BGP
+</em></strong>             daemon process.<strong class="hl-string"><em style="color:red">";
+</em></strong>        }
+
+        <strong class="hl-keyword">list</strong> neighbor {
+          <strong class="hl-keyword">key</strong> <strong class="hl-string"><em style="color:red">"address"</em></strong>;
+          <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"BGP neighbor list"</em></strong>;
+          <strong class="hl-keyword">leaf</strong> address {
+            <strong class="hl-keyword">type</strong> inet:ip-address;
+            <strong class="hl-keyword">mandatory</strong> true;
+            <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"BGP neighbor IP address"</em></strong>;
+          }
+          <strong class="hl-keyword">leaf</strong> as {
+            <strong class="hl-keyword">type</strong> inet:as-number;
+            <strong class="hl-keyword">mandatory</strong> true;
+            <strong class="hl-keyword">description</strong> <strong class="hl-string"><em style="color:red">"BGP neighbor Autonomous System number"</em></strong>;
+          }
+          <strong class="hl-keyword">leaf</strong> ttl-min {
+            <strong class="hl-keyword">type</strong> uint8;
+            <strong class="hl-keyword">description</strong>
+              <strong class="hl-string"><em style="color:red">"Optional minimum TTL value for BGP packets. When configured
+</em></strong>               enables BGP Generalized TTL Security Mechanism (GTSM).<strong class="hl-string"><em style="color:red">";
+</em></strong>          }
+          <strong class="hl-keyword">leaf</strong> password {
+            <strong class="hl-keyword">type</strong> string;
+            tailf:info <strong class="hl-string"><em style="color:red">"Optional BGP MD5 auth password."</em></strong>;
+            <strong class="hl-keyword">description</strong>
+              <strong class="hl-string"><em style="color:red">"Optional password to use for BGP authentication with this
+</em></strong>               neighbor.<strong class="hl-string"><em style="color:red">";
+</em></strong>          }
+          <strong class="hl-keyword">leaf</strong> enabled {
+            <strong class="hl-keyword">type</strong> boolean;
+            <strong class="hl-keyword">default</strong> <strong class="hl-string"><em style="color:red">"true"</em></strong>;
+            <strong class="hl-keyword">description</strong>
+              <strong class="hl-string"><em style="color:red">"If set to 'true' then an outgoing BGP connection to this
+</em></strong>               neighbor is established by the cluster primary.<strong class="hl-string"><em style="color:red">";
+</em></strong>          }
+          <strong class="hl-keyword">leaf</strong> state {
+            <strong class="hl-keyword">type</strong> string;
+            <strong class="hl-keyword">config</strong> false;
+            tailf:callpoint hcc-data;
+            tailf:info <strong class="hl-string"><em style="color:red">"State of BGP neighbor connection"</em></strong>;
+            <strong class="hl-keyword">description</strong>
+              <strong class="hl-string"><em style="color:red">"String describing the current state of the BGP connection
+</em></strong>               from the local BGP daemon to this neighbor.<strong class="hl-string"><em style="color:red">";
+</em></strong>          }
+          <strong class="hl-keyword">leaf</strong> connected {
+            <strong class="hl-keyword">type</strong> boolean;
+            <strong class="hl-keyword">config</strong> false;
+            tailf:callpoint hcc-data;
+            tailf:info <strong class="hl-string"><em style="color:red">"BGP session establishment status"</em></strong>;
+            <strong class="hl-keyword">description</strong>
+              <strong class="hl-string"><em style="color:red">"Flag indicating whether the BGP session to this neighbor
+</em></strong>               is currently established.<strong class="hl-string"><em style="color:red">";
+</em></strong>          }
+        }
+      }
+    }
+  }
+}
+
+          </pre></div><p>
+      </p></div></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ferret"></a>27.3.&nbsp;HA framework requirements</h2></div></div></div><p>ConfD only replicates the CDB
+    data. ConfD must be told by the HAFW which node should be
+    primary and which nodes should be
+    secondaries.</p><p>The HA framework must also detect when nodes fail and
+    instruct ConfD accordingly. If the primary node fails, the HAFW
+    must elect one of the remaining secondaries and appoint it the new
+    primary.  The remaining secondaries must also be informed by the HAFW
+    about the new primary situation. <span class="phrase">
+    ConfD will never take any actions regarding primary/secondary-ness
+    by itself.</span></p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ha.moo"></a>27.4.&nbsp;Mode of operation</h2></div></div></div><p>ConfD must be instructed through the
+    <code class="filename"><span class="phrase">confd.conf</span></code> configuration file that it should
+    run in HA mode. The following configuration snippet enables HA
+    mode:</p><div class="informalexample"><pre class="programlisting">&lt;ha&gt;
+  &lt;enabled&gt;true&lt;/enabled&gt;
+  &lt;ip&gt;0.0.0.0&lt;/ip&gt;
+  &lt;port&gt;4569&lt;/port&gt;
+  &lt;extraIpPorts&gt;:::4569|netns=hans0|vrf=vrf0&lt;/extraIpPorts&gt;
+  &lt;tickTimeout&gt;PT20S&lt;/tickTimeout&gt;
+&lt;/ha&gt;</pre></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+        Make sure to restart the <span class="command"><strong>ncs</strong></span> process in order
+        for the changes to take effect.
+      </p></div><p>The IP address and the port above indicates which IP and
+    which port should be used for the communication between the HA
+    nodes. <code class="sgmltag-element">extraIpPorts</code>
+    is an optional <code class="sgmltag-element">leaf-list</code>
+    of <span class="phrase">pipe-separated ip:port pair, network namespace name and VRF interface name</span>
+    which a HA primary also listens to
+    for secondary connections. For IPv6 addresses, the syntax [ip]:port may
+    be used. If the ":port" is omitted, <code class="sgmltag-element">port</code> is used.
+    The <code class="sgmltag-element">tickTimeout</code>
+    is a duration indicating how
+    often each secondary must send a tick message to the primary indicating
+    liveness. If the primary has not received a tick from a secondary
+    within 3 times the configured tick time, the secondary is considered
+    to be dead. Similarly, the primary sends tick messages to all the
+    secondaries. If a secondary has not received any tick messages from the
+    primary within the 3 times the timeout, the secondary will consider the
+    primary dead and report accordingly.</p><p>A HA node can be in one of three states:
+    <code class="sgmltag-element">NONE</code>, <code class="sgmltag-element">SECONDARY</code> or
+    <code class="sgmltag-element">PRIMARY</code>.  Initially a node is in the
+    <code class="sgmltag-element">NONE</code> state. This implies that the node
+    will read its configuration from CDB, stored locally on file.
+    Once the HA framework has decided whether the node should be a
+    secondary or a primary the HAFW must invoke either the
+    <span class="phrase">
+    function
+    <code class="function">confd_ha_besecondary(primary)</code> or
+    <code class="function">confd_ha_beprimary()</code>.
+    </span>
+    
+    </p><p>
+      When a ConfD HA node starts, it always starts up in mode
+      <code class="sgmltag-element">NONE</code>. This is consistent with how ConfD works
+      without HA enabled. At this point there are no other nodes
+      connected. Each ConfD node reads its configuration
+      data from the locally stored CDB and applications on or off the
+      node may connect to ConfD and read the data they need.
+    </p><p>At some point, the HAFW will command some nodes to become
+    secondary nodes of a named primary node. When this happens, each secondary
+    node tracks changes and (logically or physically) copies all the
+    data from the primary. Previous data at the secondary node is
+    overwritten.</p><p>Note that the HAFW, by using ConfD's start phases, can make
+    sure that ConfD does not start its northbound interfaces (NETCONF,
+    CLI, ...)  until the HAFW has decided what type of node it
+    is. Furthermore once a node has been set to the <code class="sgmltag-element">SECONDARY</code> state,
+    it is not possible to initiate new write transactions towards the node.
+    It is thus never possible for an agent to write directly into a
+    secondary node.
+    Once a node is returned either to the <code class="sgmltag-element">NONE</code> state or to
+    the <code class="sgmltag-element">PRIMARY</code> state, write transactions can once again be initiated
+    towards the node.</p><p>The HAFW may command a secondary node to become primary at any
+    time. The secondary node already has up-to-date data, so it simply
+    stops receiving updates from the previous primary. Presumably, the
+    HAFW also commands the primary node to become a secondary node, or
+    takes it down or handles the situation somehow. If it has crashed,
+    the HAFW tells the secondary to become primary, restarts the necessary
+    services on the previous primary node and gives it an appropriate
+    role, such as secondary. This is outside the scope of ConfD.</p><p>Each of the primary and secondary nodes have the same set of all
+    callpoints and validation points locally on each node. The start
+    sequence has to make sure the corresponding daemons are started
+    before the HAFW starts directing secondary nodes to the primary, and
+    before replication starts. The associated callbacks will however
+    only be executed at the primary. If e.g. the validation executing
+    at the primary needs to read data which is not stored in the
+    configuration and only available on another node, the validation
+    code must perform any needed RPC calls.</p><p>If the order from the HAFW is to become primary, the node
+    will start to listen for incoming secondaries at the <code class="sgmltag-element">ip:port</code>
+    configured under <code class="sgmltag-element">/confdCfg/ha</code>. The secondaries TCP connect
+    to the primary and this socket is used by ConfD to distribute the
+    replicated data.</p><p>If the order is to be a secondary, the node will contact the
+    primary and possibly copy the entire configuration from the
+    primary. This copy is not performed if the primary and secondary decide
+    that they have the same version of the CDB database loaded, in
+    which case nothing needs to be copied. This mechanism is
+    implemented by use of a unique token, the "transaction id" - it
+    contains the node id of the node that generated it and and a time
+    stamp, but is effectively "opaque".</p><p>This transaction id is generated by the cluster primary each
+    time a configuration change is committed, and all nodes write the
+    same transaction id into their copy of the committed
+    configuration.  If the primary dies, and one of the remaining
+    secondaries is appointed new primary, the other secondaries must be told to
+    connect to the new primary. They will compare their last
+    transaction id to the one from the newly appointed primary. If they
+    are the same, no CDB copy occurs.  This will be the case unless a
+    configuration change has sneaked in, since both the new primary and
+    the remaining secondaries will still have the last transaction id
+    generated by the old primary - the new primary will not generate a
+    new transaction id until a new configuration change is committed.
+    The same mechanism works if a secondary node is simply restarted. In
+    fact no cluster reconfiguration will lead to a CDB copy unless the
+    configuration has been changed in between.</p><p>Northbound agents should run on the primary, it is not
+    possible for an agent to commit write operations at a secondary
+    node.</p><p>When an agent commits its CDB data, CDB will stream the
+    committed data out to all registered secondaries. If a secondary dies
+    during the commit, nothing will happen, the commit will succeed
+    anyway.  When and if the secondary reconnects to the cluster, the
+    secondary will have to copy the entire configuration.  All data on the
+    HA sockets between ConfD nodes only go in the direction from the
+    primary to the secondaries. A secondary which isn't reading its data will
+    eventually lead to a situation with full TCP buffers at the
+    primary. In principle it is the responsibility of HAFW to discover
+    this situation and notify the primary ConfD about the hanging
+    secondary. However if 3 times the tick timeout is exceeded, ConfD will
+    itself consider the node dead and notify the HAFW.  The default
+    value for tick timeout is 20 seconds.</p><p>The primary node holds the active copy of the entire
+    configuration data in CDB. All configuration data has to be stored
+    in CDB for replication to work. At a secondary node, any request to
+    read will be serviced while write requests will be refused.  Thus,
+    CDB subscription code works the same regardless of whether the CDB
+    client is running at the primary or at any of the secondaries.  Once a
+    secondary has received the updates associated to a commit at the
+    primary, all CDB subscribers at the secondary will be duly notified
+    about any changes using the normal CDB subscription
+    mechanism.</p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e14325"></a>27.5.&nbsp;Security aspects</h2></div></div></div><p>We specify in <code class="filename"><span class="phrase">confd.conf</span></code> which IP
+    address the primary should bind for incoming secondaries. If we choose
+    the default value <code class="sgmltag-element">0.0.0.0</code> it is the responsibility of
+    the application to ensure that connection requests only arrive
+    from acceptable trusted sources through some means of
+    firewalling.</p><p>A cluster is also protected by a token, a secret string only
+    known to the application. The <span class="phrase">API function
+    <code class="function">confd_ha_connect()</code></span>
+    must be given the token.
+    A secondary node that connects to a primary node negotiates with the
+    primary using a CHAP-2 like protocol, thus both the primary and the
+    secondary are ensured that the other end has the same token without
+    ever revealing their own token. The token is never sent in clear
+    text over the network. This mechanism ensures that a connection
+    from a ConfD secondary to a primary can only succeed if they both have
+    the same token.</p><p>It is indeed possible to store the token itself in CDB, thus
+    an application can initially read the token from the local CDB
+    data, and then use that token in
+    <code class="function">confd_ha_connect()</code>.
+    
+    In this case it may very
+    well be a good idea to have the token stored in CDB be of type
+    <span class="type">tailf:aes-256-cfb-128-encrypted-string</span>.</p><p>If the actual CDB data that is sent on the wire between
+    cluster nodes is sensitive, and the network is untrusted, the
+    recommendation is to use IPSec between the nodes. An alternative
+    option is to decide exactly which configuration data is sensitive
+    and then use the <span class="type">tailf:aes-256-cfb-128-encrypted-string</span> type for
+    that data. If the configuration data is of type
+    <span class="type">tailf:aes-256-cfb-128-encrypted-string</span> the encrypted data will be
+    sent on the wire in update messages from the primary to the
+    secondaries.</p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e14340"></a>27.6.&nbsp;API</h2></div></div></div><p>There are two APIs used by the HA framework to control the
+    replication aspects of CDB. First there exists a synchronous API
+    used to tell ConfD what to do, secondly the application may create
+    a notifications socket and subscribe to HA related events where
+    ConfD notifies the application on certain HA related events such
+    as the loss of the primary etc. This notifications API is described
+    in <a class="xref" href="rn02re11.html" title="confd_lib_events"><span class="refentrytitle">confd_lib_events</span>(3)</a>.
+    The HA related
+    notifications sent by ConfD are crucial to how to program the
+    HA framework.</p><p>The following functions are used from the HAFW to instruct
+    ConfD about the cluster.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_connect</b>(</code></td><td>int <var class="pdparam">sock</var>, </td></tr><tr><td>&nbsp;</td><td>const struct sockaddr* <var class="pdparam">srv</var>, </td></tr><tr><td>&nbsp;</td><td>int <var class="pdparam">srv_sz</var>, </td></tr><tr><td>&nbsp;</td><td>const char *<var class="pdparam">token</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Connects a HA socket to ConfD and also provides the
+          secret token to be used in later negotiations with other
+          nodes.</p></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_beprimary</b>(</code></td><td>int <var class="pdparam">sock</var>, </td></tr><tr><td>&nbsp;</td><td>confd_value_t *<var class="pdparam">mynodeid</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Instructs the local node to become primary. The
+          function also provides a node identifier for the node. The
+          node id is of type <span class="type">confd_value_t</span>. Thus if we in
+          our configuration have trees with different branches for
+          node local data, it is highly recommended to use the same
+          type there as for the type of the node id.</p></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_besecondary</b>(</code></td><td>int <var class="pdparam">sock</var>, </td></tr><tr><td>&nbsp;</td><td>confd_value_t *<var class="pdparam">mynodeid</var>, </td></tr><tr><td>&nbsp;</td><td>struct confd_ha_node *<var class="pdparam">primary</var>, </td></tr><tr><td>&nbsp;</td><td>int <var class="pdparam">waitreply</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Instructs a node to be secondary. The definition of the
+          <span class="type">struct confd_ha_node</span> is:</p><div class="informalexample"><pre class="programlisting">
+                  <pre class="programlisting"><strong class="hl-keyword">struct</strong> confd_ha_node {
+    confd_value_t nodeid;
+    <strong class="hl-keyword">int</strong> af;               <em class="hl-comment" style="color: silver">/* AF_INET | AF_INET6 | AF_UNSPEC */</em>
+    <strong class="hl-keyword">union</strong> {               <em class="hl-comment" style="color: silver">/* address of remote note */</em>
+        <strong class="hl-keyword">struct</strong> in_addr ip4;
+        <strong class="hl-keyword">struct</strong> in6_addr ip6;
+        <strong class="hl-keyword">char</strong> *str;
+    } addr;
+    <strong class="hl-keyword">char</strong> buf[<span class="hl-number">128</span>];        <em class="hl-comment" style="color: silver">/* when confd_read_notification() and            */</em>
+                          <em class="hl-comment" style="color: silver">/* confd_ha_get_status() populate these structs, */</em>
+                          <em class="hl-comment" style="color: silver">/* if type of nodeid is C_BUF, the pointer       */</em>
+                          <em class="hl-comment" style="color: silver">/* will be set to point into this buffer         */</em>
+    <strong class="hl-keyword">char</strong> addr_buf[<span class="hl-number">128</span>];   <em class="hl-comment" style="color: silver">/* similar to the above, but for the address     */</em>
+                          <em class="hl-comment" style="color: silver">/* of remote node when using external IPC        */</em>
+                          <em class="hl-comment" style="color: silver">/* (from getpeeraddr() callback for secondary    */</em>
+                          <em class="hl-comment" style="color: silver">/* nodes)                                        */</em>
+};</pre>
+                </pre></div></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_benone</b>(</code></td><td>int <var class="pdparam">sock</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Resets a node to the initial state.</p></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_berelay</b>(</code></td><td>int <var class="pdparam">sock</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Instructs a secondary node to be a relay for other secondaries.
+          This is discussed in
+          <a class="xref" href="ch27.html#ug.ha.relay_secondaries" title="27.9.&nbsp;Relay secondaries">Section&nbsp;27.9, &#8220;Relay secondaries&#8221;</a>.</p></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_get_status</b>(</code></td><td>int <var class="pdparam">sock</var>, </td></tr><tr><td>&nbsp;</td><td>struct confd_ha_status *<var class="pdparam">stat</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>Returns the status of the current node in the user
+          provided <span class="type">struct confd_ha_status</span> structure.  The
+          definition is:</p><div class="informalexample"><pre class="programlisting">
+              <pre class="programlisting"><strong class="hl-keyword">struct</strong> confd_ha_status {
+    <strong class="hl-keyword">enum</strong> confd_ha_status_state state;
+    <em class="hl-comment" style="color: silver">/* if state is PRIMARY, we also have a list of secondaries */</em>
+    <em class="hl-comment" style="color: silver">/* if state is SECONDARY, then nodes[0] contains the primary */</em>
+    <em class="hl-comment" style="color: silver">/* if state is RELAY_SECONDARY, then nodes[0] contains the primary,
+       and following entries contain the "sub-secondaries" */</em>
+    <em class="hl-comment" style="color: silver">/* if state is NONE, we have no nodes at all */</em>
+    <strong class="hl-keyword">struct</strong> confd_ha_node nodes[<span class="hl-number">255</span>];
+    <strong class="hl-keyword">int</strong> num_nodes;
+};</pre>
+            </pre></div></dd><dt><span class="term">
+          <div class="funcsynopsis"><table border="0" class="funcprototype-table" summary="Function synopsis" style="cellspacing: 0; cellpadding: 0;"><tr><td><code class="funcdef">int <b class="fsfunc">confd_ha_secondary_dead</b>(</code></td><td>int <var class="pdparam">sock</var>, </td></tr><tr><td>&nbsp;</td><td>confd_value_t *<var class="pdparam">nodeid</var><code>)</code>;</td></tr></table><div class="funcprototype-spacer">&nbsp;</div></div>
+        </span></dt><dd><p>This function must be used by the HAFW to tell ConfD
+          that a secondary node is dead. It is vital that this is indeed
+          executed.  ConfD will notice that a secondary is dead
+          automatically if the socket to the secondary is closed, however
+          the secondary can die without closing its socket.  If
+          configured, ConfD will periodically send alive tick messages
+          from the secondaries to the primary. If a tick message isn't
+          received by the primary within the pre configured time the
+          primary will consider the secondary dead, close the socket and
+          report to the application through a notifications
+          socket.</p></dd></dl></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e14444"></a>27.7.&nbsp;Ticks</h2></div></div></div><p>The configuration parameter
+    <code class="sgmltag-element">/confdCfg/ha/tickTimeout</code> is by default set to 20
+    seconds. This means that every 20 seconds each secondary will send a
+    tick message on the socket leading to the primary. Similarly, the
+    primary will send a tick message every 20 seconds on every secondary
+    socket.</p><p>This aliveness detection mechanism is necessary for ConfD.
+    If a socket gets closed all is well, ConfD will cleanup and notify
+    the application accordingly using the notifications API.  However,
+    if a remote node freezes, the socket will not get properly closed
+    at the other end. ConfD will distribute update data from the
+    primary to the secondaries. If a remote node is not reading the data,
+    TCP buffer will get full and ConfD will have to start to buffer
+    the data. ConfD will buffer data for at most <code class="sgmltag-element">tickTime</code>
+    times 3 time units. If a <code class="sgmltag-element">tick</code> has not been received
+    from a remote node within that time, the node will be considered
+    dead. ConfD will report accordingly over the notifications socket
+    and either remove the hanging secondary or, if it is a secondary that
+    loose contact with the primary, go into the initial <code class="sgmltag-element">NONE</code>
+    state.</p><p>If the HAFW can be really trusted, it is possible to set
+    this timeout to <code class="constant">PT0S</code>, i.e zero, in which case
+    the entire dead-node-detection mechanism in ConfD is
+    disabled.</p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e14454"></a>27.8.&nbsp;Joining a cluster</h2></div></div></div><p>Some applications consist of several machines and also have
+    an architecture where it is possible to dynamically add more
+    machines to the cluster.  The procedure to add a machine to the
+    cluster is called <span class="quote">&#8220;<span class="quote">joining the cluster</span>&#8221;</span>.</p><p>Assume a situation where the cluster is running, we know
+    that the primary is running at IP address <code class="sgmltag-element">primary_ip</code>. A
+    common technique is to bring up a virtual IP address (VIP) on the
+    primary and then use gratuitous ARP to inform the other hosts on
+    the same L2 network about the new MAC/IP mapping.</p><p>The code to join a cluster is always going to be application
+    specific. Typically we would do something like the
+    following:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Start the new machine with an initial simple CLI which
+        gathers the following information from the user or from the
+        network.</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>The VIP. We need to know where the primary is.  This
+            can be entered manually. Another technique would be to use
+            UDP broadcast at the new machine and let code running at
+            the primary reply. Regardless, we need an IP address to
+            connect to.</p></li><li class="listitem"><p>The admin password.</p></li></ul></div></li><li class="listitem"><p>Connect to a server at the VIP and send the admin
+        password. This server code must then:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Use <code class="function">maapi_authenticate()</code> to
+            check that the remote user indeed knows the admin password
+            (or whichever user we choose in our application).</p></li><li class="listitem"><p>Assume a data model similar to the one in <a class="xref" href="ch27.html#ug.ha.ex.cfg_yang" title="Example&nbsp;27.1.&nbsp;A data model divided into common and node specific subtrees">Example&nbsp;27.1, &#8220;A data model divided into common and node specific
+      subtrees&#8221;</a>. The server code running
+            at the primary would then use MAAPI to populate the new
+            <code class="sgmltag-element">/cfg/cluster/host</code> tree for the joining secondary.
+            Finally the primary code replies with the secret cluster
+            token found in the primary config at
+            <code class="sgmltag-element">/cfg/shared/token</code>. It is not necessary to have
+            the token in CDB, it could also be stored somewhere else
+            or even hard coded if the network for cluster communication
+            is considered trusted.</p></li><li class="listitem"><p>The join code at the new machine now has the token.
+            It can start ConfD with its default configuration.  Once
+            ConfD is started the join code invokes
+            <code class="function">confd_ha_besecondary()</code> and we are
+            done.</p></li></ul></div></li></ol></div></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ug.ha.relay_secondaries"></a>27.9.&nbsp;Relay secondaries</h2></div></div></div><p>The normal setup of a ConfD
+    HA cluster is to have all secondaries connected directly to the
+    primary. This is a configuration that is both conceptually simple and
+    reasonably straightforward to manage for the HAFW. In some
+    scenarios, in particular a cluster with multiple secondaries at a
+    location that is network-wise distant from the primary, it can
+    however be sub-optimal, since the replicated data will be sent to
+    each remote secondary individually over a potentially low-bandwidth
+    network connection.</p><p>To make this case more efficient, we can instruct a secondary to
+    be a relay for other secondaries, by invoking the <span class="phrase"><code class="function">confd_ha_berelay()</code> API
+    function</span>.
+    This will make the secondary start listening on the IP address and port
+    configured for HA in <code class="filename"><span class="phrase">confd.conf</span></code>, and handle connections
+    from other secondaries in the same manner as the cluster primary does. The
+    initial CDB copy (if needed) to a new secondary will be done from the
+    relay secondary, and when the relay secondary receives CDB data for
+    replication from its primary, it will distribute the data to all its
+    connected secondaries in addition to updating its own CDB copy.</p><p>To instruct a node to become a secondary connected to a relay
+    secondary, we use the <span class="phrase">
+    <code class="function">confd_ha_besecondary()</code> function</span>  as
+    usual, but pass the node information for the relay secondary instead of
+    the node information for the primary. I.e. the "sub-secondary" will in
+    effect consider the relay secondary as its primary. To instruct a relay
+    secondary to stop being a relay, we can invoke the <span class="phrase"> <code class="function">confd_ha_besecondary()</code>
+    function</span>  with the same parameters as in the original
+    call. This is a no-op for a "normal" secondary, but it will cause a
+    relay secondary to stop listening for secondary connections, and disconnect
+    any already connected "sub-secondaries".</p><p>This setup requires special consideration by the HAFW. Instead
+    of just telling each secondary to connect to the primary independently,
+    it must setup the secondaries that are intended to be relays, and tell
+    them to become relays, before telling the "sub-secondaries" to connect
+    to the relay secondaries. Consider the case of a primary M and a secondary
+    S0 in one location, and two secondaries S1 and S2 in a remote location,
+    where we want S1 to act as relay for S2. The setup of the cluster
+    then needs to follow this procedure:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Tell M to be primary.</p></li><li class="listitem"><p>Tell S0 and S1 to be secondary with M as primary.</p></li><li class="listitem"><p>Tell S1 to be relay.</p></li><li class="listitem"><p>Tell S2 to be secondary with S1 as primary.</p></li></ol></div><p>Conversely, the handling of network outages and node failures
+    must also take the relay secondary setup into account. For example, if a
+    relay secondary loses contact with its primary, it will transition to the
+    <code class="sgmltag-element">NONE</code> state just like any other secondary, and it will then
+    disconnect its "sub-secondaries" which will cause those to transition to
+    <code class="sgmltag-element">NONE</code> too, since they lost contact with "their" primary. Or
+    if a relay secondary dies in a way that is detected by its
+    "sub-secondaries",
+    they will also transition to <code class="sgmltag-element">NONE</code>. Thus in the example
+    above, S1 and S2 needs to be handled differently. E.g. if S2 dies,
+    the HAFW probably won't take any action, but if S1 dies, it makes
+    sense to instruct S2 to be a secondary of M instead (and when S1 comes
+    back, perhaps tell S2 to be a relay and S1 to be a secondary of
+    S2).</p><p>Besides the use of <code class="function"><span class="phrase">confd_ha_berelay()</span></code>, the API is mostly
+    unchanged when using relay secondaries. The HA event notifications
+    reporting the arrival or the death of a secondary are still generated
+    only by the "real" cluster primary. If the <span class="phrase"><code class="function">confd_ha_get_status()</code> API
+    function</span>
+    is used towards a relay secondary, it will report the node state as
+    <span class="phrase">CONFD_HA_STATE_SECONDARY_RELAY rather than
+    just CONFD_HA_STATE_SECONDARY</span>, and the
+    array of nodes will have its primary as the first element (same as
+    for a "normal" secondary), followed by its "sub-secondaries"
+    (if any).</p></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e14516"></a>27.10.&nbsp;CDB replication</h2></div></div></div><p>When HA is enabled in <code class="filename"><span class="phrase">confd.conf</span></code> CDB
+    automatically replicates data written on the primary to the
+    connected secondary nodes. Replication is done on a per-transaction
+    basis to all the secondaries in parallel. It can be configured to be
+    done asynchronously (best performance) or synchronously in step
+    with the transaction (most secure). When ConfD is in secondary mode
+    the northbound APIs are in read-only mode, that is the
+    configuration can not be changed on a secondary other than through
+    replication updates from the primary. It is still possible to read
+    from for example NETCONF or CLI (if they are enabled) on a
+    secondary. CDB subscriptions works as usual.
+    When ConfD is in the <code class="sgmltag-element">NONE</code>
+    state CDB is unlocked and it behaves as when ConfD is not in HA
+    mode at all.</p><p>The <a class="xref" href="ch09.html#ug.opdata.cdb" title="9.8.&nbsp;Operational data in CDB">Section&nbsp;9.8, &#8220;Operational data in CDB&#8221;</a> describes how
+    operational data can be stored in CDB. If this is used it is also
+    possible to replicate operational data in HA mode. Since
+    replication comes at a cost ConfD makes it configurable whether to
+    replicate all operational data, or just the persistent data (the
+    default). See the
+    <a class="xref" href="rn03re17.html" title="confd.conf"><span class="refentrytitle">confd.conf</span>(5)</a>
+    man-page
+    for the <code class="sgmltag-element">/confdConfig/cdb/operational/replication</code>
+    configurable. Replication of operational data can also be configured
+    to be done asynchronously or synchronously, via the
+    <code class="sgmltag-element">/confdConfig/cdb/operational/replicationMode</code>
+    configurable, but since there are no transactions for the writing of
+    operational data, this pertains to a given API call writing
+    operational data.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch26.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch28.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;26.&nbsp;The Management Agent API&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;28.&nbsp;The SNMP Gateway</td></tr></table></div></body></html>

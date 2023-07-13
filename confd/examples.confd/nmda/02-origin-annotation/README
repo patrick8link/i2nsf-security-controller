@@ -1,0 +1,58 @@
+This example demonstrates the origin metadata annotation feature
+defined RFC8342 Network Management Datastore Architecture (NMDA) and
+NETCONF extension to support the origin feature.
+
+About the NETCONF Client used in the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A NETCONF client 'netconf-console', which is part of the ConfD
+installation, is used in this example. This client communicates with
+ConfD over SSH and requires Python Paramiko package (on Ubuntu you can
+install it by command 'apt-get install python-paramiko'). In case SSH
+cannot be used, there is 'netconf-console-tcp' variant. To use
+'netconf-console-tcp', update 'confd.conf' to enable
+'netconf/transport/tcp' and change all 'netconf-console' calls to
+'netconf-console-tcp'.
+
+What the example does
+~~~~~~~~~~~~~~~~~~~~~
+The example enables the origin feature in confd.conf.
+Two operational test interfaces lo and eth0 are pre-defined in the
+data provider module 'interface_dp.c and marked with origins system
+and intended respectively.
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+ 1. Build the necessary files and start ConfD.
+    interface_dp will be running in the foreground.
+
+    $ make all start
+
+ 2. In another window, retrieve the origins of the operational-state
+    content. If the --with-origin option is provided in the
+    netconf-console command, ConfD will include the origin metadata
+    annotations in the response. Note that origin applies to
+    configuration nodes in the operational datastore only.
+
+    $ netconf-console --get-data --db operational -x /interfaces --with-origin
+
+ 3. Retrieve interfaces that have origin "system" in the operational datastore.
+    Typing the following command will show all interfaces that are
+    originated from the system and response will include the origin
+    metadata annotations.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+    --origin-filter=system --with-origin
+
+    Note that if the --origin-filter option is used without the
+    --with-origin option, ConfD will select the interfaces matching
+    the origin filter but will not include the origin metadata annotation.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+    --origin-filter=system
+
+ 4. Retrieve the interfaces that do not have origin "intended".
+    Typing the following command will show all interfaces that do not
+    originate from the intended configuration datastore.
+
+    $ netconf-console --get-data --db operational -x /interfaces
+    --negated-origin-filter=intended

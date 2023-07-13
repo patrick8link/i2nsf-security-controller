@@ -1,0 +1,451 @@
+ConfD Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example demonstrates several usage cases of XPath expression.
+
+The XPath expression often returns one or more nodes, which is called node-set.
+There are functions that operate with node-set like `count`, `last`, etc.
+
+The location of a node(s) is defined using absolute or relative path.
+For relative paths the axis are used to identify elements by their relationship
+(parent, child, self, ...). Some axis have abbreviated syntax.
+E.g. . - (self::node()), .. (parent::node()),(descendant-or-self::node())
+
+Starting and running the Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ 1. Build the necessary files and start ConfD by typing
+
+        $ make clean all start cli-c
+
+ 2. Start the C-style CLI with 'make cli-c' in a different window and try
+    commands
+
+What the Example does
+~~~~~~~~~~~~~~~~~~~~~
+
+Example shows how to use simple and advanced XPath expressions in the YANG
+statements and Tailf specific annotations. In addition, it illustrates what
+means can be used to debug and troubleshoot XPath expressions in ConfD.
+
+The example uses `xpath` and `must` clispec commands borrowed from
+`examples.confd/validate/xpath_must` example.
+
+To debug XPath expression, one can use XPath trace log, which is  enabled in
+`confd.conf` element `/confdConfig/logs/xpathTraceLog`. See `xpath_trace.log`
+file.
+
+Covered XPath expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The YANG data model (`datamodel.yang`) shows how to use XPath expressions in
+yang statements (`must`, `when`, `leafref`, etc.).
+
+In the following text we describe individual expressions and give examples how
+to use and test them.
+
+
+Must statements:
+----------------
+
+1) Simple XPath checking value
+
+must "current() >= 10";
+
+Test:
+device OS123 id 9; top
+commit
+Aborted: 'device OS123 id' (value "9"):
+          the 'must' expression "current() >= 10" failed
+
+no device OS123
+
+2) XPath checking the current leaf is different from the other leaf
+
+must "not(current() =  current()/../id)";
+
+Test:
+rack 11 name R1E weight 11; top
+commit
+Aborted: 'rack 11 weight' (value "11"):
+             the 'must' expression "not(current() = current()/../id)" failed
+
+no rack 11
+
+3) Simple XPath checking if the other leaf is configured.
+
+must "../weight";
+
+Note: It is better to use `when` for this  (see `leaf height-unit`)
+
+Test:
+rack 15 weight-unit lb; top
+commit
+Aborted: 'rack 15 weight-unit' (value "lb"):
+                                        the 'must' expression "../weight" failed
+rack 15 weight 100 weight-unit lb; top
+commit
+Commit complete.
+
+4) Negated XPath checking value, using current() function
+
+must "not(current()/name = \"badval\")";
+
+Test:
+device badval id 23; top
+commit
+Aborted: 'device badval' :
+                   the 'must' expression "not(current()/name = "badval")" failed
+
+no device badval
+
+5) Negated XPath checking value, using contains() and current() functions
+
+must "not(contains(current()/name, \"wrong\"))"
+
+device Diswrong id 23; top
+commit
+Aborted: 'device Diswrong' :
+           the 'must' expression "not(contains(current()/name, "wrong"))" failed
+
+no device Diswrong
+
+6) XPath checking value, using starts-with() and current() functions
+
+must "starts-with(current(), \"Tailf\")"
+
+device D2R2 tailf-descr AB; top
+commit
+Aborted: 'device D2R2 tailf-descr' (value "AB"): Must start with 'Tailf'!
+
+device D2R2 tailf-descr TailfABC; top
+commit
+Commit complete.
+
+7) XPath checking leaf is different from any value in other list instances
+
+must "not(../../rack[weight = current()])";
+
+Test:
+rack 10 weight 11; top
+commit
+rack 11 height 11; top
+commit
+Aborted: 'rack 11 height' (value "11"):
+          the 'must' expression "not(../../rack[weight = current()])" failed
+
+rack 11 height 12; top
+commit
+Commit complete.
+
+8) Advanced XPath checking number of (list) elements is the same as number of
+   other (list) elements
+
+must "count(../device-info) = count(../device/info)";
+
+Test:
+device Da info ai; top
+device Db id 10; top
+device Dc info ci; top
+commit
+device-info ci info c; top
+commit
+Aborted: 'device-info ci' :
+    the 'must' expression "count(../device-info) = count(../device/info)" failed
+
+device-info ai info a; top
+commit
+Commit complete.
+
+9) Advanced XPath ensuring there are max. 2 `admin-status` elements in the whole
+   data model sub-tree
+
+must "count(../rack//*[admin-status = 'UP']) <= 2"
+
+error-message "There must be at maximum 2 devices with admin-status UP!";
+
+(error message text as part of `must` statement)
+
+Test:
+rack 100 device DA1 admin-status UP; top
+rack 100 device DA2 admin-status DOWN; top
+rack 101 backup device DB1 admin-status UP; top
+commit
+rack 101 backup device DB2 admin-status UP; top
+commit
+Aborted: 'rack 101' :
+                        There must be at maximum 2 devices with admin-status UP!
+
+rack 101 backup device DB2 admin-status DOWN; top
+commit
+Commit complete.
+
+When statements:
+----------------
+
+1) Simple XPath checking existence of sibling leaf
+
+when "not(../weight)";
+
+Test:
+rack 12 weight 78 height 20
+syntax error: element does not exist
+
+2) Simple XPath checking existence of sibling leaf, same functionality as
+   previous case, axis function parent::node() is used instead of ..
+
+when "not(parent::node()/height)";
+
+Test:
+rack 13 ?
+Possible completions:
+  backup  device  height  name  rack-type  weight  weight-unit  <cr>
+rack 13 height 100 ?
+Possible completions:
+  backup  device  height-unit  name  rack-type  weight-unit  <cr>
+
+`weight` is missing
+
+3) Nested `when` expressions
+
+when "../id > 100000";
+when "../color = \"yellow\"";
+
+Test:
+
+rack 13
+Possible completions:
+  backup  device  height  name  rack-type  weight  weight-unit  <cr>
+
+rack 130000
+Possible completions:
+  backup  device  extra-config  height  name  rack-type  weight
+                                                               weight-unit  <cr>
+
+rack 130000 extra-config color black ?
+Possible completions:
+  <cr>
+
+rack 130000 extra-config color yellow ?
+Possible completions:
+  shade  <cr>
+
+See `xpath-trace.log` to verify nested when is evaluated only if parent when is
+true.
+
+4) When expression for existence check
+
+when "../device";
+
+Note: this is equivalent with:  when "count(../device) != 0"
+      count is not needed and should be avoided in such cases
+
+no device; top
+commit
+d?
+Possible completions:
+  device
+device D1; top
+d?
+Possible completions:
+  device
+  device-info
+
+tailf:display-when statements:
+------------------------------
+
+1) Simple XPath checking value of sibling leaf
+
+tailf:display-when "../rack-type = \"BIG\"";
+
+Test:
+rack 11 rack-type BIG <tab>
+Possible completions:
+  backup  device  extra-info  height  height-unit  name  weight-unit  <cr>
+
+rack 11 rack-type SMALL <tab>
+Possible completions:
+  backup  device  height  height-unit  name  weight-unit  <cr>
+
+extra-info is not suggested
+
+leafref  statements:
+--------------------
+
+1) Simple XPath referencing elements in the sibling list
+
+path "../../device/info";
+
+Test:
+device Da info a-info ; top
+device Db info b-info ; top
+device-info ?
+Possible completions:
+  a-info  b-info  range
+
+2) Simple XPath referencing elements in the sibling list
+
+path "../../interfaces/name";
+
+Test:
+interfaces eth0; top
+interfaces eth1; top
+service s1 interface ?
+Possible completions:
+  eth0  eth1
+
+3) Advanced XPath using `deref` function that simplifies XPath expression.
+   `deref` function here points to `leafref` element and it returns node that
+   this `leafref` refers to
+
+path "deref(../interface)/../vrf";
+
+Note: Equivalent to this advanced XPath assuring reference can be only to leaf
+vrf which is inside interface of the same name as interface name of the service.
+See how `deref` simplified whole xpath.
+
+path "../../interfaces[name = current()/../interface]/vrf"
+
+Test:
+interfaces eth0 vrf A; top
+interfaces eth1 vrf A; top
+interfaces eth2 vrf B; top
+
+service s1 interface eth0 vrf ?
+Possible completions:
+ A
+
+Debugging and troubleshooting XPath expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+XPath trace log
+---------------
+
+To debug the XPath expressions, one can use XPath trace log.
+To enable it, modify `confd.conf` element `/confdConfig/logs/xpathTraceLog`.
+
+`/confdConfig/logs/xpathTraceLog/enabled` -  "true" or "false"
+`/confdConfig/logs/xpathTraceLog/filename ` - The name of the file where
+                                              the XPath trace log is written.
+
+E.g.:
+
+   <xpathTraceLog>
+      <enabled>true</enabled>
+      <filename>./xpath-trace.log</filename>
+    </xpathTraceLog>
+
+Test:
+device Daa id 9; top
+commit
+Aborted: 'device Daa id' (value "9"):
+                                 the 'must' expression "current() >= 10" failed
+$ cat xpath-trace.log
+2-Jan-2019::15:16:52.977 evaluating: /device[name='Daa']/id: current() >= 10
+22-Jan-2019::15:16:52.977 get_elem(/device[name='Daa']/id) = 9
+22-Jan-2019::15:16:52.977 result: /device[name='Daa']/id: false
+
+device Daa id 11; top
+commit
+Commit complete.
+
+$ cat xpath-trace.log
+22-Jan-2019::15:18:03.867 evaluating: /device[name='Daa']/id: current() >= 10
+22-Jan-2019::15:18:03.867 get_elem(/device[name='Daa']/id) = 11
+22-Jan-2019::15:18:03.867 result: /device[name='Daa']/id: true
+
+
+Evaluation of nested `when` expressions - see case 3) for When statements:
+
+rack 13 ?
+Possible completions:
+  backup  device  height  name  rack-type  weight  weight-unit  <cr>
+
+30-Jan-2019::14:39:02.160 evaluating: /rack[id='13']/extra-config:
+                                                                  ../id > 100000
+30-Jan-2019::14:39:02.160 result: /rack[id='13']/extra-config: false
+
+
+rack 130000
+Possible completions:
+  backup  device  extra-config  height  name  rack-type  weight
+                                                               weight-unit  <cr>
+
+30-Jan-2019::14:39:49.876 evaluating: /rack[id='130000']/extra-config:
+                                                                  ../id > 100000
+30-Jan-2019::14:39:49.877 result: /rack[id='130000']/extra-config: true
+30-Jan-2019::14:39:49.877 evaluating: /rack[id='130000']/extra-config/shade:
+                                                             ../color = "yellow"
+30-Jan-2019::14:39:49.878 get_elem(/rack[id='130000']/extra-config/color)
+                                                                     = not_found
+30-Jan-2019::14:39:49.878 result: /rack[id='130000']/extra-config/shade: false
+
+
+rack 130000 extra-config color black ?
+Possible completions:
+  <cr>
+
+30-Jan-2019::14:40:25.846 evaluating: /rack[id='130000']/extra-config:
+                                                                  ../id > 100000
+30-Jan-2019::14:40:25.847 result: /rack[id='130000']/extra-config: true
+30-Jan-2019::14:40:25.849 evaluating: /rack[id='130000']/extra-config/shade:
+                                                             ../color = "yellow"
+30-Jan-2019::14:40:25.849 get_elem(/rack[id='130000']/extra-config/color)
+                                                                         = black
+30-Jan-2019::14:40:25.850 result: /rack[id='130000']/extra-config/shade: false
+
+rack 130000 extra-config color yellow ?
+Possible completions:
+  shade  <cr>
+
+30-Jan-2019::14:41:00.068 evaluating: /rack[id='130000']/extra-config:
+                                                                  ../id > 100000
+30-Jan-2019::14:41:00.068 result: /rack[id='130000']/extra-config: true
+30-Jan-2019::14:41:00.070 evaluating: /rack[id='130000']/extra-config/shade:
+                                                             ../color = "yellow"
+30-Jan-2019::14:41:00.071 get_elem(/rack[id='130000']/extra-config/color)
+                                                                        = yellow
+30-Jan-2019::14:41:00.071 result: /rack[id='130000']/extra-config/shade: true
+
+
+maapi command with XPath related options (`--xpath` and `--xpath-must`)
+-----------------------------------------------------------------------
+
+Another way to troubleshoot XPath  is to use `--xpath` and
+`--xpath-must` options of `maapi` command.
+
+We use `xpath` and `must` clispec commands borrowed from
+`examples.confd/validate/xpath_must` example. These commands are helper CLI
+commands that use `maapi` command (mentioned above) in CLI. They can be used
+to test and validate XPath expressions. See `xpath.*.cli` files.
+
+Test (newly started application with clean CDB):
+device Dd id 11; top
+commit
+Commit complete.
+
+xpath /device/name
+Dd
+
+xpath /device/id
+11
+
+xpath count(/device)
+1
+
+must "/device/id > 10"
+true
+
+must "/device/id > 100"
+false
+
+Further Reading
+~~~~~~~~~~~~~~~
+
++ ConfD User Guide:
+  Chapter 3. The YANG Data Modeling Language - `must`, `when`, `leafref`
+  tailf_yang_extensions - XPATH Functions
+
++ XPath application note - XPath in NETCONF and YANG
+
++ XPath tutorials

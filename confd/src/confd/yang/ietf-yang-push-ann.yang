@@ -1,0 +1,38 @@
+module ietf-yang-push-ann {
+  namespace "urn:dummy";
+  prefix dummy;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  description
+    "Annotation module for ietf-yang-push.
+
+     Copyright 2020 Cisco Systems, Inc.
+     All rights reserved.
+     Permisson is hereby granted to redistribute this file without
+     modification";
+
+  revision 2023-02-24 {
+    description
+      "Released as part of ConfD-8.0.3 / NSO-6.0.3.
+
+       Annotate module as an internal data provider with tailf:internal-dp.";
+  }
+
+  // These enum values conflict with ietf-yang-patch edit operation
+  tailf:annotate-module 'ietf-yang-push' {
+    tailf:internal-dp;
+    tailf:annotate-statement 'typedef[name="change-type"]' {
+      tailf:annotate-statement 'type' {
+        tailf:annotate-statement 'enum[name="move"]' {
+          tailf:code-name "ypush-move";
+        }
+        tailf:annotate-statement 'enum[name="replace"]' {
+          tailf:code-name "ypush-replace";
+        }
+      }
+    }
+  }
+}

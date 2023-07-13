@@ -244,7 +244,7 @@ const ClickSubmit =async (e) => {
     setPolicyInfosform(temp2)}
 
 
-  const response = await fetch('http://115.145.178.185:5000/high_level', {
+  const response = await fetch('http://172.24.4.120:5000/high_level', {
       method: 'PUT',
       body: JSON.stringify(Policy_infos_form),
       headers: {

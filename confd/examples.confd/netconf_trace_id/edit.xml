@@ -1,0 +1,7 @@
+<servers xmlns="urn:smp"
+    xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <server nc:operation="create">
+    <name>smtp</name>
+    <value>foo</value>
+  </server>
+</servers>

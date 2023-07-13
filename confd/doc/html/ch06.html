@@ -1,0 +1,216 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;6.&nbsp;Datastores</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch05.html" title="Chapter&nbsp;5.&nbsp;The YANG Data Modeling Language"><link rel="next" href="ch07.html" title="Chapter&nbsp;7.&nbsp;Rendering Agents"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;6.&nbsp;Datastores</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch05.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch07.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.datastores"></a>Chapter&nbsp;6.&nbsp;Datastores</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="sect1"><a href="ch06.html#d5e978">6.1. Datastores</a></span></dt></dl></div><div class="sect1"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d5e978"></a>6.1.&nbsp;Datastores</h2></div></div></div><p>
+      ConfD implements the Network Management Datastore Architecture
+      (NMDA) defined in <a class="link" href="http://www.ietf.org/rfc/rfc8342.txt" target="_top"> RFC
+      8342</a>.  A central concept in the NMDA is a
+      <span class="emphasis"><em>datastore</em></span>.  A datastore is a conceptual
+      entity where data can be stored and manipulated.  A
+      <span class="emphasis"><em>configuration datastore</em></span> stores
+      configuration data for the device, and the <span class="emphasis"><em>operational
+      state datastore</em></span> contains all state data.
+    </p><p>
+      Each datastore has a <span class="emphasis"><em>datastore schema</em></span> which
+      is the set of YANG modules supported for the datastore.  All
+      data in the datastore must adhere to the datastore schema.
+    </p><p>
+      ConfD supports the mandatory datastores <code class="sgmltag-element">running</code>,
+      <code class="sgmltag-element">intended</code>, and <code class="sgmltag-element">operational</code>, and the
+      optional datastores <code class="sgmltag-element">startup</code> and <code class="sgmltag-element">candidate</code>.
+    </p><p>
+      The different datastores support a set of capabilities as
+      explained below:
+    </p><div class="variablelist"><dl class="variablelist"><dt><span class="term">running</span></dt><dd><p>
+        The running datastore contains the complete current
+        configuration of the device.
+      </p><p>
+        The schema for running is all config true nodes in all YANG
+        modules.
+      </p><p>
+        The running datastore may include configuration that requires
+        further transformations before it can be applied.
+      </p><p>
+        ConfD supports one such transformation, and that is support
+        for <span class="emphasis"><em>inactive</em></span> nodes.  In running, a node
+        can be marked as inactive.  This means that it is present in
+        running, but not used by the system (which means that they are
+        not present in the intended datastore (see below).
+      </p><p>
+        In ConfD, running can be configured to be in one of the modes
+        <span class="emphasis"><em>read-write</em></span> or
+        <span class="emphasis"><em>writable-through-candidate</em></span>.
+        Writable-through-candidate means that running can only be
+        modified by making changes to the candidate datastore (see
+        below), and by committing these changes to the candidate.
+      </p></dd><dt><span class="term">startup</span></dt><dd><p>
+        The startup datastore is a persistent datastore which the
+        device reads every time it reboots.  The contents of startup
+        are copied into running when the device reboots.  The only way
+        to modify startup is to copy running to startup.
+      </p><p>
+        The schema for startup is all config true nodes in all YANG
+        modules.
+      </p><p>
+        If running is read-write and the device has a startup
+        datastore, a manager can try changes by writing them to
+        running. If things look good, the changes can be made
+        persistent by copying them to startup. This ensures that
+        the device uses the same configuration after reboot.
+      </p></dd><dt><span class="term">candidate</span></dt><dd><p>
+        The candidate datastore is used to hold configuration data
+        that can be manipulated without impacting the current
+        configuration. The candidate configuration is a full
+        configuration data set that serves as a workspace for creating
+        and manipulating configuration data.  Additions, deletions,
+        and changes may be made to this data to construct the desired
+        configuration.
+      </p><p>
+        The schema for candidate is all config true nodes in all YANG
+        modules.
+      </p><p>
+        The candidate datastore can be committed, which means that
+        the device's running configuration is replaced with the contents
+        of the candidate datastore.
+      </p><p>
+        The candidate can be used in two different modes, with
+        different characteristics:
+      </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          It can be modified without first taking a lock on
+          the datastore. If it is modified outside a lock, it is
+          marked as being <span class="emphasis"><em>dirty</em></span>. When the candidate is
+          dirty it means that it is (potentially) different from
+          the running configuration. When it is dirty, a lock
+          cannot be taken. It leaves the dirty state by being
+          committed to running, or by discarding all changes
+          (which effectively resets it to the contents of
+          running).</p></li><li class="listitem"><p>
+          If the candidate is not dirty, and a lock is taken, no
+          one but the owner of the lock can modify the
+          database. If changes are made to the candidate while it
+          is locked, and the owner unlocks it (or closes the CLI,
+          Web UI or NETCONF session), all changes are discarded,
+          and the datastore is unlocked.</p></li></ul></div><p>
+        The candidate can be committed to running with a specified
+        <span class="emphasis"><em>timeout</em></span>. In this case, running is set to the
+        contents of the candidate. If a second commit, called a
+        <span class="emphasis"><em>confirming-commit</em></span>, is given within the timeout,
+        the changes are made permanent. If no confirming-commit is
+        given within the timeout period, running is reverted to
+        the state it had before the first commit.
+      </p></dd><dt><span class="term">intended</span></dt><dd><p>
+        The intended datastore is a read-only configuration datastore
+        that holds the complete configuration that is intended to be
+        used by the device.  It represents the configuration after all
+        configuration transformations to running have been performed
+        and is the configuration that the system attempts to apply.
+      </p><p>
+        The schema for intended is all config true nodes in all YANG
+        modules.
+      </p><p>
+        In ConfD, intended has the same contents as running, but with
+        all inactive nodes removed.
+      </p></dd><dt><span class="term">operational</span></dt><dd><p>
+        The operational state datastore is a read-only datastore that
+        contains all operational state of the device.
+      </p><p>
+        The schema for operational is all config true and all config
+        false nodes in all YANG modules.  It is possible to
+        compile a YANG module to be present in operational, but not
+        present in the configuration datastores.
+      </p><p>
+        Operational state data is typically not kept in a database but
+        read at runtime by instrumentation functions.  This can for
+        example be statistics such as counters and gauges.  In ConfD,
+        operational state data that doesn't change very often can
+        optionally be stored in CDB.
+      </p><p>
+        Configuration data in the operational state datastore have a property
+        <span class="emphasis"><em>origin</em></span> that is used to inform the client
+        where the data comes from, e.g., <span class="emphasis"><em>intended</em></span>
+        if it was configured data, or <span class="emphasis"><em>learned</em></span> if
+        it was learned via protocol interaction with some other system
+        (such as DHCP).
+      </p></dd></dl></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e1044"></a>6.1.1.&nbsp;Datastore Example</h3></div></div></div><p>
+        Suppose we have a very simple datamodel with a list of
+        interfaces.  In running, we have configured eth0, eth1 and
+        eth2, but eth2 is marked as being inactive.  There is no
+        hardware present for eth1, which means it is not present in
+        operational.  Further, the system automatically adds a
+        loopback interface.
+      </p><div class="informalexample"><pre class="screen">
+running
+-------
+eth0
+eth1
+inactive: eth2
+
+intended
+--------
+eth0
+eth1
+
+operational
+-----------
+eth0  origin=intended
+lo0   origin=system
+</pre></div></div><div class="sect2"><div class="titlepage"><div><div><h3 class="title"><a name="d5e1049"></a>6.1.2.&nbsp;Implementation Considerations</h3></div></div></div><p>
+        A project using ConfD must choose a valid combination of
+        datastores to support. Which combination to choose depends on
+        the system resources available on the device, and which
+        characteristics the end-product should have.
+      </p><p>
+        The following is a list of valid combinations:
+      </p><div class="variablelist"><dl class="variablelist"><dt><span class="term">running in read-write mode, no startup, no candidate</span></dt><dd><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              A single, non-volatile datastore is used.
+              </p></li><li class="listitem"><p>
+              Once changes are written to the datastore, they are
+              persistent, and cannot automatically be rolled back.
+              </p></li><li class="listitem"><p>
+              The application needs to react to changes to the
+              database.  If CDB is used, this means that the
+              application must use the subscription mechanism.
+              </p></li></ul></div></dd><dt><span class="term">running in read-write mode and startup</span></dt><dd><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              startup is stored in non-volatile memory, and running in
+              read-write RAM.</p></li><li class="listitem"><p>
+              The application needs to be written in such a way
+              that it reacts to changes to the database.  If CDB is
+              used, this means that the application must use the
+              subscription mechanism.</p></li></ul></div></dd><dt><span class="term">running in writable-through-candidate mode and candidate</span></dt><dd><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              Both running and candidate are stored in non-volatile
+              memory, but the candidate can efficiently be implemented
+              as a diff against running.</p></li><li class="listitem"><p>
+              The application needs to react to changes to the
+              database.  If CDB is used, this means that the
+              application must use the subscription mechanism.</p></li><li class="listitem"><p>In this mode, all changes always go through the
+              candidate, so a client does never have to copy running
+              to candidate in order to not lose any data.
+              </p></li></ul></div></dd><dt><span class="term">running in read-write mode and candidate</span></dt><dd><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+              Both running and candidate are stored in non-volatile
+              memory.</p></li><li class="listitem"><p> NOTE: This combination is NOT
+            RECOMMENDED.  When a manager reconfigures a node that has
+            the candidate and also read-write running, the manager can
+            never know that running is up to date with the candidate
+            and must thus always (logically) copy running to the
+            candidate prior to modifying the candidate.  This
+            introduces unnecessary overhead, and makes automation more
+            complicated.</p></li><li class="listitem"><p>
+              The application needs to react to changes to the
+              database.  If CDB is used, this means that the
+              application must use the subscription mechanism.</p></li><li class="listitem"><p>In this mode, running can be modified
+            without going through the candidate.  This means that a
+            client that wishes to work with the candidate may need to
+            copy running into the candidate, to ensure that no changes
+            to running are lost when the candidate is committed.</p></li></ul></div></dd></dl></div><p>
+        ConfD ensures that running and startup are always consistent,
+        in the sense that the validation constraints defined in the
+        data model hold. The candidate is allowed to be temporarily
+        inconsistent, but if it is committed to running, it must be
+        valid.
+      </p><p>
+        ConfD by default implements the datastores chosen in
+        CDB. However, ConfD can also be configured to use an external
+        database. If an external database is used, this database
+        <span class="emphasis"><em>must</em></span> implement the running and startup
+        datastores if applicable. If the candidate is used, it may be
+        implemented with CDB or as an external database.
+      </p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch05.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;5.&nbsp;The YANG Data Modeling Language&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;7.&nbsp;Rendering Agents</td></tr></table></div></body></html>

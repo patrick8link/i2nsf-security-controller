@@ -1,0 +1,36 @@
+#
+# Copyright 2009 Tail-f Systems AB
+#
+
+# Uncomment or pass on command line to build with external IPC support
+#SUPPORT_EXTERNAL_IPC = yes
+
+CONFD_DIR ?= /usr/local
+
+LIBCONFD  = -L$(CONFD_DIR)/lib -lconfd
+CFLAGS   += -Wall -g -I../ipc_drv -I$(CONFD_DIR)/include
+
+LDFLAGS    += -lpthread
+
+ifeq ($(SUPPORT_EXTERNAL_IPC), yes)
+CFLAGS    += -DEXTERNAL_IPC
+ifeq ($(shell uname -s),Linux)
+LDFLAGS   += -ldl
+endif
+endif
+
+all: confd_cmd confd_load
+
+ietf-origin.h: $(CONFD_DIR)/etc/confd/ietf-origin.fxs
+	$(CONFD_DIR)/bin/confdc --fail-on-warnings --emit-h $@ $<
+
+confd_cmd: confd_cmd.c ietf-origin.h
+	$(CC) -o $@ $< $(CFLAGS) $(LIBCONFD) $(LDFLAGS) -lm
+
+confd_load: confd_load.c
+	$(CC) -o $@ $< $(CFLAGS) $(LIBCONFD) $(LDFLAGS) -lm
+
+clean:
+	rm -f *.o a.out core confd_cmd confd_load
+	rm -rf *.dSYM
+

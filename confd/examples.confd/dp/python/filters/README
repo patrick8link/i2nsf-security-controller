@@ -1,0 +1,10 @@
+Data-provider with server-side filtering example in Python 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example shows how simple server-side filtering can be implemented using
+ConfD Python API. It uses the same data model and the same approach as the
+introductory example #5 (examples.confd/intro/python/5-stats), but adds
+server-side filtering capabilities.
+
+The API in use is almost identical to what is used in the C example in
+examples.confd/dp/filters; see the README file there for more details.

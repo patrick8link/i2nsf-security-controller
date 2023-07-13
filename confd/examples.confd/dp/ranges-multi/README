@@ -1,0 +1,114 @@
+ConfD DP API callback range registration - multiple apps example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example is variant of a "ranges" data provider example. It shows usage of
+confd-lib procedure confd_register_range_data_cb() registering for ranges in
+the single list from multiple applications.
+
+What the Example does
+~~~~~~~~~~~~~~~~~~~~~
+
+Example's YANG model - ranges-multi.yang defines an operational list "nodes".
+List has two keys - enumeration "node-type" and integer "node-id".
+
+There are two data provider daemons registering to the list for a specific
+ranges of list entries:
+
+  - "ranges_eth_app" daemon registers for all the list entries that have a key
+    node-type equal to "ethernet", regardless of the node-id values (can be any)
+
+  - "ranges_others_app" daemon registers for enumeration key equal to "wireless"
+    and adds a default range registration as well - to service all the requests
+    not covered by other range registrations
+
+Except for a dummy data responses to ConfD, both data providers print customized
+messages to a standard output, to demonstrate how different range callbacks are
+invoked by confd-lib when iterating / accessing a list.
+
+To see more details on range registration and how different callbacks print
+customized messages, please dig into the sources of included data providers.
+
+
+Starting the Example
+~~~~~~~~~~~~~~~~~~~~
+
+Similar to other ConfD examples, "make all; make start" command sequence can be
+used to build & start the example environment. The "make start" starts ConfD
+and runs the data providers on foreground:
+
+    $ make start
+    ...
+    # app daemons start in this thread, printing info to standard output!
+    # use preferably another shell session to run e.g. CLI or NETCONF query
+    # towards the running ConfD instance
+    ./build/ranges_eth_app 2>&1  &
+    ./build/ranges_others_app 2>&1  &
+    Eth-App| range registered - ETH
+    Eth-App| entering poll loop
+    Other-App| range registered - WIRELESS
+    Other-App| range registered - DEFAULT
+    Other-App| entering poll loop
+
+
+You can verify registered range callbacks using the "confd --status" command.
+Its output should, include following (or very similar) lines when executed with
+the example daemon already running:
+
+  ...
+  callpoints:
+    id=enum-callpoint path=/ranges-multi:ranges-multi/nodes
+       {ethernet} - {ethernet} daemonId=0 daemonName=./build/ranges_eth_app
+       {wireless} - {wireless} daemonId=1 daemonName=./build/ranges_others_app
+       default       daemonId=1 daemonName=./build/ranges_others_app
+  ...
+
+Main point of interest is how specific data provider callbacks are invoked by
+confd-lib when iterating the list. There are multiple ways to start the request.
+
+Try running ConfD CLI via "make cli", and show data in the examples YANG model:
+
+    admin@dev2> show ranges-multi
+    NODE      NODE
+    TYPE      ID    PAYLOAD
+    -------------------------------------------------
+    ethernet  0     Eth-App-ETH-payload-0-0
+    ethernet  1     Eth-App-ETH-payload-0-1
+    ethernet  3     Eth-App-ETH-payload-0-3
+    ethernet  7     Eth-App-ETH-payload-0-7
+    wireless  11    Other-App-DEFAULT-payload-1-11
+    wireless  47    Other-App-DEFAULT-payload-1-47
+    wireless  93    Other-App-DEFAULT-payload-1-93
+    coaxial   256   Other-App-DEFAULT-payload-3-256
+
+The list iteration invokes a registered callbacks, printing on the output of
+main shell running the DP daemons:
+
+    Eth-App| ETH get_next(-1)
+    Eth-App| ETH get_next(-1)
+    Eth-App| ETH get_elem("payload", 0, 0)
+    Eth-App| ETH get_next(0)
+    Eth-App| ETH get_elem("payload", 0, 1)
+    Eth-App| ETH get_next(1)
+    Eth-App| ETH get_elem("payload", 0, 3)
+    Eth-App| ETH get_next(2)
+    Eth-App| ETH get_elem("payload", 0, 7)
+    Eth-App| ETH get_next(3)
+    Other-App| WIRELESS get_next(-1)
+    Other-App| WIRELESS get_elem("payload", 1, 11)
+    Other-App| WIRELESS get_next(0)
+    Other-App| WIRELESS get_elem("payload", 1, 47)
+    Other-App| WIRELESS get_next(1)
+    Other-App| WIRELESS get_elem("payload", 1, 93)
+    Other-App| WIRELESS get_next(2)
+    Other-App| DEFAULT get_next(-1)
+    Other-App| DEFAULT get_elem("payload", 3 256)
+    Other-App| DEFAULT get_next(0)
+
+Alternate way to invoke data provider is to run "make query" that executes
+NETCONF --get operation towards the running ConfD and the "nodes" list.
+
+
+Further reading
+~~~~~~~~~~~~~~~
+
++ man 3 confd_lib_dp

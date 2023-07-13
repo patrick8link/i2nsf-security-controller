@@ -1,0 +1,114 @@
+module config {
+  namespace "http://tail-f.com/ns/example/config";
+  prefix config;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for Actions in the data model example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-11-27 {
+    description "YANG header information updated";
+  }
+
+  revision 2017-11-17 {
+    description "Initial revision.";
+  }
+
+  container config {
+    container system {
+      leaf sys-name {
+        type string;
+        default tst;
+      }
+      tailf:action reboot {
+        tailf:actionpoint "act-reboot";
+        input {
+        }
+        output {
+        }
+      }
+      tailf:action restart {
+        tailf:actionpoint "act-restart";
+        input {
+          leaf mode {
+            type string;
+            mandatory true;
+          }
+          leaf debug {
+            type empty;
+          }
+          container foo {
+            presence "";
+            leaf debug {
+              type empty;
+            }
+            leaf trace {
+              type string;
+            }
+          }
+        }
+        output {
+          leaf time {
+            type string;
+            mandatory true;
+          }
+        }
+      }
+/* not yet implemented
+      tailf:action abort-test {
+        tailf:actionpoint "act-abort-test";
+        input {
+          leaf mode {
+            type string;
+            mandatory true;
+          }
+        }
+        output {
+        }
+      }
+*/
+    }
+
+    list server {
+      key name;
+      max-elements 64;
+      leaf name {
+        tailf:cli-allow-range;
+        type string;
+      }
+      tailf:action reset {
+        tailf:actionpoint "act-reset";
+        input {
+          leaf when {
+            type string;
+            mandatory true;
+          }
+        }
+        output {
+          leaf time {
+            type string;
+            mandatory true;
+          }
+        }
+      }
+    }
+
+  }
+}

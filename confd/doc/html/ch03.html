@@ -1,0 +1,50 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;3.&nbsp;Unpack ConfD Installer</title><link rel="stylesheet" type="text/css" href="docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="ConfD User Guide"><link rel="up" href="index.html" title="ConfD User Guide"><link rel="prev" href="ch02.html" title="Chapter&nbsp;2.&nbsp;An introduction to ConfD"><link rel="next" href="ch04.html" title="Chapter&nbsp;4.&nbsp;Security issues"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;3.&nbsp;Unpack ConfD Installer</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch04.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="ug.unpack"></a>Chapter&nbsp;3.&nbsp;Unpack ConfD Installer</h1></div></div></div><p>The ConfD installation is delivered with a cryptographic signature to
+  make it possible to verify that the installation has not been altered or
+  corrupted.
+  This can be guaranteed since the signature was created by using a combination
+  of cryptographic hash and public key encryption.
+ </p><p>
+ Unpack of the ConfD Installer, automatically verifies the digital signature.
+ </p><div class="informalexample"><pre class="programlisting">$ <strong class="userinput"><code>sh confd-VERSION.OS.ARCH.signed.bin </code></strong>
+ </pre></div><p>
+  The variables in the command <code class="sgmltag-element">VERSION</code> refers to the ConfD version
+  to install, <code class="sgmltag-element">OS</code> refers to the Operating System (<code class="code">linux</code>
+  for any Linux distribution and <code class="code">darwin</code> for OS X) and
+  <code class="sgmltag-element">ARCH</code> refers to the CPU architecture (<code class="sgmltag-element">x86_64</code>).
+  For Example:</p><div class="informalexample"><pre class="programlisting">$ sh confd-7.6.linux.x86_64.signed.bin</pre></div><p>Once ConfD is unpacked, all the files are unpacked in the current
+  directory.
+  </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+  The ConfD installer <code class="filename">confd-VERSION.OS.ARCH.installer.bin</code>
+  </p></li><li class="listitem"><p>
+  Signature generated for the ConfD image
+  <code class="filename">confd-VERSION.OS.ARCH.installer.bin.signature</code>
+  </p></li><li class="listitem"><p>
+   An enclosed Cisco signed <code class="filename">tailf.cer</code> x.509 end-entity
+   certificate containing public key that is used to verify the signature.
+  </p></li><li class="listitem"><p>
+    <code class="filename">README.signature</code> file which briefs you more details
+    on the unpacked content
+    and the steps on "How to run the signature verification program".
+    If you would like to manually verify the signature, please refer to the
+    steps in this file.
+  </p></li><li class="listitem"><p>
+  <code class="filename">cisco_x509_verify_release.py</code>
+  python2 program that can be used to verify the 3-tier x.509 certificate
+  chain and signature.
+  </p></li><li class="listitem"><p>
+  <code class="filename">cisco_x509_verify_release.py3</code>
+  python3 program that can be used to verify the 3-tier x.509 certificate
+  chain and signature.
+  </p></li></ol></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+    If you observe network connectivity issues that might impact the signature
+    verification,
+  you can unpack the installer by using parameter
+  <code class="option">--skip-verification</code>. For example:
+  </p><div class="informalexample"><pre class="programlisting">
+      $ sh confd-7.6.linux.x86_64.signed.bin --skip-verification
+    </pre></div></div><p>Once the unpack is completed, the ConfD
+  <code class="filename">confd-VERSION.OS.ARCH.installer.bin</code>
+  installation can be performed.
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;2.&nbsp;An introduction to ConfD&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;4.&nbsp;Security issues</td></tr></table></div></body></html>

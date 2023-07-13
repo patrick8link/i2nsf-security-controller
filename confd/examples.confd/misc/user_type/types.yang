@@ -1,0 +1,71 @@
+module types {
+  namespace "http://tail-f.com/ns/example/types";
+  prefix types;
+
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems (a Cisco company)";
+
+  contact "info@tail-f.com";
+
+  description
+    "YANG datamodel for New data types example
+     (C) 2005-2018 Tail-f Systems
+
+     Permission to use this code as a starting point hereby granted
+     This is ConfD Sample Code.
+
+     See the README file for more information";
+
+  revision 2019-02-14 {
+    description "Normalized YANG identifier names.";
+  }
+
+  revision 2018-12-04 {
+    description "YANG header information updated";
+  }
+
+  revision 2009-05-25 {
+    description "Initial revision.";
+  }
+
+  typedef port-type {
+    type string;
+    tailf:info "shelf/slot/port";
+    tailf:typepoint port-type;
+  }
+  typedef ipv4-address-mask {
+    type string;
+    tailf:info "IPv4-address/mask-length";
+    tailf:typepoint ipv4-mask;
+  }
+
+  typedef ipv6-address-mask {
+    type string;
+    tailf:info "IPv6-address/mask-length";
+    tailf:typepoint ipv6-mask;
+  }
+  typedef ip-address-mask {
+    tailf:info "IP-address/mask-length";
+    type union {
+      type ipv4-address-mask;
+      type ipv6-address-mask;
+    }
+  }
+  container system {
+    list port {
+      key name;
+      max-elements 4096;
+      leaf name {
+        type port-type;
+      }
+      leaf ip {
+        type ip-address-mask;
+        mandatory true;
+      }
+    }
+  }
+}

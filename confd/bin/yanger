@@ -1,0 +1,50 @@
+#!/bin/sh
+
+bindir=`dirname $0`
+case $bindir in
+    /*) confddir=`dirname $bindir`;;
+    *)  confddir=`(cd $bindir/..; pwd)`;;
+esac
+
+if [ -d $confddir/confd_dir ]; then
+    confddir=$confddir/confd_dir
+fi
+if [ -d $confddir/lib/confd/lib/confdc/ ]; then
+    # release
+    PATH=$confddir/lib/confd/bin:$PATH
+    export PATH
+    yanger=$confddir/lib/confd/lib/confdc/yanger/bin/yanger
+else
+    # local build
+    libdir=$confddir/../lib
+    ERL_AFLAGS="-pa $libdir/yanger/ebin \
+                    $libdir/msc/ebin \
+                    $libdir/util/ebin \
+                    $libdir/xpath/ebin"
+    export ERL_AFLAGS
+    yanger=$libdir/yanger/bin/yanger
+fi
+
+if [ "x$YANG_MODPATH" != "x" ]; then
+    YANG_MODPATH=$confddir/src/confd/yang:$YANG_MODPATH
+else
+    YANG_MODPATH=$confddir/src/confd/yang
+fi
+export YANG_MODPATH
+
+#
+# If the yanger script is invoked when the YANGER_SCRIPT env.var is set,
+# for example as in:
+#
+#   env YANGER_SCRIPT="confd -E" yanger ....
+#
+# then the YANGER_ARGS will hold the yanger arguments, which will be
+# used when calling the function: yanger:main/0
+#
+if [ -n "$YANGER_SCRIPT" ]; then
+    yanger="$YANGER_SCRIPT"
+    YANGER_ARGS="$@"
+    export YANGER_ARGS
+fi
+
+exec $yanger "$@"

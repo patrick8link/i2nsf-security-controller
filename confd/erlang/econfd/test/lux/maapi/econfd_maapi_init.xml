@@ -1,0 +1,20 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <econfd_maapi xmlns="urn:test:econfd:maapi">
+    <maapi>
+      <persons>
+        <person>
+          <name>Bamse</name>
+          <age>42</age>
+        </person>
+        <person>
+          <name>Farmor</name>
+          <age>84</age>
+        </person>
+        <person>
+          <name>Lille Skutt</name>
+          <age>21</age>
+        </person>
+      </persons>
+    </maapi>
+  </econfd_maapi>
+</config>
