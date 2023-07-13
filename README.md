@@ -66,8 +66,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-![GUI Screen Shot](https://github.com/patrick8link/i2nsf-security-controller/tree/1.1/GUI.png)
+![GUI Screen Shot](https://github.com/patrick8link/i2nsf-security-controller/blob/1.1/GUI.png)
 
 Security Controller is a key component of the I2NSF framework that is responsible for managing and orchestrating the network security functions. It acts as a central entity that receives high-level rule sets and translates them into low-level configurations that can be understood and implemented by the NSFs. It also selects the NSFs that can apply the security requirements by selecting the NSFs with appropriate capabilities.
 
