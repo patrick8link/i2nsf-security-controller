@@ -16,7 +16,7 @@ config.sections()
 
 
 def query_with_file(filename):
-    host = "10.0.0.19"
+    host = {config['DEFAULT']['PrivateDMS']}
 
     with manager.connect(host=host, port=2022, username="admin", password="admin", hostkey_verify=False) as m:
         with open(filename, 'r') as f:
@@ -30,7 +30,7 @@ def query_with_file(filename):
     return data
 
 def query_with_string(capability):
-    host = "10.0.0.19"
+    host = config['DEFAULT']['PrivateDMS']
     with manager.connect(host=host, port=2022, username="admin", password="admin", hostkey_verify=False) as m:
         start_rpc = etree.fromstring(capability)
         c = m.dispatch(rpc_command=start_rpc)

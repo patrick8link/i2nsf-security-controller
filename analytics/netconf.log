@@ -1,6 +1,6 @@
-<INFO> 7-Jul-2023::04:46:15.098 ubuntu confd[118021]: netconf id=14 new ssh session for user "admin" from 10.0.0.28
-<INFO> 7-Jul-2023::04:46:15.230 ubuntu confd[118021]: netconf id=14 got rpc: {urn:ietf:params:xml:ns:netconf:base:1.0}edit-config attrs: message-id="urn:uuid:2b4939e8-fd90-4c9e-9cb5-dd13a6ec0311"
-<INFO> 7-Jul-2023::04:46:15.242 ubuntu confd[118021]: netconf id=14 edit-config target=running attrs: message-id="urn:uuid:2b4939e8-fd90-4c9e-9cb5-dd13a6ec0311"
-<INFO> 7-Jul-2023::04:46:15.660 ubuntu confd[118021]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:2b4939e8-fd90-4c9e-9cb5-dd13a6ec0311"
-<INFO> 7-Jul-2023::04:46:15.764 ubuntu confd[118021]: netconf id=14 close-session attrs: message-id="urn:uuid:9aad769d-2943-4401-ae86-9a7d94e9d9c7"
-<INFO> 7-Jul-2023::04:46:15.766 ubuntu confd[118021]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:9aad769d-2943-4401-ae86-9a7d94e9d9c7"
+<INFO> 13-Jul-2023::05:07:44.339 ubuntu confd[135384]: netconf id=14 new ssh session for user "admin" from 10.0.0.28
+<INFO> 13-Jul-2023::05:07:44.476 ubuntu confd[135384]: netconf id=14 got rpc: {urn:ietf:params:xml:ns:netconf:base:1.0}edit-config attrs: message-id="urn:uuid:49e87dc7-a9ba-4408-b625-c4400ccc05bb"
+<INFO> 13-Jul-2023::05:07:44.493 ubuntu confd[135384]: netconf id=14 edit-config target=running attrs: message-id="urn:uuid:49e87dc7-a9ba-4408-b625-c4400ccc05bb"
+<INFO> 13-Jul-2023::05:07:44.893 ubuntu confd[135384]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:49e87dc7-a9ba-4408-b625-c4400ccc05bb"
+<INFO> 13-Jul-2023::05:07:44.997 ubuntu confd[135384]: netconf id=14 close-session attrs: message-id="urn:uuid:03e17959-8b6f-44b0-af5b-341bf428858c"
+<INFO> 13-Jul-2023::05:07:44.998 ubuntu confd[135384]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:03e17959-8b6f-44b0-af5b-341bf428858c"

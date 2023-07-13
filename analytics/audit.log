@@ -1,6 +1,6 @@
-<INFO> 7-Jul-2023::04:46:15.077 ubuntu confd[118021]: audit user: admin/0 local authentication succeeded via netconf from 10.0.0.28:51218 with ssh, member of groups: admin
-<INFO> 7-Jul-2023::04:46:15.077 ubuntu confd[118021]: audit user: admin/0 logged in via netconf from 10.0.0.28:51218 with ssh using local authentication
-<INFO> 7-Jul-2023::04:46:15.098 ubuntu confd[118021]: audit user: admin/14 assigned to groups: admin
-<INFO> 7-Jul-2023::04:46:15.098 ubuntu confd[118021]: audit user: admin/14 created new session via netconf from 10.0.0.28:51218 with ssh
-<INFO> 7-Jul-2023::04:46:15.765 ubuntu confd[118021]: audit user: admin/14 terminated session (reason: normal)
-<INFO> 7-Jul-2023::04:46:15.773 ubuntu confd[118021]: audit user: admin/0 logged out <local> user
+<INFO> 13-Jul-2023::05:07:44.318 ubuntu confd[135384]: audit user: admin/0 local authentication succeeded via netconf from 10.0.0.28:45918 with ssh, member of groups: admin
+<INFO> 13-Jul-2023::05:07:44.319 ubuntu confd[135384]: audit user: admin/0 logged in via netconf from 10.0.0.28:45918 with ssh using local authentication
+<INFO> 13-Jul-2023::05:07:44.339 ubuntu confd[135384]: audit user: admin/14 assigned to groups: admin
+<INFO> 13-Jul-2023::05:07:44.339 ubuntu confd[135384]: audit user: admin/14 created new session via netconf from 10.0.0.28:45918 with ssh
+<INFO> 13-Jul-2023::05:07:44.998 ubuntu confd[135384]: audit user: admin/14 terminated session (reason: normal)
+<INFO> 13-Jul-2023::05:07:45.009 ubuntu confd[135384]: audit user: admin/0 logged out <local> user

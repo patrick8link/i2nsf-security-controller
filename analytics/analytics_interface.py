@@ -18,6 +18,8 @@ import _confd.cdb as cdb
 import dhcpd_ns
 from ncclient import manager
 
+import pymongo
+
 def duration2secs(duration):
     duration_string = str(duration)
     # Note that this function is not complete, it only handles seconds
@@ -69,7 +71,9 @@ class Subscriber:
             for j in range (0,rules):
                 #cdb.cd(rsock,"rules[{index}]".format(index=j))
                 rule_name = cdb.get(rsock,"/i2nsf-security-policy[{index_i}]/rules[{index_j}]/name".format(index_i=i,index_j=j))
+                nsf_name = cdb.get(rsock,"/i2nsf-security-policy[{index_i}]/nsf-name".format(index_i=i,index_j=j))
                 print(f"rule-name: {rule_name}")
+                print(f"nsf-name: {nsf_name}")
 
                 #CONDITION CHECK
                 if cdb.exists(rsock, "/i2nsf-security-policy[{index_i}]/rules[{index_j}]/condition/ipv4".format(index_i=i,index_j=j)):
@@ -103,46 +107,58 @@ class Subscriber:
                 ingress_action = cdb.get(rsock,"/i2nsf-security-policy[{index_i}]/rules[{index_j}]/action/packet-action/ingress-action".format(index_i=i,index_j=j))
                 print(f"ingress_action: {ingress_action}")
 
+        # GET IP ADDRESS INFO OF THE NSF
+        try:
+            client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+            db = client["nsfDB"]
+            col = db["capabilities"]
+            query = {"nsf-name":f"{nsf_name}"}
+            res = col.find_one(query)
+            print(res["nsf-access-info"]["ip"])
+            print(int(res["nsf-access-info"]["port"]))
 
-        confd = {'address': '10.0.0.5',
-           'netconf_port': 2022,
-           'username': 'admin',
-           'password': 'admin'}
+            confd = {'address': res["nsf-access-info"]["ip"],
+            'netconf_port': int(res["nsf-access-info"]["port"]),
+            'username': 'admin',
+            'password': 'admin'}
 
-        confd_manager = manager.connect(
-            host = confd["address"],
-            port = confd["netconf_port"],
-            username = confd["username"],
-            password = confd["password"],
-            hostkey_verify = False)
+            confd_manager = manager.connect(
+                host = confd["address"],
+                port = confd["netconf_port"],
+                username = confd["username"],
+                password = confd["password"],
+                hostkey_verify = False)
 
-        reconfiguration= f"""
-<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    <i2nsf-security-policy xmlns="urn:ietf:params:xml:ns:yang:ietf-i2nsf-nsf-facing-interface"
-        xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-        <name>{name}</name>
-        <rules>
-            <name>{rule_name}</name>
-            <priority>255</priority>
-            <condition>
-                <ipv4>
-                    <source-ipv4-range>
-                        <start>{start}</start>
-                        <end>{end}</end>
-                    </source-ipv4-range>
-                </ipv4>
-            </condition>
-            <action>
-                <packet-action>
-                    <ingress-action>drop</ingress-action>
-                </packet-action>
-            </action>
-        </rules>
-    </i2nsf-security-policy>
-</nc:config>
-"""
-        confd_reconfiguration = confd_manager.edit_config(target="running",config = reconfiguration)
-        confd_manager.close_session()
+            reconfiguration= f"""
+    <nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <i2nsf-security-policy xmlns="urn:ietf:params:xml:ns:yang:ietf-i2nsf-nsf-facing-interface"
+            xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <name>{name}</name>
+            <rules>
+                <name>{rule_name}</name>
+                <priority>255</priority>
+                <condition>
+                    <ipv4>
+                        <source-ipv4-range>
+                            <start>{start}</start>
+                            <end>{end}</end>
+                        </source-ipv4-range>
+                    </ipv4>
+                </condition>
+                <action>
+                    <packet-action>
+                        <ingress-action>drop</ingress-action>
+                    </packet-action>
+                </action>
+            </rules>
+        </i2nsf-security-policy>
+    </nc:config>
+    """
+            confd_reconfiguration = confd_manager.edit_config(target="running",config = reconfiguration)
+            confd_manager.close_session()
+
+        except:
+            print("An exception occurred")
 
         # default_lease_time = cdb.get(rsock, "/dhcp/default-lease-time")
         # max_lease_time = cdb.get(rsock, "/dhcp/max-lease-time")
