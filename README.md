@@ -87,7 +87,7 @@ _Below is an example of how you can instruct your audience on installing and set
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/patrick8link/i2nsf-security-controller/tree/1.1
+   git clone https://github.com/patrick8link/i2nsf-security-controller/ -b 1.1
    ```
 2. Install confd - For more information access [ConfD Kick Start Guide](https://info.tail-f.com/confd-evaluation-kick-start-guide)
    ```sh
