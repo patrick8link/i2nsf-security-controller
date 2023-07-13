@@ -4,3 +4,15 @@
 <INFO> 13-Jul-2023::05:07:44.893 ubuntu confd[135384]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:49e87dc7-a9ba-4408-b625-c4400ccc05bb"
 <INFO> 13-Jul-2023::05:07:44.997 ubuntu confd[135384]: netconf id=14 close-session attrs: message-id="urn:uuid:03e17959-8b6f-44b0-af5b-341bf428858c"
 <INFO> 13-Jul-2023::05:07:44.998 ubuntu confd[135384]: netconf id=14 sending rpc-reply, attrs: message-id="urn:uuid:03e17959-8b6f-44b0-af5b-341bf428858c"
+<INFO> 13-Jul-2023::07:08:03.434 ubuntu confd[135384]: netconf id=16 new ssh session for user "admin" from 10.0.0.28
+<INFO> 13-Jul-2023::07:08:03.545 ubuntu confd[135384]: netconf id=16 got rpc: {urn:ietf:params:xml:ns:netconf:base:1.0}edit-config attrs: message-id="urn:uuid:33fdfeb5-c95e-4299-8e33-4843b743f6d3"
+<INFO> 13-Jul-2023::07:08:03.552 ubuntu confd[135384]: netconf id=16 edit-config target=running attrs: message-id="urn:uuid:33fdfeb5-c95e-4299-8e33-4843b743f6d3"
+<INFO> 13-Jul-2023::07:08:03.560 ubuntu confd[135384]: netconf id=16 sending rpc-reply, attrs: message-id="urn:uuid:33fdfeb5-c95e-4299-8e33-4843b743f6d3"
+<INFO> 13-Jul-2023::07:08:03.664 ubuntu confd[135384]: netconf id=16 close-session attrs: message-id="urn:uuid:37860fe4-bf39-4fc5-ac39-0c585fedba7b"
+<INFO> 13-Jul-2023::07:08:03.665 ubuntu confd[135384]: netconf id=16 sending rpc-reply, attrs: message-id="urn:uuid:37860fe4-bf39-4fc5-ac39-0c585fedba7b"
+<INFO> 13-Jul-2023::07:15:54.971 ubuntu confd[135384]: netconf id=18 new ssh session for user "admin" from 10.0.0.28
+<INFO> 13-Jul-2023::07:15:55.077 ubuntu confd[135384]: netconf id=18 got rpc: {urn:ietf:params:xml:ns:netconf:base:1.0}edit-config attrs: message-id="urn:uuid:c0892d37-90f3-4761-b77d-0843d6e32fbb"
+<INFO> 13-Jul-2023::07:15:55.083 ubuntu confd[135384]: netconf id=18 edit-config target=running attrs: message-id="urn:uuid:c0892d37-90f3-4761-b77d-0843d6e32fbb"
+<INFO> 13-Jul-2023::07:15:55.094 ubuntu confd[135384]: netconf id=18 sending rpc-reply, attrs: message-id="urn:uuid:c0892d37-90f3-4761-b77d-0843d6e32fbb"
+<INFO> 13-Jul-2023::07:15:55.198 ubuntu confd[135384]: netconf id=18 close-session attrs: message-id="urn:uuid:3fe87d20-6375-4ca2-9f78-64fef6fb7cf4"
+<INFO> 13-Jul-2023::07:15:55.199 ubuntu confd[135384]: netconf id=18 sending rpc-reply, attrs: message-id="urn:uuid:3fe87d20-6375-4ca2-9f78-64fef6fb7cf4"

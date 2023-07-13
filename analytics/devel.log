@@ -24,3 +24,5 @@
 	[]
 <INFO> 13-Jul-2023::05:07:38.660 ubuntu confd[<0.9.0>]: confd Erlang emulator PID: 135384
 <INFO> 13-Jul-2023::05:07:44.519 ubuntu confd[<0.289.0>]: confd Getting delta diff, no alt-name: true
+<INFO> 13-Jul-2023::07:08:03.555 ubuntu confd[<0.331.0>]: confd Getting delta diff, no alt-name: true
+<INFO> 13-Jul-2023::07:15:55.087 ubuntu confd[<0.369.0>]: confd Getting delta diff, no alt-name: true

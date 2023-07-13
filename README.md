@@ -111,7 +111,8 @@ _Below is an example of how you can instruct your audience on installing and set
    ```
 5. Insert initial data to MongoDB
    ```sh
-   python3 API/insertMongoDB.py
+   cd ~/i2nsf-security-controller/API
+   python3 insertMongoDB.py
    ```
 6. Update **controller.ini** with the correct IP addresses
    ```sh
