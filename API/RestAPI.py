@@ -172,32 +172,35 @@ def restInsertConfiguration():
 
     #GET IP ADDRESS OF NSF
     for key,value in result.items():
-      client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-      db = client["nsfDB"]
-      col = db["capabilities"]
+      try:
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+        db = client["nsfDB"]
+        col = db["capabilities"]
 
-      query = {"nsf-name":key}
-      res = col.find_one(query)
-      confd = {'address': res["nsf-access-info"]["ip"],
-          'netconf_port': 2022,
-          'username': 'admin',
-          'password': 'admin'}
+        query = {"nsf-name":key}
+        res = col.find_one(query)
+        confd = {'address': res["nsf-access-info"]["ip"],
+            'netconf_port': 2022,
+            'username': 'admin',
+            'password': 'admin'}
 
-      confd_manager = manager.connect(
-          host = confd["address"],
-          port = confd["netconf_port"],
-          username = confd["username"],
-          password = confd["password"],
-          hostkey_verify = False)
-      
-      configuration = f"""
-<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    {value}
-</nc:config>
-"""
-      confd_configuration = confd_manager.edit_config(target="running",config = configuration)
-      confd_manager.close_session()
-
+        confd_manager = manager.connect(
+            host = confd["address"],
+            port = confd["netconf_port"],
+            username = confd["username"],
+            password = confd["password"],
+            hostkey_verify = False)
+        
+        configuration = f"""
+    <nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+        {value}
+    </nc:config>
+    """
+        confd_configuration = confd_manager.edit_config(target="running",config = configuration)
+        confd_manager.close_session()
+      except:
+        print("Cannot connect to NSF's confd")
+    
     return result
 
 def cleanNullTerms(d):
