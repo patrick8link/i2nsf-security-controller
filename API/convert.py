@@ -8,28 +8,6 @@ Created on Mon May 30 16:09:31 2022
 import i2nsfMongoDB
 from collections import OrderedDict
 
-def convert(highData,db):
-    lowData = OrderedDict()
-    for keys,value in highData.items():
-        lowAttr = i2nsfDB.mapAttr(keys,db)
-        if (i2nsfDB.getUserData(value,db)):
-            name, mac, start_ipv4, end_ipv4, start_ipv6, end_ipv6 = i2nsfDB.getUserData(value,db)
-            if mac:
-                lowData[lowAttr[0][1]] = mac
-            elif start_ipv4 and end_ipv4:
-                lowData[lowAttr[2][1]] = start_ipv4 + " " + end_ipv4
-            elif start_ipv6 and end_ipv6:
-                lowData[lowAttr[4][1]] = start_ipv6 + " " + end_ipv6
-        elif (i2nsfDB.getURLData(value,db)):
-            urlData = i2nsfDB.getURLData(value,db)
-            lowData[lowAttr[2][1]] = []
-            if urlData:
-                for data in urlData:
-                    lowData[lowAttr[2][1]].append(data[1])
-        else:
-            lowData[lowAttr[0][1]] = value
-    return(lowData)
-
 def convertMongo(highData):
     lowData = OrderedDict()
     for keys,value in highData.items():
