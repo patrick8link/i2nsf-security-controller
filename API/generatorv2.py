@@ -6,7 +6,7 @@ Created on Mon May 30 17:25:17 2022
 """
 
 import DFAAPI
-from convert import convert, convertMongo
+from convert import convertMongo
 from bindingNFI4 import ietf_i2nsf_nsf_facing_interface
 #from bindingCFI import ietf_i2nsf_cfi_policy
 from pybind.pyangbind.lib.serialise import pybindIETFXMLEncoder
@@ -301,8 +301,6 @@ def gen(xml):
             else:
                 highData[resInfo[x][4]] = resData[x][0]
             
-    #conv = convert(highData,db)
-    #print("High Data: ",highData)
     convMongo = convertMongo(highData)
     nfi = ietf_i2nsf_nsf_facing_interface()
 
