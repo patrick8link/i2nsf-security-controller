@@ -91,6 +91,7 @@ _Below is an example of how you can instruct your audience on installing and set
    ```
 2. Install confd - For more information access [ConfD Kick Start Guide](https://info.tail-f.com/confd-evaluation-kick-start-guide)
    ```sh
+   sudo apt update
    sudo apt install unzip libxml2-utils python3-pip subversion
    unzip confd-basic-8.0.4.linux.x86_64.zip
    sudo ln -s /usr/bin/python3 /usr/bin/python
